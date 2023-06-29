@@ -1,0 +1,15 @@
+
+TIMETAG 2021/08/12 17:39:00 UTC
+MK3DB_VERSION 1
+. vgosDbMake: Library ID: SgLib-0.7.3 (New Market) released on 25 Jun, 2021
+. vgosDbMake: Driver  ID: vgosDbMake-0.5.3 (Monrovia) released on 08 Jun, 2021
+. vgosDbMake: Host    ID: demi (Hw: x86_64; Sw: 3.10.0-693.21.1.el7.x86_64 version of Linux)
+. vgosDbMake: User    ID: Mike Titus <mike@haystack.mit.edu>, MIT Haystack Observatory
+. vgosDbMake: User command: "vgosDbMake -t vo0357.corr 3758"
+. vgosDbMake: Input data  : "/home/mike//vgosdb/input/3758"
+. selfCheck: the X-band is set as the primary one
+. selfCheck: the record mode has been set to "NChan:32 Rbw:2048.0 Bps:2"
+. selfCheck: skipping the eccentricities set up: incomplete data set 
+. checkChannelSetup: the session is ok
+. selfCheck: the session selfcheck has been completed
+. vgosDbMake: the session VO0357 (20DEC22VG) has been imported from fringes files

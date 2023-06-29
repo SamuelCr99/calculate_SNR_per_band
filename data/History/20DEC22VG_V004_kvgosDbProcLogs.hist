@@ -1,0 +1,77 @@
+
+TIMETAG 2021/08/12 20:06:47 UTC
+MK3DB_VERSION 4
+The cable cal data were reset for selected station(s) GGAO12M, KOKEE12M, MACGO12M, WETTZ13S, RAEGYEB, ISHIOKA
+. vgosDbProcLogs: Library ID: SgLib-0.7.3 (New Market) released on 25 Jun, 2021
+. vgosDbProcLogs: Driver  ID: vgosDbProcLogs-0.5.3 (Ballenger Run) released on 08 Jun, 2021
+. vgosDbProcLogs: Host    ID: demi (Hw: x86_64; Sw: 3.10.0-693.21.1.el7.x86_64 version of Linux)
+. vgosDbProcLogs: User    ID: Daniel Hoak <dhoak@mit.edu>, MIT Haystack Observatory
+. vgosDbProcLogs: User command: "vgosDbProcLogs -zc -s GGAO12M -s KOKEE12M -s MACGO12M -s WETTZ13S -s RAEGYEB -s ISHIOKA -k pcmt 20DEC22VG_V003_iMIT_kall.wrp"
+. vgosDbProcLogs: Input data  : ./20DEC22VG_V003_iMIT_kall.wrp
+. vgosDbProcLogs: the session VO0357 (20DEC22VG) has been imported from vgosDb data set
+. vgosDbProcLogs: the cable cal data were reset for selected station(s) GGAO12M, KOKEE12M, MACGO12M, WETTZ13S, RAEGYEB, ISHIOKA of the session VO0357 (20DEC22VG)
+w readFile: got a duplicate record " Ca CAMBRIDG --------- ---- Cambridge, UK (VLBA)" for the station name "CAMBRIDG" in the ns-codes file [/500/oper/master/ns-codes.txt]
+w readFile: got a duplicate record " Cb CAMBRIDG --------- ---- Cambridge, UK (Ryle)" for the station name "CAMBRIDG" in the ns-codes file [/500/oper/master/ns-codes.txt]
+w readFile: got a duplicate record " Ef EFLSBERG 14209S001 7203 Effelsberg, Germany (originally Mk4, now common EVN usage)" for the station name "EFLSBERG" in the ns-codes file [/500/oper/master/ns-codes.txt]
+w readFile: got a duplicate record " Jv JODRELL2 --------- ---- VLBA, Jodrell Bank, UK" for the station name "JODRELL2" in the ns-codes file [/500/oper/master/ns-codes.txt]
+. importDataFromLogFiles: checking [/500/sessions/2020/vo0357/] directory for station log files
+. importDataFromLogFiles: processing /500/sessions/2020/vo0357/vo0357gs.pcmt.BCD.XY.dat, a PCMT file for GGAO12M station
+w readLogFile: station GGAO12M: no proc record has been found in the log file
+. readLogFile: station GGAO12M: 985 strings of the log file (71K) were read
+. verifyReadings: station GGAO12M: insufficient number (0) of meteo parameters; skipped
+. verifyReadings: station GGAO12M: insufficient number (0) of tsys readings; skipped
+. verifyReadings: station GGAO12M: cannot find any usable cablelong measurements
+w verifyReadings: station GGAO12M: cannot determine the cable calibration sign
+w verifyReadings: no default cable cal list were provided
+. propagateData: station GGAO12M: 983 exact matches of cable calibrations were found
+. importDataFromLogFiles: processing /500/sessions/2020/vo0357/vo0357is.pcmt.BCD.XY.dat, a PCMT file for ISHIOKA station
+w readLogFile: station ISHIOKA: no proc record has been found in the log file
+. readLogFile: station ISHIOKA: 729 strings of the log file (53K) were read
+. verifyReadings: station ISHIOKA: insufficient number (0) of meteo parameters; skipped
+. verifyReadings: station ISHIOKA: insufficient number (0) of tsys readings; skipped
+. verifyReadings: station ISHIOKA: cannot find any usable cablelong measurements
+w verifyReadings: station ISHIOKA: cannot determine the cable calibration sign
+w verifyReadings: no default cable cal list were provided
+. propagateData: station ISHIOKA: 703 exact matches of cable calibrations were found
+. importDataFromLogFiles: processing /500/sessions/2020/vo0357/vo0357k2.pcmt.ABCD.XY.dat, a PCMT file for KOKEE12M station
+w readLogFile: station KOKEE12M: no proc record has been found in the log file
+. readLogFile: station KOKEE12M: 774 strings of the log file (56K) were read
+. verifyReadings: station KOKEE12M: insufficient number (0) of meteo parameters; skipped
+. verifyReadings: station KOKEE12M: insufficient number (0) of tsys readings; skipped
+. verifyReadings: station KOKEE12M: cannot find any usable cablelong measurements
+w verifyReadings: station KOKEE12M: cannot determine the cable calibration sign
+w verifyReadings: no default cable cal list were provided
+. propagateData: station KOKEE12M: 772 exact matches of cable calibrations were found
+. importDataFromLogFiles: processing /500/sessions/2020/vo0357/vo0357mg.pcmt.ABCD.XY.dat, a PCMT file for MACGO12M station
+w readLogFile: station MACGO12M: no proc record has been found in the log file
+. readLogFile: station MACGO12M: 970 strings of the log file (70K) were read
+. verifyReadings: station MACGO12M: insufficient number (0) of meteo parameters; skipped
+. verifyReadings: station MACGO12M: insufficient number (0) of tsys readings; skipped
+. verifyReadings: station MACGO12M: cannot find any usable cablelong measurements
+w verifyReadings: station MACGO12M: cannot determine the cable calibration sign
+w verifyReadings: no default cable cal list were provided
+. propagateData: station MACGO12M: 968 exact matches of cable calibrations were found
+. importDataFromLogFiles: processing /500/sessions/2020/vo0357/vo0357yj.pcmt.CD.XY.dat, a PCMT file for RAEGYEB station
+w readLogFile: station RAEGYEB: no proc record has been found in the log file
+. readLogFile: station RAEGYEB: 736 strings of the log file (53K) were read
+. verifyReadings: station RAEGYEB: insufficient number (0) of meteo parameters; skipped
+. verifyReadings: station RAEGYEB: insufficient number (0) of tsys readings; skipped
+. verifyReadings: station RAEGYEB: cannot find any usable cablelong measurements
+w verifyReadings: station RAEGYEB: cannot determine the cable calibration sign
+w verifyReadings: no default cable cal list were provided
+w cleanCableCalibrations: station RAEGYEB: 3 outliers have been removed
+. propagateData: station RAEGYEB: no cable cal record found for the scan "357-1813" in the log file
+. propagateData: station RAEGYEB: no cable cal record found for the scan "357-1911" in the log file
+. propagateData: station RAEGYEB: no cable cal record found for the scan "358-1120" in the log file
+. propagateData: station RAEGYEB: 731 exact and 3 closest matches of cable calibrations were found
+. importDataFromLogFiles: processing /500/sessions/2020/vo0357/vo0357ws.pcmt.BCD.XY.dat, a PCMT file for WETTZ13S station
+w readLogFile: station WETTZ13S: no proc record has been found in the log file
+. readLogFile: station WETTZ13S: 800 strings of the log file (57K) were read
+. verifyReadings: station WETTZ13S: insufficient number (0) of meteo parameters; skipped
+. verifyReadings: station WETTZ13S: insufficient number (0) of tsys readings; skipped
+. verifyReadings: station WETTZ13S: cannot find any usable cablelong measurements
+w verifyReadings: station WETTZ13S: cannot determine the cable calibration sign
+w verifyReadings: no default cable cal list were provided
+. propagateData: station WETTZ13S: 798 exact matches of cable calibrations were found
+E parseSkdFile: the file /500/sessions/2020/vo0357/vo0357.skd does not exists
+. vgosDbProcLogs: import of data from station log files has been complete

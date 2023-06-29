@@ -1,0 +1,22 @@
+
+TIMETAG 2021/08/12 17:57:07 UTC
+MK3DB_VERSION 2
+CALC11.02 Ver. 2016.12.29  Thu Aug 12 13:57:07 2021      demi
+Calc 11 at MIT  -MT-
+
+TIMETAG 2021/08/12 17:57:20 UTC
+. vgosDbCalc: Library ID: SgLib-0.7.3 (New Market) released on 25 Jun, 2021
+. vgosDbCalc: Driver  ID: vgosDbCalc-0.4.3 (Clarksburg) released on 25 Jun, 2021
+. vgosDbCalc: Host    ID: demi (Hw: x86_64; Sw: 3.10.0-693.21.1.el7.x86_64 version of Linux)
+. vgosDbCalc: User    ID: Mike Titus <mike@haystack.mit.edu>, MIT Haystack Observatory
+. vgosDbCalc: User command: "vgosDbCalc /home/mike/vgosdb/output/2020/20DEC22VG/20DEC22VG_V001_iMIT_kall.wrp"
+. vgosDbCalc: Input data  : /home/mike/vgosdb/output/2020/20DEC22VG/20DEC22VG_V001_iMIT_kall.wrp
+. vgosDbCalc: External a priori setup: 
+. vgosDbCalc: SITES    : /500/oper/solve_apriori_files/blokq.c11.dat
+. vgosDbCalc: Sources  : /500/oper/solve_apriori_files/blokq.c11.dat
+. vgosDbCalc: Ocean    : /500/oper/solve_apriori_files/blokq.c11.dat
+. vgosDbCalc: EOPs     : /500/oper/solve_apriori_files/usno_finals.erp
+. vgosDbCalc: Tilts    : /500/oper/solve_apriori_files/tilt.dat
+. vgosDbCalc: OPTL     : /500/oper/solve_apriori_files/blokq.c11.dat
+. vgosDbCalc: running observations through CALC has been complete
+. putDataIntoVgosDb: no clock break information were added to the vgosDb data tree
