@@ -1,6 +1,36 @@
 import math
+import sys
+from math import sin, cos, radians
+
+def ElAz_to_HAdec2(el,az,lat,lon):
+    dec = math.asin(math.sin(lat)*math.sin(el) + math.cos(lat)*math.cos(el)*math.cos(az))
+
+    #HA1 = math.asin((-math.cos(el)*math.sin(az))/math.cos(dec))
+    HA1 = math.acos(-(sin(el)*cos(lat)*cos(lon) - cos(el)*cos(az)*sin(lat)*cos(lon) - cos(el)*sin(az)*sin(lon))/cos(dec))
+    HA2 = -HA1
+    if HA2 > math.pi:
+        HA2 -= 2*math.pi
+    if HA2 < -math.pi:
+        HA2 += 2*math.pi
+
+    HA = [HA1,HA2]
+
+    #f = lambda h: abs(math.cos(lat)*math.sin(el) - math.sin(lat)*math.cos(el)*math.cos(az) - math.cos(dec)*math.cos(h))
+    f = lambda h: sin(el)*cos(lat)*sin(lon) - cos(el)*cos(az)*sin(lat)*sin(lon) - cos(el)*sin(az)*cos(lon) - cos(dec)*sin(h)
+
+    a = [f(HA1),f(HA2)]
+    i  = a.index(min(a))
+
+    return math.degrees(HA[i]),math.degrees(dec)
 
 def ElAz_to_HAdec(el,az,lat):
+    # print(f'elevation: {el}')
+    # print(f'azimuth: {az}')
+    # print(f'latitude: {lat}')
+
+    # el = math.radians(el)
+    # az = math.radians(az)
+
     dec = math.asin(math.sin(lat)*math.sin(el) + math.cos(lat)*math.cos(el)*math.cos(az))
 
     #HA1 = math.asin((-math.cos(el)*math.sin(az))/math.cos(dec))
@@ -74,27 +104,16 @@ def baseline_direction(lat1,lon1,lat2,lon2):
         dy = -dy
         dz = -dz
     
-    _,theta,phi = to_spherical(dx,dy,dz)
+    return dx,dy,dz
 
-    HA = phi
-    dec = math.pi/2 - theta
-
-    return HA,dec
-
-def to_uv(something):
-    # First, get all of these nice variables
-    D_lambda = 0
-    lat1 = 0
-    lon1 = 0
-    lat2 = 0
-    lon2 = 0
-    el = 0
-    az = 0
-
-    h,d = baseline_direction(lat1,lon1,lat2,lon2)
+def to_uv(lon1,lat1,lon2,lat2,el,az):
+    X,Y,Z = baseline_direction(lat1,lon1,lat2,lon2)
     H,delta = ElAz_to_HAdec(el,az,lat1)
 
-    u = D_lambda*math.cos(d)*math.sin(H-h)
-    v = D_lambda*(math.sin(d)*math.cos(delta)-math.cos(d)*math.sin(delta)*math.cos(H-h))
+    u = X*sin(H) + Y*cos(H)
+    v = -X*cos(H) + Y*sin(H) + Z/math.tan(delta)
 
     return u,v
+
+if __name__ == '__main__':
+    to_uv(radians(-76.83), radians(39.02), radians(140.22), radians(36.21), 0.873, 6.202)
