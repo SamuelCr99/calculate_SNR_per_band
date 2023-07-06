@@ -1,116 +1,50 @@
-import math
-import sys
-from math import sin, cos, radians
+from math import sin, cos, radians, asin, acos, pi
 
 def ElAz_to_RAdec(el,az,lat,lon):
-    dec = math.asin(math.sin(lat)*math.sin(el) + math.cos(lat)*math.cos(el)*math.cos(az))
+    dec = asin(sin(lat)*sin(el) + cos(lat)*cos(el)*cos(az))
 
-    #HA1 = math.asin((-math.cos(el)*math.sin(az))/math.cos(dec))
-    HA1 = math.acos(-(sin(el)*cos(lat)*cos(lon) - cos(el)*cos(az)*sin(lat)*cos(lon) - cos(el)*sin(az)*sin(lon))/cos(dec))
-    HA2 = -HA1
-    if HA2 > math.pi:
-        HA2 -= 2*math.pi
-    if HA2 < -math.pi:
-        HA2 += 2*math.pi
-
+    HA1 = acos(-(sin(el)*cos(lat)*cos(lon) - cos(el)*cos(az)*sin(lat)*cos(lon) - cos(el)*sin(az)*sin(lon))/cos(dec))
+    HA2 = 2*pi-HA1
     HA = [HA1,HA2]
 
-    #f = lambda h: abs(math.cos(lat)*math.sin(el) - math.sin(lat)*math.cos(el)*math.cos(az) - math.cos(dec)*math.cos(h))
-    f = lambda h: sin(el)*cos(lat)*sin(lon) - cos(el)*cos(az)*sin(lat)*sin(lon) - cos(el)*sin(az)*cos(lon) - cos(dec)*sin(h)
+    f = lambda h: abs(sin(el)*cos(lat)*sin(lon) - cos(el)*cos(az)*sin(lat)*sin(lon) - cos(el)*sin(az)*cos(lon) - cos(dec)*sin(h))
 
     a = [f(HA1),f(HA2)]
     i  = a.index(min(a))
 
-    return math.degrees(HA[i]),math.degrees(dec)
+    return HA[i],dec
 
 def ElAz_to_HAdec(el,az,lat):
-    # print(f'elevation: {el}')
-    # print(f'azimuth: {az}')
-    # print(f'latitude: {lat}')
+    dec = asin(sin(lat)*sin(el) + cos(lat)*cos(el)*cos(az))
 
-    # el = math.radians(el)
-    # az = math.radians(az)
-
-    dec = math.asin(math.sin(lat)*math.sin(el) + math.cos(lat)*math.cos(el)*math.cos(az))
-
-    HA1 = math.acos((math.cos(lat)*math.sin(el) - math.sin(lat)*math.cos(el)*math.cos(az))/ math.cos(dec))
-    HA2 = -HA1
-    if HA2 > math.pi:
-        HA2 -= 2*math.pi
-    if HA2 < -math.pi:
-        HA2 += 2*math.pi
-
+    HA1 = acos((cos(lat)*sin(el) - sin(lat)*cos(el)*cos(az))/cos(dec))
+    HA2 = 2*pi-HA1
     HA = [HA1,HA2]
 
-    f = lambda h: abs(-math.cos(el)*math.sin(az)-math.cos(dec)*math.sin(h))
+    f = lambda h: abs(-cos(el)*sin(az)-cos(dec)*sin(h))
 
     a = [f(HA1),f(HA2)]
     i  = a.index(min(a))
 
     return HA[i], dec
-    
 
-def to_spherical(x,y,z):
-    # Turns cartesian coordinates to spherical. Theta goes from 0 to pi and
-    # phi goes from -pi to pi
-    if z == 0:
-        theta = math.pi/2
-    else:
-        theta = math.atan(math.sqrt(x**2+y**2)/abs(z))
-        if z < 0:
-            theta = math.pi - theta
-    if x == 0:
-        if y > 0:
-            phi = math.pi/2
-        else:
-            phi = -math.pi/2
-    else:
-        phi = math.atan(y/x)
-        if x < 0:
-            phi += math.pi
-    
-    while theta < 0:
-        theta += 2*math.pi
-    while theta > math.pi:
-        theta -= 2*math.pi
-    while phi < -math.pi:
-        phi += 2*math.pi
-    while phi > math.pi:
-        phi -= 2*math.pi
-    
-    r = math.sqrt(x**2+y**2+z**2)
-
-    return r,theta,phi
-
-def to_cartesian(r,theta,phi):
-    x = r*math.sin(theta)*math.cos(phi)
-    y = r*math.sin(theta)*math.sin(phi)
-    z = r*math.cos(theta)
-    return x,y,z
-
-def baseline_direction(lat1,lon1,lat2,lon2):
-
-    x1,y1,z1 = to_cartesian(1,math.pi/2-lat1,lon1)
-    x2,y2,z2 = to_cartesian(1,math.pi/2-lat2,lon2)
-
-    dx = x2-x1
-    dy = y2-y1
-    dz = z2-z1
-
-    if dz < 0:
-        dx = -dx
-        dy = -dy
-        dz = -dz
-    
-    return dx,dy,dz
-
-def to_uv(lon,lat,X,Y,Z,el,az,freq):
+def to_uv(lon,lat,X1,Y1,Z1,X2,Y2,Z2,el,az,freq):
     omega = 299792458/freq
-    X,Y,Z = X/omega, Y/omega, Z/omega
-    RA,dec = ElAz_to_RAdec(el,az,lat,lon)
+    X1,Y1,Z1,X2,Y2,Z2 = X1/omega,Y1/omega,Z1/omega,X2/omega,Y2/omega,Z2/omega
 
-    u = X*sin(RA) + Y*cos(RA)
+    X = X1-X2
+    Y = Y1-Y2
+    Z = Z1-Z2
+    
+    RA,dec = ElAz_to_RAdec(el,az,lat,lon)
+    # HA,dec = ElAz_to_HAdec(el,az,lat)
+    # RA = HA + lon
+
+    u = -X*sin(RA) - Y*cos(RA)
     v = X*sin(dec)*cos(RA) - Y*sin(dec)*sin(RA) + Z*cos(dec)
+
+    print(dec)
+    print(RA)
 
     return u,v
 

@@ -29,6 +29,7 @@ def dump(dir, remove_information):
     baseline_info = nc.Dataset(f'{dir}Observables/Baseline.nc')
 
     chanamp = np.ma.getdata(channelinfo['ChanAmpPhase'])
+    freq = np.ma.getdata(channelinfo['ChannelFreq']).tolist()
     snr = np.ma.getdata(snr_info['SNR'])
     timeutc = np.ma.getdata(timeutc_info['YMDHM'])
     second = np.ma.getdata(timeutc_info['Second'])
@@ -56,18 +57,22 @@ TIMETAG: {now.strftime('%Y/%m/%d %H:%M:%S')} UTC
         cosines = list(map(lambda a,p: a*math.cos(math.radians(p)),amp,phase))
         sines = list(map(lambda a,p: a*math.sin(math.radians(p)),amp,phase))
 
-        T = math.sqrt(pow(sum(cosines),2)+pow(sum(sines),2))
-        A = math.sqrt(pow(sum(cosines[0:8]),2)+pow(sum(sines[0:8]),2))
-        B = math.sqrt(pow(sum(cosines[8:16]),2)+pow(sum(sines[8:16]),2))
-        C = math.sqrt(pow(sum(cosines[16:24]),2)+pow(sum(sines[16:24]),2))
-        D = math.sqrt(pow(sum(cosines[24:32]),2)+pow(sum(sines[24:32]),2))
+        frequencies = freq[i]
 
         # Count the number of data points in each channel which don't equal 0
         M = len(list(filter(lambda x: x != 0, amp)))
-        N_A = len(list(filter(lambda x: x != 0, amp[0:8])))
-        N_B = len(list(filter(lambda x: x != 0, amp[8:16])))
-        N_C = len(list(filter(lambda x: x != 0, amp[16:24])))
-        N_D = len(list(filter(lambda x: x != 0, amp[24:32])))
+        N_A = len(list(filter(lambda f: f>0 and f<4500,frequencies)))
+        N_B = len(list(filter(lambda f: f>4500 and f<6000,frequencies)))
+        N_C = len(list(filter(lambda f: f>6000 and f<8000,frequencies)))
+        N_D = len(list(filter(lambda f: f>8000,frequencies)))
+
+        T = math.sqrt(pow(sum(cosines),2)+pow(sum(sines),2))
+        A = math.sqrt(pow(sum(cosines[0:N_A]),2)+pow(sum(sines[0:N_A]),2))
+        B = math.sqrt(pow(sum(cosines[N_A:N_A+N_B]),2)+pow(sum(sines[N_A:N_A+N_B]),2))
+        C = math.sqrt(pow(sum(cosines[N_A+N_B:N_A+N_B+N_C]),2)+pow(sum(sines[N_A+N_B:N_A+N_B+N_C]),2))
+        D = math.sqrt(pow(sum(cosines[N_A+N_B+N_C:M]),2)+pow(sum(sines[N_A+N_B+N_C:M]),2))
+
+        
 
         A_SNR = str(A/T*snr[i]*math.sqrt(M/N_A))
         B_SNR = str(B/T*snr[i]*math.sqrt(M/N_B))
@@ -83,7 +88,7 @@ TIMETAG: {now.strftime('%Y/%m/%d %H:%M:%S')} UTC
         line = " \t".join([t,sec,s,b,A_SNR,B_SNR,C_SNR,D_SNR])
         lines.append(line)
 
-    with open('dump.txt', 'w') as f:
+    with open('dump2.txt', 'w') as f:
         f.write('\n'.join(lines))
 
 

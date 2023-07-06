@@ -1,6 +1,7 @@
 import netCDF4 as nc
 import pandas as pd
 import numpy as np
+from statistics import mean
 
 def bytes_to_string(bytes):
     string = ""
@@ -19,7 +20,9 @@ def find_datapoints(dir):
     # time, source, station1, station2, el1, az1, el2, az2
     baseline_ds = nc.Dataset(f'{dir}Observables/Baseline.nc')
     timeutc_ds = nc.Dataset(f'{dir}Observables/TimeUTC.nc')
-    source_ds = nc. Dataset(f'{dir}Observables/Source.nc')
+    source_ds = nc.Dataset(f'{dir}Observables/Source.nc')
+    channel_freq_ds = nc.Dataset(f'{dir}Observables/ChannelInfo_bX.nc')
+    ref_freq_ds = nc.Dataset(f'{dir}Observables/RefFreq_bX.nc')
 
     source = []
     for elem in np.ma.getdata(source_ds["Source"]).tolist():
@@ -35,6 +38,19 @@ def find_datapoints(dir):
     for elem in np.ma.getdata(baseline_ds["Baseline"]).tolist():
         stat1.append(bytes_to_string(elem[0]).replace(" ",""))
         stat2.append(bytes_to_string(elem[1]).replace(" ",""))
+    A_freq = []
+    B_freq = []
+    C_freq = []
+    D_freq = []
+    for frequencies in np.ma.getdata(channel_freq_ds["ChannelFreq"]).tolist():
+        A_freq.append(mean(list(filter(lambda f: f>0 and f<4500,frequencies))))
+        B_freq.append(mean(list(filter(lambda f: f>4500 and f<6000,frequencies))))
+        C_freq.append(mean(list(filter(lambda f: f>6000 and f<8000,frequencies))))
+        D_freq.append(mean(list(filter(lambda f: f>8000,frequencies))))
+
+    tot_freq = []
+    tot_freq.append(ref_freq_ds["RefFreq"][0])
+    tot_freq *= len(time)
 
     stations = pd.read_csv(f'{dir}stations.csv')
 
@@ -80,7 +96,13 @@ def find_datapoints(dir):
                        "El1": El1,
                        "Az1": Az1,
                        "El2": El2,
-                       "Az2": Az2})
+                       "Az2": Az2,
+                       "A_freq": A_freq,
+                       "B_freq": B_freq,
+                       "C_freq": C_freq,
+                       "D_freq": D_freq,
+                       "tot_freq": tot_freq})
+
     
     df.to_csv(f"{dir}datapoints.csv",index=False)
 
@@ -102,6 +124,7 @@ def find_stations(dir):
             lat.append(matching_row['Lat'].iloc[0])
 
 
+    print(lon)
     df = pd.DataFrame(columns=['name', 'x', 'y', 'z', 'lat', 'lon'])
     df['name'] = stations
     df['name'] = df['name'].str.replace(' ', '')
@@ -118,4 +141,4 @@ def find_stations(dir):
 
 if __name__ == '__main__':
     find_stations('data/')
-    # find_datapoints("data/")
+    find_datapoints("data/")
