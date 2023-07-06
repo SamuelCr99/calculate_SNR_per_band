@@ -1,6 +1,7 @@
 import pandas as pd
 import math
 import netCDF4 as nc
+import numpy as np
 from to_uv import to_uv
 
 
@@ -28,6 +29,8 @@ matching_rows.reset_index(drop=True, inplace=True)
 
 ggao12mDS = nc.Dataset('data/GGAO12M/AzEl_V001.nc', 'r')
 ggao12mTimeDS = nc.Dataset('data/GGAO12M/TimeUTC.nc', 'r')
+uv_data = nc.Dataset(f'data/ObsDerived/UVFperAsec_bX.nc', 'r')
+uv_mes = np.ma.getdata(uv_data['UVFperAsec'])
 
 lines_to_write = ['u,v']
 
@@ -35,9 +38,7 @@ for _, row in matching_rows.iterrows():
     for i in range(len(ggao12mTimeDS['YMDHM'])):
         time_stamp = ggao12mTimeDS['YMDHM'][i]
         if compare_time(row['YMDHM'], time_stamp, row['SECOND'], ggao12mTimeDS['Second'][i]):
-            el = ggao12mDS['ElTheo'][i][0]
-            az = ggao12mDS['AzTheo'][i][0]
-            u, v = to_uv(math.radians(39.02), math.radians(-76.83), math.radians(36.21), math.radians(140.22) ,el, az)
+            u, v = uv_mes[i][0]*206264.81, uv_mes[i][1]*206264.81
             lines_to_write.append(f'{u},{v}')
 
 with open('ggao12m_baseline_match.txt', 'w') as f:
