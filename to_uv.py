@@ -2,7 +2,7 @@ import math
 import sys
 from math import sin, cos, radians
 
-def ElAz_to_HAdec2(el,az,lat,lon):
+def ElAz_to_RAdec(el,az,lat,lon):
     dec = math.asin(math.sin(lat)*math.sin(el) + math.cos(lat)*math.cos(el)*math.cos(az))
 
     #HA1 = math.asin((-math.cos(el)*math.sin(az))/math.cos(dec))
@@ -104,12 +104,13 @@ def baseline_direction(lat1,lon1,lat2,lon2):
     
     return dx,dy,dz
 
-def to_uv(lon1,lat1,lon2,lat2,el,az):
-    X,Y,Z = baseline_direction(lat1,lon1,lat2,lon2)
-    H,delta = ElAz_to_HAdec(el,az,lat1)
+def to_uv(lon,lat,X,Y,Z,el,az,freq):
+    omega = 299792458/freq
+    X,Y,Z = X/omega, Y/omega, Z/omega
+    RA,dec = ElAz_to_RAdec(el,az,lat,lon)
 
-    u = X*sin(H) + Y*cos(H)
-    v = -X*cos(H) + Y*sin(H) + Z/math.tan(delta)
+    u = X*sin(RA) + Y*cos(RA)
+    v = X*sin(dec)*cos(RA) - Y*sin(dec)*sin(RA) + Z*cos(dec)
 
     return u,v
 

@@ -90,8 +90,17 @@ def find_stations(dir):
     stations = []
     station_xyz = xyz['AprioriStationXYZ'][:]
     stations = list(xyz['AprioriStationList'][:].astype(str))
+
+    lonlatDF = pd.read_csv('position.cat', delim_whitespace=True)
+    lon = []
+    lat = []
     for i, _ in enumerate(stations):
-        stations[i] = ''.join(stations[i])
+        stations[i] = ''.join(stations[i]).strip()
+        matching_row = lonlatDF[lonlatDF["Name"] == stations[i]]
+        if len(matching_row) > 0:
+            lon.append(matching_row['Lon'].iloc[0])
+            lat.append(matching_row['Lat'].iloc[0])
+
 
     df = pd.DataFrame(columns=['name', 'x', 'y', 'z', 'lat', 'lon'])
     df['name'] = stations
@@ -99,6 +108,8 @@ def find_stations(dir):
     df['x'] = station_xyz[:,0]
     df['y'] = station_xyz[:,1]
     df['z'] = station_xyz[:,2]
+    df['lat'] = lat
+    df['lon'] = lon
 
     with open(f'{dir}stations.csv', 'w') as f:
         f.write(df.to_csv(index=False))
@@ -107,4 +118,4 @@ def find_stations(dir):
 
 if __name__ == '__main__':
     find_stations('data/')
-    find_datapoints("data/")
+    # find_datapoints("data/")
