@@ -33,7 +33,6 @@ def ElAz_to_HAdec(el,az,lat):
 
     dec = math.asin(math.sin(lat)*math.sin(el) + math.cos(lat)*math.cos(el)*math.cos(az))
 
-    #HA1 = math.asin((-math.cos(el)*math.sin(az))/math.cos(dec))
     HA1 = math.acos((math.cos(lat)*math.sin(el) - math.sin(lat)*math.cos(el)*math.cos(az))/ math.cos(dec))
     HA2 = -HA1
     if HA2 > math.pi:
@@ -43,13 +42,12 @@ def ElAz_to_HAdec(el,az,lat):
 
     HA = [HA1,HA2]
 
-    #f = lambda h: abs(math.cos(lat)*math.sin(el) - math.sin(lat)*math.cos(el)*math.cos(az) - math.cos(dec)*math.cos(h))
-    f = lambda h: -math.cos(el)*math.sin(az)-math.cos(dec)*math.sin(h)
+    f = lambda h: abs(-math.cos(el)*math.sin(az)-math.cos(dec)*math.sin(h))
 
     a = [f(HA1),f(HA2)]
     i  = a.index(min(a))
 
-    return math.degrees(HA[i]),math.degrees(dec)
+    return HA[i], dec
     
 
 def to_spherical(x,y,z):
