@@ -10,12 +10,14 @@ BAND_B_C_LIM = 6000
 BAND_C_D_LIM = 8000
 
 def bytes_to_string(bytes):
+    # Converts a list of byte characters to a string
     string = ""
     for byte in bytes:
         string += byte.decode("utf-8")
     return string
 
 def time_to_string(time):
+    # Converts YMDHM time list to a nicely formatted string
     h = time[3]
     m = time[4]
     if h<10: h = f"0{h}"
@@ -23,6 +25,22 @@ def time_to_string(time):
     return f"{time[0]}/{time[1]}/{time[2]}-{h}:{m}"
 
 def find_datapoints(dir):
+    """
+    Finds all information about all observations
+
+    It finds the time, seconds, source, stations in the baseline, elevation and
+    azimuth for both stations, the frequency of each band (A, B, C & D) and the
+    total frequency, the SNR for each band and the total SNR, the bandwidth for
+    each band and the integration time of the observation. It saves this to a
+    CSV file.
+
+    Parameter:
+    dir(string): The source directory
+
+    Returns:
+    No return values!
+    """
+
     # Import datasets
     baseline_ds = nc.Dataset(f'{dir}Observables/Baseline.nc')
     timeutc_ds = nc.Dataset(f'{dir}Observables/TimeUTC.nc')
@@ -175,6 +193,18 @@ def find_datapoints(dir):
 
 
 def find_stations(dir):
+    """
+    Finds stations, their coordinates and their SEFD
+
+    Combines two lists, one with coordinates and one with SEFD, matching on
+    station name. Saves to a CSV file.
+
+    Parameter:
+    dir(string): The source directory
+
+    Returns:
+    No return values!
+    """
 
     station_sefds = pd.read_csv('data/equip.cat', delim_whitespace=True)[['Antenna', 'X_SEFD', 'S_SEFD']]
     station_locations = pd.read_csv('data/position.cat', delim_whitespace=True)[['Name','X', 'Y', 'Z', 'Lat','Lon']]

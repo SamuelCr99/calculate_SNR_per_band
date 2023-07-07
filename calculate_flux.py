@@ -3,12 +3,22 @@ from math import sqrt
 
 
 def calculate_flux(index):
-    # This can be changed to return 8 values at once
+    """
+    Calculates the flux of a source at a given index in the data/datapoints.csv file.
+
+    Pramaeters:
+    index (int): The index of the source in the data/datapoints.csv file.
+
+    Returns:
+    list[float]: A list of the calculated fluxes for each band for the source at the given index.
+
+    """
+
     general_data = pd.read_csv('data/datapoints.csv')
     station_data = pd.read_csv('data/stations.csv')
 
     int_time = general_data.int_time.iloc[index]
-    C = 1#general_data.C.iloc[index]
+    C = 1 # Currently assume C is always equal to 1
 
     stat1 = general_data.Station1.iloc[index]
     stat2 = general_data.Station2.iloc[index]

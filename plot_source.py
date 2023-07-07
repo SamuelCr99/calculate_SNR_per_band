@@ -8,6 +8,18 @@ from calculate_flux import calculate_flux
 import random
 
 def plot_source(source,baseline):
+    """
+    Plots uv coordinates of a source at a given baseline.
+
+    Parameters:
+    source(string): The source to plot
+    baseline(string): Baseline to observe the source at
+
+    Returns:
+    No return values!
+    """    
+
+
     ref_freq = np.ma.getdata(nc.Dataset(f'data/Observables/RefFreq_bX.nc', 'r')["RefFreq"]).tolist()[0]
     uv_data = np.ma.getdata(nc.Dataset(f'data/ObsDerived/UVFperAsec_bX.nc', 'r')['UVFperAsec']).tolist()
     data = pd.read_csv("data/datapoints.csv")
