@@ -13,7 +13,7 @@ stations = pd.read_csv("data/stations.csv")
 i = 0
 data = all_data.iloc[i]
 
-ref_freq = np.ma.getdata(ref_freq_ds["RefFreq"]).tolist()[i]
+ref_freq = np.ma.getdata(ref_freq_ds["RefFreq"]).tolist()[0]
 el = data.El1
 az = data.Az1
 A_freq = data.A_freq
