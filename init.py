@@ -119,10 +119,10 @@ def find_datapoints(dir):
         sines = list(map(lambda a,p: a*math.sin(math.radians(p)),amp,phase))
 
         # Count the number of data points in each channel which don't equal 0
-        N_A = len(A_channels)
-        N_B = len(B_channels)
-        N_C = len(C_channels)
-        N_D = len(D_channels)
+        N_A = len(A_channels[i])
+        N_B = len(B_channels[i])
+        N_C = len(C_channels[i])
+        N_D = len(D_channels[i])
         M = N_A + N_B + N_C + N_D
 
         T = math.sqrt(pow(sum(cosines),2)+pow(sum(sines),2))

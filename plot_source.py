@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from find_station_baseline_match import find_station_baseline_match
+from find_index import find_index_of_source_baseline, find_index_of_source
 from to_uv import convert_uv
 import pandas as pd
 import netCDF4 as nc
@@ -12,7 +12,8 @@ def plot_source(source,baseline):
     uv_data = np.ma.getdata(nc.Dataset(f'data/ObsDerived/UVFperAsec_bX.nc', 'r')['UVFperAsec']).tolist()
     data = pd.read_csv("data/datapoints.csv")
 
-    baseline_matches = find_station_baseline_match(source,baseline)
+    baseline_matches = find_index_of_source_baseline(source,baseline)
+    baseline_matches = find_index_of_source(source)
 
     coords_u = []
     coords_v = []
