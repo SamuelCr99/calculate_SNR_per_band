@@ -7,7 +7,7 @@ import numpy as np
 from calculate_flux import calculate_flux
 import random
 
-def plot_source(source,baseline):
+def plot_source(source,baseline, dir):
     """
     Plots uv coordinates of a source at a given baseline.
 
@@ -19,9 +19,8 @@ def plot_source(source,baseline):
     No return values!
     """    
 
-
-    ref_freq = np.ma.getdata(nc.Dataset(f'data/Observables/RefFreq_bX.nc', 'r')["RefFreq"]).tolist()[0]
-    uv_data = np.ma.getdata(nc.Dataset(f'data/ObsDerived/UVFperAsec_bX.nc', 'r')['UVFperAsec']).tolist()
+    ref_freq = np.ma.getdata(nc.Dataset(f'{dir}Observables/RefFreq_bX.nc', 'r')["RefFreq"]).tolist()[0]
+    uv_data = np.ma.getdata(nc.Dataset(f'{dir}ObsDerived/UVFperAsec_bX.nc', 'r')['UVFperAsec']).tolist()
     data = pd.read_csv("data/datapoints.csv")
 
     baseline_matches = find_index_of_source_baseline(source,baseline)
@@ -56,5 +55,6 @@ def plot_source(source,baseline):
 if __name__ == '__main__':
     source = "1803+784"
     baseline = "GGAO12M/ISHIOKA"
-    plot_source(source,baseline)
+    session_path = 'data/sessions/session1/'
+    plot_source(source,baseline,session_path)
 

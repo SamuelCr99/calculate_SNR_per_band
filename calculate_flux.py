@@ -48,6 +48,5 @@ def calculate_flux(index):
     return [A_flux, B_flux, C_flux, D_flux, A_flux, B_flux, C_flux, D_flux]
 
 
-
 if __name__ == '__main__':
     calculate_flux(0)

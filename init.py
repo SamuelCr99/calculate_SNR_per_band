@@ -48,7 +48,7 @@ def find_datapoints(dir):
     channel_info = nc.Dataset(f'{dir}Observables/ChannelInfo_bX.nc')
     ref_freq_ds = nc.Dataset(f'{dir}Observables/RefFreq_bX.nc')
     snr_info = nc.Dataset(f'{dir}Observables/SNR_bX.nc')
-    corrinfo = nc.Dataset('data/Observables/CorrInfo-difx_bX.nc')
+    corrinfo = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bX.nc')
 
     # Find source
     source = []
@@ -189,10 +189,10 @@ def find_datapoints(dir):
                        "D_bw": D_bw,
                        "int_time": int_time})
 
-    df.to_csv(f"{dir}datapoints.csv",index=False)
+    df.to_csv("data/datapoints.csv",index=False)
 
 
-def find_stations(dir):
+def find_stations():
     """
     Finds stations, their coordinates and their SEFD
 
@@ -214,9 +214,9 @@ def find_stations(dir):
     joined_df = joined_df.rename(columns={'Name': 'name', 'X': 'x', 'Y': 'y', 'Z': 'z', 'Lon': 'lon', 'Lat': 'lat'})
     
     # Write to csv file
-    joined_df.to_csv(f'{dir}stations.csv', index=False)
+    joined_df.to_csv('data/stations.csv', index=False)
 
 
 if __name__ == '__main__':
-    find_stations('data/')
-    find_datapoints("data/")
+    find_stations()
+    find_datapoints("data/sessions/session1/")
