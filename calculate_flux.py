@@ -14,8 +14,8 @@ def calculate_flux(index):
 
     """
 
-    general_data = pd.read_csv('data/datapoints.csv')
-    station_data = pd.read_csv('data/stations.csv')
+    general_data = pd.read_csv('data/derived/datapoints.csv', skiprows=1)
+    station_data = pd.read_csv('data/derived/stations.csv')
 
     int_time = general_data.int_time.iloc[index]
     C = 1  # Currently assume C is always equal to 1
@@ -35,23 +35,19 @@ def calculate_flux(index):
 
     A_SNR = general_data.A_SNR.iloc[index]
     A_band_width = general_data.A_bw.iloc[index]*10**6
-    A_flux = A_SNR * sqrt(SEFD1_S * SEFD2_S) / \
-        (C * sqrt(2*int_time*A_band_width))
+    A_flux = A_SNR * sqrt(SEFD1_S * SEFD2_S) / (C * sqrt(2*int_time*A_band_width))
 
     B_SNR = general_data.B_SNR.iloc[index]
     B_band_width = general_data.B_bw.iloc[index]*10**6
-    B_flux = B_SNR * sqrt(SEFD1_X * SEFD2_X) / \
-        (C * sqrt(2*int_time*B_band_width))
+    B_flux = B_SNR * sqrt(SEFD1_X * SEFD2_X) / (C * sqrt(2*int_time*B_band_width))
 
     C_SNR = general_data.C_SNR.iloc[index]
     C_band_width = general_data.C_bw.iloc[index]*10**6
-    C_flux = C_SNR * sqrt(SEFD1_X * SEFD2_X) / \
-        (C * sqrt(2*int_time*C_band_width))
+    C_flux = C_SNR * sqrt(SEFD1_X * SEFD2_X) / (C * sqrt(2*int_time*C_band_width))
 
     D_SNR = general_data.D_SNR.iloc[index]
     D_band_width = general_data.D_bw.iloc[index]*10**6
-    D_flux = D_SNR * sqrt(SEFD1_X * SEFD2_X) / \
-        (C * sqrt(2*int_time*D_band_width))
+    D_flux = D_SNR * sqrt(SEFD1_X * SEFD2_X) / (C * sqrt(2*int_time*D_band_width))
 
     return [A_flux, B_flux, C_flux, D_flux, A_flux, B_flux, C_flux, D_flux]
 

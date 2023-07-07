@@ -100,7 +100,7 @@ def find_datapoints(dir):
     tot_freq *= len(time)
 
     # Find elevation and azimuth
-    stations = pd.read_csv(f'{dir}stations.csv')
+    stations = pd.read_csv('data/derived/stations.csv')
     time_sec_list = list(map(lambda t, s: f"{t}:{s}", time, second))
     stat_time_df = pd.DataFrame(
         {"stat1": stat1, "stat2": stat2, "time": time_sec_list})
@@ -208,8 +208,10 @@ def find_datapoints(dir):
                        "D_bw": D_bw,
                        "int_time": int_time})
 
-    df.to_csv("data/datapoints.csv", index=False)
-
+    datapoints_csv = df.to_csv(index=False)
+    datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + datapoints_csv
+    with open("data/derived/datapoints.csv","w") as file:
+        file.write(datapoints_csv)
 
 def find_stations():
     """
@@ -226,9 +228,9 @@ def find_stations():
     """
 
     station_sefds = pd.read_csv(
-        'data/equip.cat', delim_whitespace=True)[['Antenna', 'X_SEFD', 'S_SEFD']]
+        'data/standard/equip.cat', delim_whitespace=True)[['Antenna', 'X_SEFD', 'S_SEFD']]
     station_locations = pd.read_csv(
-        'data/position.cat', delim_whitespace=True)[['Name', 'X', 'Y', 'Z', 'Lat', 'Lon']]
+        'data/standard/position.cat', delim_whitespace=True)[['Name', 'X', 'Y', 'Z', 'Lat', 'Lon']]
     joined_df = pd.merge(station_locations, station_sefds,
                          left_on='Name', right_on='Antenna')
     joined_df = joined_df.drop(columns=['Antenna'])
@@ -237,7 +239,7 @@ def find_stations():
         columns={'Name': 'name', 'X': 'x', 'Y': 'y', 'Z': 'z', 'Lon': 'lon', 'Lat': 'lat'})
 
     # Write to csv file
-    joined_df.to_csv('data/stations.csv', index=False)
+    joined_df.to_csv("data/derived/stations.csv", index=False)
 
 
 if __name__ == '__main__':

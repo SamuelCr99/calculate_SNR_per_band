@@ -12,7 +12,7 @@ def find_index_of_source_baseline(source, baseline):
     Returns:
     A list of indices of rows in datapoints.csv that match the given source and baseline.
     """
-    df = pd.read_csv("data/datapoints.csv")
+    df = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
     station1 = baseline.split("/")[0]
     station2 = baseline.split("/")[1]
     return df.loc[(df.Source == source) & (df['Station1'] == station1) & (df['Station2'] == station2)].index.tolist()
@@ -28,7 +28,7 @@ def find_index_of_source(source):
     Returns:
     A list of indices of rows in datapoints.csv that match the given source and baseline.
     """
-    df = pd.read_csv("data/datapoints.csv")
+    df = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
     return df.loc[df.Source == source].index.tolist()
 
 

@@ -23,7 +23,7 @@ def plot_source(source, baseline, dir):
         f'{dir}Observables/RefFreq_bX.nc', 'r')["RefFreq"]).tolist()[0]
     uv_data = np.ma.getdata(nc.Dataset(
         f'{dir}ObsDerived/UVFperAsec_bX.nc', 'r')['UVFperAsec']).tolist()
-    data = pd.read_csv("data/datapoints.csv")
+    data = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
 
     baseline_matches = find_index_of_source_baseline(source, baseline)
     baseline_matches = find_index_of_source(source)
@@ -60,4 +60,10 @@ if __name__ == '__main__':
     source = "1803+784"
     baseline = "GGAO12M/ISHIOKA"
     session_path = 'data/sessions/session1/'
+
+    if "/" not in session_path:
+        session_path = f"data/sessions/{session_path}/"
+    elif session_path[-1] != "/":
+        session_path += "/"
+
     plot_source(source, baseline, session_path)
