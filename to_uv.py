@@ -28,7 +28,7 @@ def ElAz_to_HAdec(el,az,lat):
 
     return HA[i], dec
 
-def to_uv(lon,lat,X1,Y1,Z1,X2,Y2,Z2,el,az,freq):
+def to_uv(lon,lat,X1,Y1,Z1,X2,Y2,Z2,el,az,freq,alg=0):
     omega = 299792458/freq
     X1,Y1,Z1,X2,Y2,Z2 = X1/omega,Y1/omega,Z1/omega,X2/omega,Y2/omega,Z2/omega
 
@@ -36,15 +36,15 @@ def to_uv(lon,lat,X1,Y1,Z1,X2,Y2,Z2,el,az,freq):
     Y = Y1-Y2
     Z = Z1-Z2
     
-    RA,dec = ElAz_to_RAdec(el,az,lat,lon)
-    # HA,dec = ElAz_to_HAdec(el,az,lat)
-    # RA = HA + lon
-
-    u = -X*sin(RA) - Y*cos(RA)
-    v = X*sin(dec)*cos(RA) - Y*sin(dec)*sin(RA) + Z*cos(dec)
-
-    print(dec)
-    print(RA)
+    if alg == 0:
+        RA,dec = ElAz_to_RAdec(el,az,lat,-lon)
+        u = -X*sin(RA) - Y*cos(RA)
+        v = X*sin(dec)*cos(RA) - Y*sin(dec)*sin(RA) + Z*cos(dec)
+    else:
+        HA,dec = ElAz_to_HAdec(el,az,lat)
+        RA = HA + lon
+        u = X*sin(RA) -Y*cos(RA)
+        v = -X*cos(RA) + Y*sin(RA) + Z*cos(dec)
 
     return u,v
 
