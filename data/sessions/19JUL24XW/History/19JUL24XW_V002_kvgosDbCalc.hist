@@ -1,0 +1,29 @@
+
+TIMETAG 2019/07/24 17:01:41 UTC
+MK3DB_VERSION 2
+CALC11.02 Ver. 2016.12.29  Wed Jul 24 13:01:40 2019gs690-gs61
+Calc 11 at GSFC  -KB-
+
+TIMETAG 2019/07/24 17:01:44 UTC
+. vgosDbCalc: Library ID: SgLib-0.6.4 (Tir-na Nog'th) released on 28 Feb, 2019
+. vgosDbCalc: Driver  ID: vgosDbCalc-0.3.4 (Texorami) released on 28 Feb, 2019
+. vgosDbCalc: Host    ID: gs690-gs61a-gsvgsfc-ivscc-server1.gsfc.nasa.gov (Hw: x86_64; Sw: 3.10.0-957.12.2.el7.x86_64 version of Linux)
+. vgosDbCalc: User    ID: Karen Baver <karen.d.baver@nasa.gov>, Goddard Space Flight Center VLBI Analysis Center
+. vgosDbCalc: User command: "/space/nusolve/bin/vgosDbCalc 19JUL24XW_V001_iWACO_kall.wrp"
+. vgosDbCalc: Input data  : ./19JUL24XW_V001_iWACO_kall.wrp
+. vgosDbCalc: External a priori setup: 
+. vgosDbCalc: SITES    : /500/oper/solve_apriori_files/blokq.c11.dat
+. vgosDbCalc: Sources  : /500/oper/solve_apriori_files/blokq.c11.dat
+. vgosDbCalc: Ocean    : /500/oper/solve_apriori_files/blokq.c11.dat
+. vgosDbCalc: EOPs     : /500/oper/solve_apriori_files/usno_finals.erp
+. vgosDbCalc: Tilts    : /500/oper/solve_apriori_files/tilt.dat
+. vgosDbCalc: OPTL     : /500/oper/solve_apriori_files/blokq.c11.dat
+. vgosDbCalc: the session W19205 (19JUL24XW) has been imported from vgosDb data set
+. vgosDbCalc: collected 2 bands: X, S
+  mimicCalcMain2(): processing X-band has been started
+  mimicCalcMain2(): processing X-band has been finished
+  mimicCalcMain2(): processing S-band has been started
+  mimicCalcMain2(): processing S-band has been finished
+. vgosDbCalc: running observations through CALC has been complete
+. putDataIntoVgosDb: no clock break information were added to the vgosDb data tree
+. createWrapperFileName: the organization name has been adjusted: WACO => GSFC

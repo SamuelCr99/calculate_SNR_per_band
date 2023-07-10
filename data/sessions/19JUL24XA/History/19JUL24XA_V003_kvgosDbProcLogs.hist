@@ -1,0 +1,472 @@
+
+TIMETAG 2019/10/18 18:49:39 UTC
+MK3DB_VERSION 3
+. vgosDbProcLogs: Library ID: SgLib-0.6.4 (Tir-na Nog'th) released on 29 Aug, 2019
+. vgosDbProcLogs: Driver  ID: vgosDbProcLogs-0.4.4 (Avernus) released on 03 Apr, 2019
+. vgosDbProcLogs: Host    ID: gs690-gs61a-gsvgsfc-ivscc-server1.gsfc.nasa.gov (Hw: x86_64; Sw: 3.10.0-957.12.2.el7.x86_64 version of Linux)
+. vgosDbProcLogs: User    ID: David Gordon <david.gordon-1@nasa.gov>, Goddard Space Flight Center
+. vgosDbProcLogs: User command: "/space/nusolve/bin/vgosDbProcLogs 19JUL24XA_V002_iGSFC_kall.wrp"
+. vgosDbProcLogs: Input data  : ./19JUL24XA_V002_iGSFC_kall.wrp
+. vgosDbProcLogs: the session RD1907 (19JUL24XA) has been imported from vgosDb data set
+w readFile: got a duplicate record " Ca CAMBRIDG --------- ---- Cambridge, UK (VLBA)" for the station name "CAMBRIDG" in the ns-codes file [/500/oper/master/ns-codes.txt]
+w readFile: got a duplicate record " Cb CAMBRIDG --------- ---- Cambridge, UK (Ryle)" for the station name "CAMBRIDG" in the ns-codes file [/500/oper/master/ns-codes.txt]
+w readFile: got a duplicate record " Ef EFLSBERG 14209S001 7203 Effelsberg, Germany (originally Mk4, now common EVN usage)" for the station name "EFLSBERG" in the ns-codes file [/500/oper/master/ns-codes.txt]
+w readFile: got a duplicate record " Jv JODRELL2 --------- ---- VLBA, Jodrell Bank, UK" for the station name "JODRELL2" in the ns-codes file [/500/oper/master/ns-codes.txt]
+. importDataFromLogFiles: checking [/500/sessions/2019/rd1907/] directory for station log files
+. importDataFromLogFiles: processing /500/sessions/2019/rd1907/rd1907ft.log, a log file for FORTLEZA station
+. readLogFile: station FORTLEZA: collected operator's comments: 
+. readLogFile: station FORTLEZA: 2019/07/24 17:37:19: maser to GPS offset is: 0.434us
+. readLogFile: station FORTLEZA: 2019/07/24 17:37:59: formatter to GPS offset is: 0.343us
+. readLogFile: station FORTLEZA: 2019/07/24 17:38:52: delay line is inserted
+. readLogFile: station FORTLEZA: 2019/07/24 17:39:38: delay line is removed
+. readLogFile: station FORTLEZA: 2019/07/24 17:40:44: weather: sky is clear
+. readLogFile: station FORTLEZA: 2019/07/24 17:41:57: receiver is warm during the IVS-R1904 session
+. readLogFile: station FORTLEZA: 2019/07/25 18:06:17: weather: sky is partly cloudy
+. readLogFile: station FORTLEZA: 2019/07/25 18:06:20: delay line is removed
+. readLogFile: station FORTLEZA: 2019/07/25 18:07:40: delay line is inserted
+. readLogFile: station FORTLEZA: 16711 strings of the log file (1002K) were read (192 strings were skipped)
+. checkRinexFile: extracted 359 meteo records from 1455 strings of /500/sessions/2019/rd1907/ceeu2051.19m RINEX file
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 103%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 103%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 103.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 103.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 103%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.8%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.1%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.6%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.4%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.5%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.2%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102.3%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 102%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 101.7%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.9%; adjusted it to 100%
+w checkRinexFile: the extracted relative humidity looks suspicious: 100.4%; adjusted it to 100%
+. checkRinexFile: extracted 1080 meteo records from 1455 strings of /500/sessions/2019/rd1907/ceeu2061.19m RINEX file
+. checkRinexFile: collected 1439 meteo records
+. propagateData: station FORTLEZA: 114 exact matches of cable calibrations were found
+. propagateData: station FORTLEZA: meteo parameters were found
+. importDataFromLogFiles: processing /500/sessions/2019/rd1907/rd1907hh.log, a log file for HARTRAO station
+. readLogFile: station HARTRAO: collected operator's comments: 
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: Session rd1907 ready message for HartRAO.
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: ;"-----------------------------------------
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: Comments:
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: HartRAO is ready to start the experiment
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: First source: 1929+226 at 18:00:00  UT
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: FMOUT-GPS: 1.1767 microseconds
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: Wx:  Temperature (C): 10.2  Pressure (mBar): 867.4  Humidity (%): 32.5
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: Sky Conditions: clear skies
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: Cable difference is: longer cable makes the reading smaller by
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: 526.1 microseconds and is nominal
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: Pointing values: na
+. readLogFile: station HARTRAO: 2019/07/24 16:14:38: Tsys (x1/s/x2): 48.4/104/54
+. readLogFile: station HARTRAO: 2019/07/24 17:40:15: clock offset: UTC-HartRAO =1.74 us @ 17:38 UT (MASER leads GPS)"
+. readLogFile: station HARTRAO: 2019/07/24 17:41:17: delay counter reading decreases when line length increases"
+. readLogFile: station HARTRAO: 2019/07/24 17:41:41: weather conditions: clear skies"
+. readLogFile: station HARTRAO: 2019/07/24 18:00:02: Session rd1907 auto-start message for HartRAO.
+. readLogFile: station HARTRAO: 2019/07/24 18:00:02: ;"----------------------------------------------
+. readLogFile: station HARTRAO: 2019/07/24 18:00:02: Started recording with source: 1929+226 at 205.18:00:00 UT
+. readLogFile: station HARTRAO: 2019/07/25 06:40:30: Weather conditions: clear skies
+. readLogFile: station HARTRAO: 2019/07/25 13:21:04: Weather conditions: clear skies
+. readLogFile: station HARTRAO: 2019/07/25 17:51:58: Weather conditions: clear skies
+. readLogFile: station HARTRAO: 2019/07/25 17:56:24: clock offset: UTC-HartRAO=1.75 us @ 17:38 UT (MASER leads GPS)"
+. readLogFile: station HARTRAO: 2019/07/25 17:56:27: Weather conditions: clear skies
+. readLogFile: station HARTRAO: 2019/07/25 17:59:53: Weather conditions: clear skies
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: Session rd1907 stop message for HartRAO.
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: ;"----------------------------------------
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: Comments:
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: HartRAO has completed RD1907.
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: First scan bad due to a clock jump prior to start.
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: Weather conditions were clear throughout.
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: Data will be e-shipped to Shanghai.
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: Problem scans:
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: Source   Scan start   Explanation of problem
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: 1929+226 205-1800b    clock jump before, resynced after
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: Disk Inventory: A 0, B 2, C 0, D 1, E 1, F 0, G 1, H 0, (other larger) 6
+. readLogFile: station HARTRAO: 2019/07/25 18:00:07: Observation finished at: 17:59:50 UT
+. readLogFile: station HARTRAO: 16977 strings of the log file (1M) were read
+w cleanCableCalibrations: station HARTRAO: 2 outliers have been removed
+. propagateData: station HARTRAO: no cable cal record found for the scan "206-1256" in the log file
+. propagateData: station HARTRAO: no cable cal record found for the scan "206-1435" in the log file
+. propagateData: station HARTRAO: 136 exact and 2 closest matches of cable calibrations were found
+. propagateData: station HARTRAO: meteo parameters were found
+. importDataFromLogFiles: processing /500/sessions/2019/rd1907/rd1907ho.log, a log file for HOBART26 station
+. readLogFile: station HOBART26: collected operator's comments: 
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Checklist "Before observation"
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Sent by Prad (user alias: oper(4))
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: System: Schedule file prepared OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Signals: S/X receiver on axis OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: DBBC: Server software running OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: DBBC: pps_sync sent (if reconfigured) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: DBBC: client software NOT running on DBBC OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: DBBC: IFs correctly selected OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: DBBC: Frequency settings correct OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Mark5: Time correct (ntpq) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Mark5: recording mode set (e.g. proc=xxxx; ready_disk) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Mark5: reported VSNs agree with printed labels OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Mark5: configured (e.g. setupsx) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Mark5: Times OK (i.e. mk5=dot?  fmset may be required) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Time: Maser ok OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Time: Field system time aggrees with station time (fmset) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Time: Maser to GPS difference in usec (maserdelay command. Enter value@day/time) (value=+7.4920E-006@205/17:46:56)
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Time: Formatter out to GPS difference in usec (clkoff command. Enter value@day/time)
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: (value=7.4920E-006
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Time: delays OK, stable and within 1us (clkoff, maserdelay) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Mark5: test recording OK (scan_check and autocorrelation) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Cryogenics: Vacuum pressure less than 3.5 OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Cryogenics: 70K stage temperature below 65K OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Cryogenics: He supply pressure above 275 psi OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: hardware: Cal released (newsmerd: calu -m pcfs) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: caltsys works and Tsys ~50-70 K OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: wth works OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Meteorology: Weather conditions ok (enter short meteorological report) (value=50% cloud cover) OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Skype chat with other stations started OK
+. readLogFile: station HOBART26: 2019/07/24 17:48:24: Additional notes:
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Checklist "During observation"
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Sent by Prad (user alias: oper(4))
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Hobart 26m Checklist OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Antenna : on source and tracking OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Data: Autocorrelations OK OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Time: delays OK, stable and within 1us (clkoff, maserdelay) OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Time: Field System time (econtrol StatusMonitor) agrees with station time OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Time: Maser status OK OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Mark5: mk5=mode? correct OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Mark5: mk5=dot? response nominal OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Mark5: disk_pos OK? Log (actual - expected) in GB (value=0) OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Meteorology: Weather (wth) being logged OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Meteorology: Sky conditions logged (percentage cloud cover, rain etc) (value=50% cloud cover) OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Tsys: S-band Tsys 50 to 70K OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Tsys: X-band Tsys 50 to 70K OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Check the receiver position with rxp OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Cryogenics: Vacuum pressure less than 3.5 OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Cryogenics: 70K stage temperature below 65K OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Cryogenics: He supply pressure above 275 psi OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Log Monitor audio check button sounds audible beep OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Make sure Skype is running for chat with sites and on-call person OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: System: Check and update Handover and Current Issues wiki pages OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: System: Any problems or concerns logged OK
+. readLogFile: station HOBART26: 2019/07/24 22:02:49: Additional notes:
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Checklist "During observation"
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Sent by Earl (user alias: oper(4))
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Hobart 26m Checklist OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Antenna : on source and tracking NOK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Data: Autocorrelations OK OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Time: delays OK, stable and within 1us (clkoff, maserdelay) OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Time: Field System time (econtrol StatusMonitor) agrees with station time NOK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Time: Maser status OK NOK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Mark5: mk5=mode? correct OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Mark5: mk5=dot? response nominal OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Mark5: disk_pos OK? Log (actual - expected) in GB (value=-2.9) OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Meteorology: Weather (wth) being logged OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Meteorology: Sky conditions logged (percentage cloud cover, rain etc) (value=Clear) OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Tsys: S-band Tsys 50 to 70K OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Tsys: X-band Tsys 50 to 70K OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Check the receiver position with rxp OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Cryogenics: Vacuum pressure less than 3.5 OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Cryogenics: 70K stage temperature below 65K NOK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Cryogenics: He supply pressure above 275 psi OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Log Monitor audio check button sounds audible beep OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Make sure Skype is running for chat with sites and on-call person OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: System: Check and update Handover and Current Issues wiki pages OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: System: Any problems or concerns logged OK
+. readLogFile: station HOBART26: 2019/07/25 08:30:28: Additional notes: 70K stage at 112
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Checklist "During observation"
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Sent by Earl (user alias: oper(4))
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Hobart 26m Checklist OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Antenna : on source and tracking OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Data: Autocorrelations OK OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Time: delays OK, stable and within 1us (clkoff, maserdelay) OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Time: Field System time (econtrol StatusMonitor) agrees with station time NOK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Time: Maser status OK NOK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Mark5: mk5=mode? correct OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Mark5: mk5=dot? response nominal OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Mark5: disk_pos OK? Log (actual - expected) in GB (value=-2.9) OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Meteorology: Weather (wth) being logged OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Meteorology: Sky conditions logged (percentage cloud cover, rain etc) (value=light cloud) OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Tsys: S-band Tsys 50 to 70K OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Tsys: X-band Tsys 50 to 70K OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Check the receiver position with rxp OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Cryogenics: Vacuum pressure less than 3.5 OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Cryogenics: 70K stage temperature below 65K NOK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Cryogenics: He supply pressure above 275 psi OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Log Monitor audio check button sounds audible beep OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Make sure Skype is running for chat with sites and on-call person OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: System: Check and update Handover and Current Issues wiki pages OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: System: Any problems or concerns logged OK
+. readLogFile: station HOBART26: 2019/07/25 12:32:15: Additional notes: 70k stage at 86K
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Checklist "During observation"
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Sent by Tiege (user alias: oper(4))
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Hobart 26m Checklist OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Antenna : on source and tracking OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Data: Autocorrelations OK OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Time: delays OK, stable and within 1us (clkoff, maserdelay) OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Time: Field System time (econtrol StatusMonitor) agrees with station time OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Time: Maser status OK OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Mark5: mk5=mode? correct OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Mark5: mk5=dot? response nominal OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Mark5: disk_pos OK? Log (actual - expected) in GB (value=-3.0) OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Meteorology: Weather (wth) being logged OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Meteorology: Sky conditions logged (percentage cloud cover, rain etc) (value=80% cloud cover) OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Tsys: S-band Tsys 50 to 70K OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Tsys: X-band Tsys 50 to 70K OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Check the receiver position with rxp OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Cryogenics: Vacuum pressure less than 3.5 OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Cryogenics: 70K stage temperature below 65K OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Cryogenics: He supply pressure above 275 psi OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Log Monitor audio check button sounds audible beep OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Make sure Skype is running for chat with sites and on-call person OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: System: Check and update Handover and Current Issues wiki pages OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: System: Any problems or concerns logged OK
+. readLogFile: station HOBART26: 2019/07/25 13:54:16: Additional notes:
+. readLogFile: station HOBART26: 2019/07/25 18:31:01: Checklist "After observation"
+. readLogFile: station HOBART26: 2019/07/25 18:31:01: Sent by Tiege (user alias: oper(4))
+. readLogFile: station HOBART26: 2019/07/25 18:31:01: Antenna: back in stow position OK
+. readLogFile: station HOBART26: 2019/07/25 18:31:01: Additional notes:
+. readLogFile: station HOBART26: 31196 strings of the log file (1M) were read
+. verifyReadings: station HOBART26: insufficient number (0) of cable calibrations; skipped
+w verifyReadings: station HOBART26: cannot find any usable cable calibrations
+. propagateData: station HOBART26: meteo parameters were found
+. importDataFromLogFiles: processing /500/sessions/2019/rd1907/rd1907mc.log, a log file for MEDICINA station
+. readLogFile: station MEDICINA: collected operator's comments: 
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: Session rd1907 ready message for Medicina.
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: ;"------------------------------------------
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: First source: 1929+226 at 18:00  UT
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: GPS-FMOUT: 9.74 microseconds
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: Wx:  Temperature (C): 34.1  Pressure (mBar): 1012.5  Humidity (%): 38.0
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: Sky Conditions: clear sky, sunny
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: Cable difference is: longer cable makes the reading larger by
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: 0 microseconds and is nominal
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: Pointing values:
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: SEFD  X/S       Source          Az/El      Offset1  Offset2
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: 288/516     3c123          198/75      -0.002   0.004
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: 0/0       3c84           268/72      -0.001   0.002
+. readLogFile: station MEDICINA: 2019/07/24 16:40:33: Tsys (x1/s/x2): 35/66/28
+. readLogFile: station MEDICINA: 2019/07/24 18:00:11: Session rd1907 auto-start message for Medicina.
+. readLogFile: station MEDICINA: 2019/07/24 18:00:11: ;"-----------------------------------------------
+. readLogFile: station MEDICINA: 2019/07/24 18:00:11: Started recording with source: 1929+226 at 205.18:00:02 UT
+. readLogFile: station MEDICINA: 2019/07/25 18:02:51: Session rd1907 stop message for Medicina.
+. readLogFile: station MEDICINA: 2019/07/25 18:02:51: ;"-----------------------------------------
+. readLogFile: station MEDICINA: 2019/07/25 18:02:51: Problem scans:
+. readLogFile: station MEDICINA: 2019/07/25 18:02:51: Source   Scan start   Explanation of problem
+. readLogFile: station MEDICINA: 2019/07/25 18:02:51: 0        0            na
+. readLogFile: station MEDICINA: 2019/07/25 18:02:51: Disk Inventory: A 0, B 0, C 0, D 0, E 0, F 0, G 0, H 0, (other larger) 0
+. readLogFile: station MEDICINA: 2019/07/25 18:02:51: Observation finished at: 17:59:50 UT
+. readLogFile: station MEDICINA: 18243 strings of the log file (1M) were read
+. verifyReadings: station MEDICINA: insufficient number (0) of cable calibrations; skipped
+w verifyReadings: station MEDICINA: cannot find any usable cable calibrations
+. propagateData: station MEDICINA: meteo parameters were found
+. importDataFromLogFiles: processing /500/sessions/2019/rd1907/rd1907ny.log, a log file for NYALES20 station
+. readLogFile: station NYALES20: collected operator's comments: 
+. readLogFile: station NYALES20: 2019/07/24 17:47:15: zenith tsys:
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: Session t2133 ready message for Ny-Alesund.
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: ;"-------------------------------------------
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: First source: 1829+226 at 18:00:00  UT
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: GPS-FMOUT: 168.87 microseconds
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: Wx:  Temperature (C): 9  Pressure (mBar): 1011.1  Humidity (%): 71
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: Sky Conditions: overcast
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: Cable difference is: longer cable makes the reading larger by
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: 690 microseconds and is nominal
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: Pointing values:
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: SEFD  X/S       Source          Az/El      Offset1  Offset2
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: 817/1320    cygnusa         88/41      -0.0020  -0.0126
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: 930/1283    casa            37/50      -0.0099  -0.0082
+. readLogFile: station NYALES20: 2019/07/24 17:48:40: Tsys (IFA/IFB/IFC): 55/53/133
+. readLogFile: station NYALES20: 2019/07/24 18:00:04: Session rd1907 auto-start message for Ny-Alesund.
+. readLogFile: station NYALES20: 2019/07/24 18:00:04: ;"-------------------------------------------------
+. readLogFile: station NYALES20: 2019/07/24 18:00:04: Started recording with source: 1929+226 at 205.18:00:00 UT
+. readLogFile: station NYALES20: 2019/07/25 18:01:13: Session rd1907 stop message for Ny-Alesund.
+. readLogFile: station NYALES20: 2019/07/25 18:01:13: ;"-------------------------------------------
+. readLogFile: station NYALES20: 2019/07/25 18:01:13: Comments:
+. readLogFile: station NYALES20: 2019/07/25 18:01:13: warmup during session
+. readLogFile: station NYALES20: 2019/07/25 18:01:13: Disk Inventory: A 0, B 0, C 0, D 10, E 0, F 0, G 0, H 0, (other larger) 10
+. readLogFile: station NYALES20: 2019/07/25 18:01:13: Observation finished at: 17:55:44 UT
+. readLogFile: station NYALES20: 60648 strings of the log file (4M) were read (37763 strings were skipped)
+. propagateData: station NYALES20: 137 exact matches of cable calibrations were found
+. propagateData: station NYALES20: meteo parameters were found
+. importDataFromLogFiles: processing /500/sessions/2019/rd1907/rd1907wz.log, a log file for WETTZELL station
+w readLogFile: station WETTZELL: the scan name "206-1150" will be replaced with "206-1225a", looks like discontinuity in the log file
+w readLogFile: station WETTZELL: the source name "1330+476" will be replaced with "0748+126", looks like discontinuity in the log file
+. readLogFile: station WETTZELL: collected operator's comments: 
+. readLogFile: station WETTZELL: 2019/07/24 19:37:02: Observation:        R D 1 9 0 7 W z ; 24.07.2019
+. readLogFile: station WETTZELL: 2019/07/24 19:37:12: ;"                     ============================
+. readLogFile: station WETTZELL: 2019/07/24 19:37:15: Delta[UT(C,Wettzell) to UT(Efos-39)] = 2.819 us at 205/16:45 UT.
+. readLogFile: station WETTZELL: 2019/07/24 19:37:19: Delta[UT(C,Wettzell) to UT(GPS,TAC2)] = 0.886 us at 205/16:45 UT.
+. readLogFile: station WETTZELL: 2019/07/24 19:37:22: Pointing tested with casa and found o.k.
+. readLogFile: station WETTZELL: 2019/07/24 19:37:25: cable reading and Phasecal o.k.
+. readLogFile: station WETTZELL: 2019/07/24 19:37:30: Weather: SUNNY AND HOT.
+. readLogFile: station WETTZELL: 2019/07/24 22:07:15: start of remote attendance by neidhardt
+. readLogFile: station WETTZELL: 2019/07/25 06:28:18: end of remote attendance
+. readLogFile: station WETTZELL: 2019/07/25 11:23:27: receiver overheat switch released. observation stopped and waiting for cool down at
+. readLogFile: station WETTZELL: 2019/07/25 11:23:27: 206/11:16 ut at source 1348-308.
+. readLogFile: station WETTZELL: 2019/07/25 13:21:28: sources from 206/11:16 - 12:22 ut lost because of receiver overheat.
+. readLogFile: station WETTZELL: 46974 strings of the log file (3M) were read (33688 strings were skipped)
+. verifyReadings: station WETTZELL: cannot find any usable cablelong measurements
+w verifyReadings: station WETTZELL: cannot determine the cable calibration sign
+. verifyReadings: station WETTZELL: the cable sign was set to "+" according to the list of default cable signs
+. propagateData: station WETTZELL: 95 exact matches of cable calibrations were found
+. propagateData: station WETTZELL: meteo parameters were found
+. vgosDbProcLogs: import of data from station log files has been complete

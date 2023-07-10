@@ -1,0 +1,49 @@
+
+TIMETAG 2019/10/18 18:54:32 UTC
+MK3DB_VERSION 4
+SgLib-0.6.4 (Tir-na Nog'th): data has been read from vgosDb container specified by /500/vgosDB/2019/19JUL24XA/19JUL24XA_V003_iGSFC_kall.wrp
+
+TIMETAG 2019/10/18 20:54:03 UTC
+Analyzed by David Gordon (hereafter DG) at NASA Goddard Space Flight Center. Contact info: <David.Gordon-1@nasa.gov>
+DG> RD1907: GSFC Analysis  -DG-
+DG> HARTRAO clock unstable, 7 clock break terms used. One break at WETTZELL.
+DG> 3C48 adjusted in solution, 58 mas adjustment from apriori  -DG-
+DG> NuSolve fit of 24.5 psec.
+IVS-R&D-7: GSFC analysis (DG)
+G-Gxs solution,   60/  60 clocks/atms,    2/  40 constraints, 23.9833-hr gradients.
+Solve fit is 168.15 psec.
+Detected 8 clock breaks
+A clock break marker has been set for HARTRAO  at 25 Jul, 2019; 00:52:00.0000
+A clock break marker has been set for HARTRAO  at 25 Jul, 2019; 06:44:00.0000
+A clock break marker has been set for HARTRAO  at 25 Jul, 2019; 08:00:00.0000
+A clock break marker has been set for HARTRAO  at 25 Jul, 2019; 08:56:00.0000
+A clock break marker has been set for WETTZELL at 25 Jul, 2019; 12:03:00.0000
+A clock break marker has been set for HARTRAO  at 25 Jul, 2019; 14:32:00.0000
+A clock break marker has been set for HARTRAO  at 25 Jul, 2019; 15:50:00.0000
+A clock break marker has been set for HARTRAO  at 25 Jul, 2019; 16:27:00.0000
+The following flyby options were used in the solution:
+Station positions flyby file: glo.sit
+Station velocities flyby file: glo.vel
+Source flyby file: glo.src
+Station axis offset flyby file: glo.axis
+EOP high frequency variations flyby file: NONE
+Station mean gradients flyby file: NONE
+Nutation series flyby file :  NONE
+Nutation offset flyby file :  NONE
+Earth rotation flyby file  :  NONE
+Tectonic plate motion file :  NONE
+Group delay ambiguities were resolved (well, at least, tried to resolve)
+Group delay outliers were processed and editing info has been updated.
+Troposphere and cable cal status for standard solution have been stored.
+Observation dependent contribution status has been stored.
+Reweighting updated for:
+FO-HA FO-HO FO-ME FO-NY FO-WE HA-HO HA-ME HA-NY HA-WE HO-ME 
+HO-NY HO-WE ME-NY ME-WE NY-WE 
+Solution data configuration: group delays with ionosphere corrections
+Clock and atmosphere constraint information saved.
+Batchmode clock parameterization saved.
+Batchmode atmosphere parameterization saved.
+Ionosphere corrections were evaluated for group delays.
+Barometer calibration and barometer height offset not available.
+Elevation cutoff data stored in database.
+Eccentricity data store in data base header.

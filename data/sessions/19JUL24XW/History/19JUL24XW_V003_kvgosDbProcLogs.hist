@@ -1,0 +1,35 @@
+
+TIMETAG 2019/07/24 17:01:47 UTC
+MK3DB_VERSION 3
+. vgosDbProcLogs: Library ID: SgLib-0.6.4 (Tir-na Nog'th) released on 28 Feb, 2019
+. vgosDbProcLogs: Driver  ID: vgosDbProcLogs-0.4.4 (Avernus) released on 28 Feb, 2019
+. vgosDbProcLogs: Host    ID: gs690-gs61a-gsvgsfc-ivscc-server1.gsfc.nasa.gov (Hw: x86_64; Sw: 3.10.0-957.12.2.el7.x86_64 version of Linux)
+. vgosDbProcLogs: User    ID: Karen Baver <karen.d.baver@nasa.gov>, Goddard Space Flight Center VLBI Analysis Center
+. vgosDbProcLogs: User command: "/space/nusolve/bin/vgosDbProcLogs -klog /500/vgosDB/2019/19JUL24XW/19JUL24XW_V002_iGSFC_kall.wrp"
+. vgosDbProcLogs: Input data  : /500/vgosDB/2019/19JUL24XW/19JUL24XW_V002_iGSFC_kall.wrp
+. vgosDbProcLogs: the session W19205 (19JUL24XW) has been imported from vgosDb data set
+w readFile: got a duplicate record " Ca CAMBRIDG --------- ---- Cambridge, UK (VLBA)" for the station name "CAMBRIDG" in the ns-codes file [/500/oper/master/ns-codes.txt]
+w readFile: got a duplicate record " Cb CAMBRIDG --------- ---- Cambridge, UK (Ryle)" for the station name "CAMBRIDG" in the ns-codes file [/500/oper/master/ns-codes.txt]
+w readFile: got a duplicate record " Ef EFLSBERG 14209S001 7203 Effelsberg, Germany (originally Mk4, now common EVN usage)" for the station name "EFLSBERG" in the ns-codes file [/500/oper/master/ns-codes.txt]
+w readFile: got a duplicate record " Jv JODRELL2 --------- ---- VLBA, Jodrell Bank, UK" for the station name "JODRELL2" in the ns-codes file [/500/oper/master/ns-codes.txt]
+. importDataFromLogFiles: checking [/500/sessions/2019/w19205/] directory for station log files
+. importDataFromLogFiles: processing /500/sessions/2019/w19205/w19205wz.log, a log file for WETTZELL station
+. readLogFile: station WETTZELL: collected operator's comments: 
+. readLogFile: station WETTZELL: 2019/07/24 07:05:13: observation: w19205wz at jul. 2019 - 24.
+. readLogFile: station WETTZELL: 2019/07/24 07:06:12: delta ut ( ref-efos39 ) = 2.814us at 205/06:45:14ut
+. readLogFile: station WETTZELL: 2019/07/24 07:06:50: delta ut ( ref-gps,tac2 ) = 0.892us at 205/06:45:14ut
+. readLogFile: station WETTZELL: 2019/07/24 07:06:57: systemstatus - ok.
+. readLogFile: station WETTZELL: 2019/07/24 07:07:13: wx/ clear sky, calm.
+. readLogFile: station WETTZELL: 8551 strings of the log file (499K) were read
+. verifyReadings: station WETTZELL: cannot find any usable cablelong measurements
+w verifyReadings: station WETTZELL: cannot determine the cable calibration sign
+. verifyReadings: station WETTZELL: the cable sign was set to "+" according to the list of default cable signs
+. propagateData: station WETTZELL: 53 exact matches of cable calibrations were found
+. propagateData: station WETTZELL: meteo parameters were found
+. verifyReadings: station MK-VLBA: cannot find any usable cablelong measurements
+. propagateData: station MK-VLBA: 53 exact (16 are multiple) matches of cable calibrations were found
+. propagateData: station MK-VLBA: meteo parameters were found
+. verifyReadings: station PIETOWN: cannot find any usable cablelong measurements
+. propagateData: station PIETOWN: 53 exact (10 are multiple) matches of cable calibrations were found
+. propagateData: station PIETOWN: meteo parameters were found
+. vgosDbProcLogs: import of data from station log files has been complete
