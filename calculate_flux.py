@@ -1,5 +1,5 @@
 import pandas as pd
-from math import sqrt
+from math import sqrt, degrees
 
 
 def calculate_flux(index, general_data, station_data):
@@ -24,7 +24,6 @@ def calculate_flux(index, general_data, station_data):
         station_data.X_SEFD.loc[station_data.name == stat1].iloc[0])
     SEFD2_X = float(
         station_data.X_SEFD.loc[station_data.name == stat2].iloc[0])
-
     SEFD1_S = float(
         station_data.S_SEFD.loc[station_data.name == stat1].iloc[0])
     SEFD2_S = float(
