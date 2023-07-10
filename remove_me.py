@@ -1,7 +1,15 @@
-import netCDF4 as nc
+import PySimpleGUI as sg
+
+sources = ['hej', 'asd', 'lol']
+
+left_col = [[sg.Listbox(sources, key="source_list", s=(30,30), enable_events=True)]]
+
+layout = [[sg.Column(left_col)]]
+main_window = sg.Window('VLBI baseline viewer', layout,
+                        margins=[20, 20], resizable=True, finalize=True)
 
 
-dir = 'data/sessions/19JUL24XA/'
-channel_info = nc.Dataset(f'{dir}Observables/ChannelInfo_bX.nc')
-
-print(channel_info["ChannelFreq"][:])
+while True:
+    window, event, values = sg.read_all_windows()
+    if event == "source_list":
+        print(values["source_list"])
