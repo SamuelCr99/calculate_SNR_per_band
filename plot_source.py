@@ -5,6 +5,9 @@ import pandas as pd
 import netCDF4 as nc
 import numpy as np
 from calculate_flux import calculate_flux
+import time
+from math import sqrt
+
 
 
 def plot_source(source, baseline, dir):
@@ -19,11 +22,14 @@ def plot_source(source, baseline, dir):
     No return values!
     """
 
+    start = time.time()
+
     ref_freq = np.ma.getdata(nc.Dataset(
         f'{dir}Observables/RefFreq_bX.nc', 'r')["RefFreq"]).tolist()[0]
     uv_data = np.ma.getdata(nc.Dataset(
         f'{dir}ObsDerived/UVFperAsec_bX.nc', 'r')['UVFperAsec']).tolist()
     data = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
+    station_data = pd.read_csv('data/derived/stations.csv')
 
     baseline_matches = find_index_of_source_baseline(source, baseline)
     baseline_matches = find_index_of_source(source)
@@ -33,8 +39,7 @@ def plot_source(source, baseline, dir):
     flux = []
 
     for point in baseline_matches:
-        u_orig, v_orig = uv_data[point][0] * \
-            206264.81, uv_data[point][1]*206264.81
+        u_orig, v_orig = uv_data[point][0]*206264.81, uv_data[point][1]*206264.81
 
         A_freq = data.A_freq.iloc[point]
         B_freq = data.B_freq.iloc[point]
@@ -48,11 +53,22 @@ def plot_source(source, baseline, dir):
 
         coords_u.extend([u_A, u_B, u_C, u_D, -u_A, -u_B, -u_C, -u_D])
         coords_v.extend([v_A, v_B, v_C, v_D, -v_A, -v_B, -v_C, -v_D])
+        
 
-        flux.extend(calculate_flux(point))
+        flux.extend(calculate_flux(point, data, station_data))
 
     # Only dots
+    print(f"Time taken: {time.time() - start} seconds")
+
+    plt.figure(1)
     plt.scatter(coords_u, coords_v, c=flux, marker=".")
+    plt.figtext(
+        0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
+
+    distance = list(map(lambda u,v: sqrt(u**2+v**2),coords_u,coords_v))
+    plt.figure(2)
+    plt.scatter(distance,flux, marker=".")
+    
     plt.show()
 
 

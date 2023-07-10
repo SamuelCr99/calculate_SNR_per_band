@@ -2,7 +2,7 @@ import pandas as pd
 from math import sqrt
 
 
-def calculate_flux(index):
+def calculate_flux(index, general_data, station_data):
     """
     Calculates the flux of a source at a given index in the data/datapoints.csv file.
 
@@ -13,9 +13,6 @@ def calculate_flux(index):
     list[float]: A list of the calculated fluxes for each band for the source at the given index.
 
     """
-
-    general_data = pd.read_csv('data/derived/datapoints.csv', skiprows=1)
-    station_data = pd.read_csv('data/derived/stations.csv')
 
     int_time = general_data.int_time.iloc[index]
     C = 1  # Currently assume C is always equal to 1
@@ -50,7 +47,3 @@ def calculate_flux(index):
     D_flux = D_SNR * sqrt(SEFD1_X * SEFD2_X) / (C * sqrt(2*int_time*D_band_width))
 
     return [A_flux, B_flux, C_flux, D_flux, A_flux, B_flux, C_flux, D_flux]
-
-
-if __name__ == '__main__':
-    calculate_flux(0)

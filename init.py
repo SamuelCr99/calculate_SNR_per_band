@@ -96,9 +96,6 @@ def find_datapoints(dir):
     C_freq = list(map(lambda l: mean(l), C_channels))
     D_freq = list(map(lambda l: mean(l), D_channels))
 
-    tot_freq = ref_freq_ds["RefFreq"][0]
-    tot_freq *= len(time)
-
     # Find elevation and azimuth
     stations = pd.read_csv('data/derived/stations.csv')
     time_sec_list = list(map(lambda t, s: f"{t}:{s}", time, second))
@@ -196,7 +193,6 @@ def find_datapoints(dir):
                        "B_freq": B_freq,
                        "C_freq": C_freq,
                        "D_freq": D_freq,
-                       "tot_freq": tot_freq,
                        "A_SNR": A_SNR,
                        "B_SNR": B_SNR,
                        "C_SNR": C_SNR,
