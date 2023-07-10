@@ -80,7 +80,10 @@ def find_datapoints(dir):
     B_channels = []
     C_channels = []
     D_channels = []
+    print(channel_info["ChannelFreq"][:])
     for frequencies in np.ma.getdata(channel_info["ChannelFreq"]).tolist():
+        if type(frequencies) == float:
+            frequencies = [frequencies]
         A_channels.append(
             list(filter(lambda f: f > 0 and f < BAND_A_B_LIM, frequencies)))
         B_channels.append(
@@ -244,4 +247,5 @@ def find_stations():
 
 if __name__ == '__main__':
     find_stations()
-    find_datapoints("data/sessions/session1/")
+    # find_datapoints("data/sessions/session1/")
+    find_datapoints("data/sessions/19JUL24XW/")
