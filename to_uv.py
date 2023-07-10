@@ -23,7 +23,6 @@ def ElAz_to_RAdec(el, az, lat, lon):
                sin(lat)*cos(lon) - cos(el)*sin(az)*sin(lon))/cos(dec))
     RA2 = 2*pi-RA1
     RA = [RA1, RA2]
-
     def f(h): return abs(sin(el)*cos(lat)*sin(lon) - cos(el)*cos(az) *
                          sin(lat)*sin(lon) - cos(el)*sin(az)*cos(lon) - cos(dec)*sin(h))
 

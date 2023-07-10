@@ -29,7 +29,7 @@ def find_index_of_source(source):
     A list of indices of rows in datapoints.csv that match the given source and baseline.
     """
     df = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
-    return df.loc[df.Source == source].index.tolist()
+    return df.loc[(df.Source == source) & (df.Q_code > 5)].index.tolist()
 
 
 if __name__ == '__main__':

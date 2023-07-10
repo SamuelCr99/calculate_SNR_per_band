@@ -5,7 +5,6 @@ import pandas as pd
 import netCDF4 as nc
 import numpy as np
 from calculate_flux import calculate_flux
-import time
 from math import sqrt
 
 
@@ -21,9 +20,6 @@ def plot_source(source, baseline, dir):
     Returns:
     No return values!
     """
-
-    start = time.time()
-
     ref_freq = np.ma.getdata(nc.Dataset(
         f'{dir}Observables/RefFreq_bX.nc', 'r')["RefFreq"]).tolist()[0]
     uv_data = np.ma.getdata(nc.Dataset(
@@ -46,6 +42,7 @@ def plot_source(source, baseline, dir):
         C_freq = data.C_freq.iloc[point]
         D_freq = data.D_freq.iloc[point]
 
+
         u_A, v_A = convert_uv(u_orig, v_orig, ref_freq, A_freq)
         u_B, v_B = convert_uv(u_orig, v_orig, ref_freq, B_freq)
         u_C, v_C = convert_uv(u_orig, v_orig, ref_freq, C_freq)
@@ -58,16 +55,25 @@ def plot_source(source, baseline, dir):
         flux.extend(calculate_flux(point, data, station_data))
 
     # Only dots
-    print(f"Time taken: {time.time() - start} seconds")
-
     plt.figure(1)
     plt.scatter(coords_u, coords_v, c=flux, marker=".")
+    plt.xlabel("U [lambda]")
+    plt.ylabel("V [lambda]")
+    plt.colorbar()
     plt.figtext(
         0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
 
     distance = list(map(lambda u,v: sqrt(u**2+v**2),coords_u,coords_v))
     plt.figure(2)
-    plt.scatter(distance,flux, marker=".")
+    colors = ['red', 'blue', 'green', 'yellow'] * 2*len(baseline_matches) 
+    plt.scatter(distance,flux, marker=".", c=colors)
+    plt.xlabel("sqrt(U^2+V^2) [lambda])")
+    plt.ylabel("Flux")
+    # Create empty scatter plots with the correct name and colors for the legend 
+    plt.legend(handles=[plt.scatter([],[], c=colors[0], label='Band A'), 
+                        plt.scatter([],[], c=colors[1], label='Band B'), 
+                        plt.scatter([],[], c=colors[2], label='Band C'), 
+                        plt.scatter([],[], c=colors[3], label='Band D')])
     
     plt.show()
 

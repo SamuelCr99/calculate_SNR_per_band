@@ -51,9 +51,9 @@ def find_datapoints(dir):
     timeutc_ds = nc.Dataset(f'{dir}Observables/TimeUTC.nc')
     source_ds = nc.Dataset(f'{dir}Observables/Source.nc')
     channel_info = nc.Dataset(f'{dir}Observables/ChannelInfo_bX.nc')
-    ref_freq_ds = nc.Dataset(f'{dir}Observables/RefFreq_bX.nc')
     snr_info = nc.Dataset(f'{dir}Observables/SNR_bX.nc')
     corrinfo = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bX.nc')
+    quality_code_ds = nc.Dataset(f'{dir}Observables/QualityCode_bX.nc')
 
     # Find source
     source = []
@@ -179,6 +179,9 @@ def find_datapoints(dir):
     # Find integration time
     int_time = np.ma.getdata(corrinfo["EffectiveDuration"]).tolist()
 
+    # Find quality code
+    qualcode = list(bytes_to_string(np.ma.getdata(quality_code_ds["QualityCode"]).tolist()))
+
     # Collect everything into a dataframe
     df = pd.DataFrame({"YMDHM": time,
                        "Second": second,
@@ -202,7 +205,8 @@ def find_datapoints(dir):
                        "B_bw": B_bw,
                        "C_bw": C_bw,
                        "D_bw": D_bw,
-                       "int_time": int_time})
+                       "int_time": int_time,
+                       "Q_code": qualcode})
 
     datapoints_csv = df.to_csv(index=False)
     datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + datapoints_csv
