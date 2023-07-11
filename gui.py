@@ -40,6 +40,10 @@ def run_gui():
         if event == "plot":
             # Todo: Add checks to that source and band are selected
             source = values["source_list"]
+            if source not in sources:
+                sg.Popup("Source not found! Please select one from the list.")
+                continue
+
             ignored_stations = []
             band = [values['A_band'], values['B_band'], values['C_band'], values['D_band']].index(True)
 

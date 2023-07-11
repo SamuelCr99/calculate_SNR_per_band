@@ -42,9 +42,9 @@ def plot_source(source, baseline, dir, ignored_stations, band):
         u_orig, v_orig = uv_data[point][0]*206264.81, uv_data[point][1]*206264.81
 
         if band == 0: freq = data.A_freq.iloc[point]
-        if band == 1: freq = data.B_freq.iloc[point]
-        if band == 2: freq = data.C_freq.iloc[point]
-        if band == 3: freq = data.D_freq.iloc[point]
+        elif band == 1: freq = data.B_freq.iloc[point]
+        elif band == 2: freq = data.C_freq.iloc[point]
+        elif band == 3: freq = data.D_freq.iloc[point]
 
         u, v = convert_uv(u_orig, v_orig, ref_freq, freq)
 
@@ -62,20 +62,15 @@ def plot_source(source, baseline, dir, ignored_stations, band):
     plt.colorbar()
     plt.figtext(
         0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
+    plt.title(f"UV coordinates for source {source} for band {chr(ord('A')+band)}")
 
     distance = list(map(lambda u,v: sqrt(u**2+v**2),coords_u,coords_v))
     plt.figure(FIG_COUNT)
     FIG_COUNT += 1
-    colors = ['red', 'blue', 'green', 'yellow']
-    plt.scatter(distance,flux, marker=".", c=colors[band])
+    plt.scatter(distance,flux, marker=".", c='black')
     plt.xlabel("sqrt(U^2+V^2) [lambda])")
     plt.ylabel("Flux")
-    # Create empty scatter plots with the correct name and colors for the legend 
-    plt.legend(handles=[plt.scatter([],[], c=colors[0], label='Band A'), 
-                        plt.scatter([],[], c=colors[1], label='Band B'), 
-                        plt.scatter([],[], c=colors[2], label='Band C'), 
-                        plt.scatter([],[], c=colors[3], label='Band D')])
-    
+    plt.title(f"Flux vs. sqrt(U^2+V^2) for band {chr(ord('A')+band)}")
     plt.show(block=False)
 
 
