@@ -8,7 +8,7 @@ def run_gui():
     
 
     sg.theme("DarkBlue")
-    sg.SetOptions(font=("Andalde Mono", 10))
+    sg.SetOptions(font=("Andalde Mono", 12))
     source_dict = find_station_matches()
     
     sources = list(source_dict.keys())
