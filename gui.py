@@ -38,7 +38,6 @@ def run_gui():
             break
 
         if event == "plot":
-            # Todo: Add checks to that source and band are selected
             source = values["source_list"]
             if source not in sources:
                 sg.Popup("Source not found! Please select one from the list.")
