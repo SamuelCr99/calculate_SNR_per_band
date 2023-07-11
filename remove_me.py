@@ -1,15 +1,17 @@
 import PySimpleGUI as sg
 
-sources = ['hej', 'asd', 'lol']
-
-left_col = [[sg.Listbox(sources, key="source_list", s=(30,30), enable_events=True)]]
-
-layout = [[sg.Column(left_col)]]
-main_window = sg.Window('VLBI baseline viewer', layout,
-                        margins=[20, 20], resizable=True, finalize=True)
+gif103 = 'images/gif103.gif'
 
 
-while True:
-    window, event, values = sg.read_all_windows()
-    if event == "source_list":
-        print(values["source_list"])
+layout = [  [sg.Text('Loading....', font='ANY 15')],
+            [sg.Image(gif103, key='_IMAGE_')],
+           [sg.Button('Cancel')]
+         ]
+
+window = sg.Window('My new window').Layout(layout)
+
+while True:             # Event Loop
+    event, values = window.Read(timeout=25)
+    if event in (None, 'Exit', 'Cancel'):
+        break
+    window.Element('_IMAGE_').UpdateAnimation(gif103,  time_between_frames=50)

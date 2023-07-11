@@ -46,6 +46,8 @@ def find_datapoints(dir):
     No return values!
     """
 
+    if dir[-1] != '/': dir += '/'
+
     # Import datasets
     baseline_ds = nc.Dataset(f'{dir}Observables/Baseline.nc')
     timeutc_ds = nc.Dataset(f'{dir}Observables/TimeUTC.nc')
@@ -80,7 +82,6 @@ def find_datapoints(dir):
     B_channels = []
     C_channels = []
     D_channels = []
-    print(channel_info["ChannelFreq"][:])
     for frequencies in np.ma.getdata(channel_info["ChannelFreq"]).tolist():
         if type(frequencies) == float:
             frequencies = [frequencies]

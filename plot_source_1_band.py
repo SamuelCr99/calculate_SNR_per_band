@@ -23,6 +23,8 @@ def plot_source(source, baseline, dir, ignored_stations, band):
 
     global FIG_COUNT
 
+    if dir[-1] != '/': dir += '/'
+
     ref_freq = np.ma.getdata(nc.Dataset(
         f'{dir}Observables/RefFreq_bX.nc', 'r')["RefFreq"]).tolist()[0]
     uv_data = np.ma.getdata(nc.Dataset(
