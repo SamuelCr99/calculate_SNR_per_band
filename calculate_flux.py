@@ -2,7 +2,7 @@ import pandas as pd
 from math import sqrt, degrees
 
 
-def calculate_flux(index, general_data, station_data):
+def calculate_flux(index, general_data, station_data, band=-1):
     """
     Calculates the flux of a source at a given index in the data/datapoints.csv file.
 
@@ -45,4 +45,8 @@ def calculate_flux(index, general_data, station_data):
     D_band_width = general_data.D_bw.iloc[index]*10**6
     D_flux = D_SNR * sqrt(SEFD1_X * SEFD2_X) / (C * sqrt(2*int_time*D_band_width))
 
-    return [A_flux, B_flux, C_flux, D_flux, A_flux, B_flux, C_flux, D_flux]
+
+    if band == -1:
+        return [A_flux, B_flux, C_flux, D_flux, A_flux, B_flux, C_flux, D_flux]
+    
+    return [[A_flux, B_flux, C_flux, D_flux][band]]*2

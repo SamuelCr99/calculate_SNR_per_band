@@ -32,6 +32,25 @@ def find_index_of_source(source):
     return df.loc[(df.Source == source) & (df.Q_code > 5)].index.tolist()
 
 
+def find_index_of_source_ignore_stations(source, ignore):
+    """
+    Find all rows in datapoints.csv that match a given source.
+
+    Parameters:
+    source(string): The source to find
+
+    Returns:
+    A list of indices of rows in datapoints.csv that match the given source and baseline.
+    """
+    df = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
+
+    # Find all rows that don't contain the stations in ignore
+    for station in ignore:
+        df = df.loc[(df.Station1 != station) & (df.Station2 != station)]
+
+    return df.loc[(df.Source == source) & (df.Q_code > 5)].index.tolist()
+
+
 if __name__ == '__main__':
     source = "1803+784"
     baseline = "GGAO12M/ISHIOKA"
