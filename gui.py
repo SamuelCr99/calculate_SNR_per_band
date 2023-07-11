@@ -16,7 +16,7 @@ def run_gui():
 
     layout = create_layout(sources,stations)
     main_window = sg.Window('VLBI baseline viewer', layout,
-                            margins=[20, 20], resizable=True, finalize=True)
+                            margins=[20, 20], resizable=True, finalize=True, icon="images/favicon.ico")
 
 
     # Event loop for the GUI
