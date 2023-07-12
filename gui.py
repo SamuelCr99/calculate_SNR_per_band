@@ -151,7 +151,10 @@ def run_gui():
                 elif (not values[f"{box}_scroll"]) and (scrollable):
                     ignored_stations.append(box)
 
-            plot_source(source, dir, ignored_stations=ignored_stations, bands=band)
+            return_message = plot_source(source, dir, ignored_stations=ignored_stations, bands=band)
+            if return_message == "no_data_found":
+                sg.Popup("No data points found for this source using the selected stations and band.")
+            
 
         ### Load events ###
 
