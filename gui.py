@@ -3,7 +3,7 @@ import pandas as pd
 from tkinter.filedialog import askdirectory
 from gui_utility.find_station_matches import find_station_matches
 from layout import create_layout
-from plot_source_1_band import plot_source
+from plot_source import plot_source
 from init import find_datapoints
 
 
@@ -174,7 +174,7 @@ def run_gui():
             sg.PopupAnimated(None)
 
         if show_gif:
-            sg.PopupAnimated("images/loading.gif", time_between_frames=50)
+            sg.PopupAnimated("images/loading2.gif", time_between_frames=50)
 
 
 if __name__ == '__main__':

@@ -7,9 +7,9 @@ import numpy as np
 from calculate_flux import calculate_flux
 from math import sqrt
 
+FIG_COUNT = 1
 
-
-def plot_source(source, baseline, dir, ignored_stations):
+def plot_source(source, dir, ignored_stations=[], bands=[0,1,2,3], baseline=""):
     """
     Plots uv coordinates of a source at a given baseline.
 
@@ -20,6 +20,11 @@ def plot_source(source, baseline, dir, ignored_stations):
     Returns:
     No return values!
     """
+
+    global FIG_COUNT
+
+    if dir[-1] != '/': dir += '/'
+
     ref_freq = np.ma.getdata(nc.Dataset(
         f'{dir}Observables/RefFreq_bX.nc', 'r')["RefFreq"]).tolist()[0]
     uv_data = np.ma.getdata(nc.Dataset(
@@ -27,57 +32,61 @@ def plot_source(source, baseline, dir, ignored_stations):
     data = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
     station_data = pd.read_csv('data/derived/stations.csv')
 
-    # baseline_matches = find_index_of_source_baseline(source, baseline)
-    # baseline_matches = find_index_of_source(source)
-    baseline_matches = find_index_of_source_ignore_stations(source, ignored_stations)
+    if baseline:
+        baseline_matches = find_index_of_source_baseline(source, baseline)
+    else:
+        baseline_matches = find_index_of_source_ignore_stations(source, ignored_stations)
 
     coords_u = []
     coords_v = []
     flux = []
 
-    for point in baseline_matches:
-        u_orig, v_orig = uv_data[point][0]*206264.81, uv_data[point][1]*206264.81
+    if not isinstance(bands, list):
+        bands = [bands]
 
-        A_freq = data.A_freq.iloc[point]
-        B_freq = data.B_freq.iloc[point]
-        C_freq = data.C_freq.iloc[point]
-        D_freq = data.D_freq.iloc[point]
+    for band in bands:
+        for point in baseline_matches:
+            u_orig, v_orig = uv_data[point][0]*206264.81, uv_data[point][1]*206264.81
 
+            if band == 0: freq = data.A_freq.iloc[point]
+            elif band == 1: freq = data.B_freq.iloc[point]
+            elif band == 2: freq = data.C_freq.iloc[point]
+            elif band == 3: freq = data.D_freq.iloc[point]
 
-        u_A, v_A = convert_uv(u_orig, v_orig, ref_freq, A_freq)
-        u_B, v_B = convert_uv(u_orig, v_orig, ref_freq, B_freq)
-        u_C, v_C = convert_uv(u_orig, v_orig, ref_freq, C_freq)
-        u_D, v_D = convert_uv(u_orig, v_orig, ref_freq, D_freq)
+            u, v = convert_uv(u_orig, v_orig, ref_freq, freq)
 
+            coords_u.extend([u, -u])
+            coords_v.extend([v, -v])
 
-        coords_u.extend([u_A, u_B, u_C, u_D, -u_A, -u_B, -u_C, -u_D])
-        coords_v.extend([v_A, v_B, v_C, v_D, -v_A, -v_B, -v_C, -v_D])
-        
-
-        flux.extend(calculate_flux(point, data, station_data))
+            flux.extend(calculate_flux(point, data, station_data, band))
 
     # Only dots
-    plt.figure(1)
+    plt.figure(FIG_COUNT)
+    FIG_COUNT += 1
     plt.scatter(coords_u, coords_v, c=flux, marker=".")
     plt.xlabel("U [lambda]")
     plt.ylabel("V [lambda]")
     plt.colorbar()
+    bands_letters = list(map(lambda b: chr(ord('A')+b), bands))
     plt.figtext(
         0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
+    plt.title(f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
 
     distance = list(map(lambda u,v: sqrt(u**2+v**2),coords_u,coords_v))
-    plt.figure(2)
-    colors = ['red', 'blue', 'green', 'yellow'] * 2*len(baseline_matches) 
+    plt.figure(FIG_COUNT)
+    FIG_COUNT += 1
+    base_colors = ['red', 'blue', 'green', 'yellow']
+    if len(bands) > 1:
+        colors = sum(list(map(lambda b: [base_colors[b]]*2*len(baseline_matches), bands)),[])
+    else:
+        colors = "black"
     plt.scatter(distance,flux, marker=".", c=colors)
     plt.xlabel("sqrt(U^2+V^2) [lambda]")
-    plt.ylabel("Flux")
-    # Create empty scatter plots with the correct name and colors for the legend 
-    plt.legend(handles=[plt.scatter([],[], c=colors[0], label='Band A'), 
-                        plt.scatter([],[], c=colors[1], label='Band B'), 
-                        plt.scatter([],[], c=colors[2], label='Band C'), 
-                        plt.scatter([],[], c=colors[3], label='Band D')])
-    
-    plt.show()
+    plt.ylabel("Flux density")
+    plt.title(f"Flux density vs. sqrt(U^2+V^2) for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
+    if len(bands) > 1:
+        plt.legend(handles=list(map(lambda b: plt.scatter([],[], c=base_colors[b], label=f'Band {chr(ord("A")+b)}'), bands)))
+    plt.show(block=True) #CHANGE!!!!!!!!!!!!!!
 
 
 if __name__ == '__main__':
@@ -90,4 +99,4 @@ if __name__ == '__main__':
     elif session_path[-1] != "/":
         session_path += "/"
 
-    plot_source(source, baseline, session_path, [])
+    plot_source(source, baseline, session_path, [], [3])
