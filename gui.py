@@ -174,8 +174,7 @@ def run_gui():
             sg.PopupAnimated(None)
 
         if show_gif:
-            sg.PopupAnimated("images/loading.gif",
-                             background_color="black", time_between_frames=100)
+            sg.PopupAnimated("images/loading.gif", time_between_frames=50)
 
 
 if __name__ == '__main__':
