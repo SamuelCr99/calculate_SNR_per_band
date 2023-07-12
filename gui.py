@@ -6,6 +6,7 @@ from layout import create_layout
 from plot_source_1_band import plot_source
 from init import find_datapoints
 
+
 def find_datapoints_threaded(dir):
     """
     Asynchronous function for finding datapoints in the background. 
@@ -21,6 +22,7 @@ def find_datapoints_threaded(dir):
     except:
         pass
 
+
 def run_gui():
     """
     Main function for the GUI. Creates the layout and runs the event loop.
@@ -31,7 +33,7 @@ def run_gui():
     Returns:
     No return values
     """
-    
+
     # Launch the GUI window
     sg.theme("DarkGrey5")
     sg.SetOptions(font=("Andalde Mono", 12))
@@ -54,23 +56,24 @@ def run_gui():
         event, values = main_window.Read(timeout=25)
 
         ### Menu bar events ###
-        
+
         if event == "Open folder":
             new_dir = askdirectory(initialdir="data/sessions")
             if new_dir != dir and new_dir:
                 # If the user has selected a new folder, start the loading animation
                 # and find the datapoints in the background
                 show_gif = True
-                main_window.perform_long_operation(lambda : find_datapoints_threaded(new_dir),"load_done")
+                main_window.perform_long_operation(
+                    lambda: find_datapoints_threaded(new_dir), "load_done")
 
         if event == "About...":
             sg.Popup("About info")
-        
+
         if event == sg.WIN_CLOSED or event == "cancel" or event == "Exit":
             break
 
         ### Settings events ###
-        
+
         if event == "source_list":
 
             # Ignore event if no source was selected
@@ -86,7 +89,7 @@ def run_gui():
                 main_window[box].hide_row()
                 main_window[f"{box}_scroll"].update(visible=False)
                 main_window[f"{box}_scroll"].hide_row()
-            
+
             # Switch to scrollable column if more than 9 entries
             scrollable = len(source_dict[values["source_list"]]) > 9
 
@@ -98,12 +101,12 @@ def run_gui():
                 else:
                     main_window[box].update(visible=True)
                     main_window[box].unhide_row()
-            
+
             if scrollable:
                 main_window["check_box_col_scroll"].update(visible=True)
             else:
                 main_window["check_box_col"].update(visible=True)
-            
+
             # Update the GUI
             main_window["check_box_col"].contents_changed()
             main_window["check_box_col_scroll"].contents_changed()
@@ -132,15 +135,17 @@ def run_gui():
                 sg.Popup("Source not found! Please select one from the list.")
                 continue
 
-            ignored_stations = []
             # Find which band the user has selected, selected station will have
             # a value of True, all others False
-            band = [values['A_band'], values['B_band'], values['C_band'], values['D_band']].index(True)
+            band = [values['A_band'], values['B_band'],
+                    values['C_band'], values['D_band']].index(True)
 
+            # Ignore the stations that were unselected in the GUI
+            ignored_stations = []
             for box in stations:
-                if (not values[box]) and (not scrollable) :
+                if (not values[box]) and (not scrollable):
                     ignored_stations.append(box)
-                elif (not values[f"{box}_1"]) and (scrollable) :
+                elif (not values[f"{box}_scroll"]) and (scrollable):
                     ignored_stations.append(box)
 
             plot_source(source, '', dir, ignored_stations, band)
@@ -169,7 +174,9 @@ def run_gui():
             sg.PopupAnimated(None)
 
         if show_gif:
-            sg.PopupAnimated("images/loading.gif", background_color="black", grab_anywhere=False, time_between_frames=100)
+            sg.PopupAnimated("images/loading.gif",
+                             background_color="black", time_between_frames=100)
+
 
 if __name__ == '__main__':
     run_gui()
