@@ -47,7 +47,6 @@ def run_gui():
 
     # Fixes issue with layout on Windows 11
     plt.figure()
-    plt.close()
 
     # Static variables for the event loop
     source_dict = {}
