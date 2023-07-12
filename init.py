@@ -28,6 +28,13 @@ def time_to_string(time):
         m = f"0{m}"
     return f"{time[0]}/{time[1]}/{time[2]}-{h}:{m}"
 
+def is_float(v):
+    try:
+        float(v)
+        return True
+    except:
+        return False
+
 
 def find_datapoints(dir):
     """
@@ -82,7 +89,13 @@ def find_datapoints(dir):
     B_channels = []
     C_channels = []
     D_channels = []
-    for frequencies in np.ma.getdata(channel_info["ChannelFreq"]).tolist():
+    if is_float(channel_info["ChannelFreq"][0]):
+        frequency_matrix = [np.ma.getdata(channel_info["ChannelFreq"]).tolist()]*len(time)
+
+    else:
+        frequency_matrix = np.ma.getdata(channel_info["ChannelFreq"]).tolist()
+
+    for frequencies in frequency_matrix:
         if type(frequencies) == float:
             frequencies = [frequencies]
         A_channels.append(
@@ -95,10 +108,10 @@ def find_datapoints(dir):
             list(filter(lambda f: f > BAND_C_D_LIM, frequencies)))
 
     # Find frequency for each band
-    A_freq = list(map(lambda l: mean(l), A_channels))
-    B_freq = list(map(lambda l: mean(l), B_channels))
-    C_freq = list(map(lambda l: mean(l), C_channels))
-    D_freq = list(map(lambda l: mean(l), D_channels))
+    A_freq = list(map(lambda l: mean(l) if l != [] else None, A_channels))
+    B_freq = list(map(lambda l: mean(l) if l != [] else None, B_channels))
+    C_freq = list(map(lambda l: mean(l) if l != [] else None, C_channels))
+    D_freq = list(map(lambda l: mean(l) if l != [] else None, D_channels))
 
     # Find elevation and azimuth
     stations = pd.read_csv('data/derived/stations.csv')
@@ -169,10 +182,17 @@ def find_datapoints(dir):
         D = math.sqrt(
             pow(sum(cosines[N_A+N_B+N_C:M]), 2)+pow(sum(sines[N_A+N_B+N_C:M]), 2))
 
-        A_SNR.append(A/T*snr[i]*math.sqrt(M/N_A))
-        B_SNR.append(B/T*snr[i]*math.sqrt(M/N_B))
-        C_SNR.append(C/T*snr[i]*math.sqrt(M/N_C))
-        D_SNR.append(D/T*snr[i]*math.sqrt(M/N_D))
+        curr_A_SNR = A/T*snr[i]*math.sqrt(M/N_A) if N_A != 0 else 0
+        A_SNR.append(curr_A_SNR)
+
+        curr_B_SNR = B/T*snr[i]*math.sqrt(M/N_B) if N_B != 0 else 0
+        B_SNR.append(curr_B_SNR)
+
+        curr_C_SNR = C/T*snr[i]*math.sqrt(M/N_C) if N_C != 0 else 0
+        C_SNR.append(curr_C_SNR)
+
+        curr_D_SNR = D/T*snr[i]*math.sqrt(M/N_D) if N_D != 0 else 0
+        D_SNR.append(curr_D_SNR)
 
     # Find bandwidth
     A_bw = list(map(lambda ch: 32*len(ch), A_channels))
@@ -249,4 +269,4 @@ def find_stations():
 if __name__ == '__main__':
     find_stations()
     # find_datapoints("data/sessions/session1/")
-    find_datapoints("data/sessions/19JUL24XW/")
+    find_datapoints("data/sessions/19JUL24XA/")
