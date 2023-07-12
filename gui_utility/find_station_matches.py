@@ -1,6 +1,18 @@
 import pandas as pd
 
 def find_station_matches():
+    """
+    Creates a dictionary mapping every source to a list of stations that have 
+    data for that source. 
+
+    Parameters:
+    No parameters
+
+    Returns:
+    d (dict): Dictionary mapping every source to a list of stations that have 
+    data for that source.
+
+    """
     df = pd.read_csv('data/derived/datapoints.csv', skiprows=1)[['Station1', 'Station2', 'Source']]
 
     d = {}
