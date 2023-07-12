@@ -43,6 +43,9 @@ def run_gui():
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True, icon="images/favicon.ico")
+    main_window.TKroot.minsize(360,620)
+
+    # Fixes issue with layout on Windows 11
     plt.figure()
     plt.close()
 
