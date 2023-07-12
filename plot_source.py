@@ -60,6 +60,11 @@ def plot_source(source, dir, ignored_stations=[], bands=[0,1,2,3], baseline=""):
 
             flux.extend(calculate_flux(point, data, station_data, band))
 
+    coords_u = [u for u in coords_u if u == u]
+    coords_v = [v for v in coords_v if v == v]
+    if len(coords_u) == 0 or len(coords_v) == 0:
+        return "no_data_found"
+
     # Only dots
     plt.figure(FIG_COUNT)
     FIG_COUNT += 1
@@ -86,7 +91,7 @@ def plot_source(source, dir, ignored_stations=[], bands=[0,1,2,3], baseline=""):
     plt.title(f"Flux density vs. sqrt(U^2+V^2) for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
     if len(bands) > 1:
         plt.legend(handles=list(map(lambda b: plt.scatter([],[], c=base_colors[b], label=f'Band {chr(ord("A")+b)}'), bands)))
-    plt.show(block=True) #CHANGE!!!!!!!!!!!!!!
+    plt.show(block=False) #CHANGE!!!!!!!!!!!!!!
 
 
 if __name__ == '__main__':
