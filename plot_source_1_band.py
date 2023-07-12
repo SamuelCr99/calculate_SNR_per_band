@@ -70,7 +70,7 @@ def plot_source(source, baseline, dir, ignored_stations, band):
     plt.figure(FIG_COUNT)
     FIG_COUNT += 1
     plt.scatter(distance,flux, marker=".", c='black')
-    plt.xlabel("sqrt(U^2+V^2) [lambda])")
+    plt.xlabel("sqrt(U^2+V^2) [lambda]")
     plt.ylabel("Flux")
     plt.title(f"Flux vs. sqrt(U^2+V^2) for band {chr(ord('A')+band)}")
     plt.show(block=False)

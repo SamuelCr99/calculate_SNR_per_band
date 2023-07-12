@@ -69,7 +69,7 @@ def plot_source(source, baseline, dir, ignored_stations):
     plt.figure(2)
     colors = ['red', 'blue', 'green', 'yellow'] * 2*len(baseline_matches) 
     plt.scatter(distance,flux, marker=".", c=colors)
-    plt.xlabel("sqrt(U^2+V^2) [lambda])")
+    plt.xlabel("sqrt(U^2+V^2) [lambda]")
     plt.ylabel("Flux")
     # Create empty scatter plots with the correct name and colors for the legend 
     plt.legend(handles=[plt.scatter([],[], c=colors[0], label='Band A'), 

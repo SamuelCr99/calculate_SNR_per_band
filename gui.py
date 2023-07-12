@@ -48,7 +48,7 @@ def run_gui():
                 main_window[f"{box}_1"].update(visible=False)
                 main_window[f"{box}_1"].hide_row()
             
-            scrollable = len(source_dict[values["source_list"]]) > 8
+            scrollable = len(source_dict[values["source_list"]]) > 9
 
             for box in source_dict[values["source_list"]]:
                 if scrollable:
