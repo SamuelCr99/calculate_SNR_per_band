@@ -31,10 +31,10 @@ def create_layout(stations):
                 [sg.VPush()],
                 [sg.Push(), sg.Button("Plot", key="plot"), sg.Button("Cancel", key="cancel")]]
 
-    menu = [["File", ["Open folder", "Exit"]],
-            ["Help", "About..."]]
+    menu = [["&File", ["&Open folder", "&Exit"]],
+            ["&Help", "&About..."]]
 
-    layout = [[sg.Menu(menu, key="menu")],
+    layout = [[sg.MenubarCustom(menu)],
               [sg.Column(left_col, expand_x=True, expand_y=True)]]
 
     return layout

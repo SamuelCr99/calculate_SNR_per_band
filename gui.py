@@ -5,6 +5,7 @@ from gui_utility.find_station_matches import find_station_matches
 from layout import create_layout
 from plot_source import plot_source
 from init import find_datapoints
+import matplotlib.pyplot as plt
 
 
 def find_datapoints_threaded(dir):
@@ -41,7 +42,9 @@ def run_gui():
     stations = list(set(pd.read_csv('data/derived/stations.csv')['name']))
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
-                            margins=[20, 20], resizable=True, finalize=True, icon="images/favicon.ico")
+                            margins=[0, 0], resizable=True, finalize=True, icon="images/favicon.ico")
+    plt.figure()
+    plt.close()
 
     # Static variables for the event loop
     source_dict = {}
