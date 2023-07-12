@@ -91,7 +91,7 @@ def plot_source(source, dir, ignored_stations=[], bands=[0,1,2,3], baseline=""):
     plt.title(f"Flux density vs. sqrt(U^2+V^2) for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
     if len(bands) > 1:
         plt.legend(handles=list(map(lambda b: plt.scatter([],[], c=base_colors[b], label=f'Band {chr(ord("A")+b)}'), bands)))
-    plt.show(block=False) #CHANGE!!!!!!!!!!!!!!
+    plt.show(block=False) 
 
 
 if __name__ == '__main__':
@@ -105,3 +105,4 @@ if __name__ == '__main__':
         session_path += "/"
 
     plot_source(source, baseline, session_path, [], [3])
+    plt.show()
