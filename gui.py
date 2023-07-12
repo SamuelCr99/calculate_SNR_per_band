@@ -148,7 +148,7 @@ def run_gui():
                 elif (not values[f"{box}_scroll"]) and (scrollable):
                     ignored_stations.append(box)
 
-            plot_source(source, '', dir, ignored_stations, band)
+            plot_source(source, dir, ignored_stations=ignored_stations, bands=band)
 
         ### Load events ###
 
@@ -174,7 +174,7 @@ def run_gui():
             sg.PopupAnimated(None)
 
         if show_gif:
-            sg.PopupAnimated("images/loading2.gif", time_between_frames=50)
+            sg.PopupAnimated("images/loading.gif", time_between_frames=50)
 
 
 if __name__ == '__main__':
