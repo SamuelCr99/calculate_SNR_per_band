@@ -173,6 +173,7 @@ def run_gui():
 
             source_dict = find_station_matches()
             sources = list(source_dict.keys())
+            sources.sort()
             main_window["source_list"].update(values=sources)
 
             main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
