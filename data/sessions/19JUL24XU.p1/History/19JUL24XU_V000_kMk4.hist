@@ -1,0 +1,161 @@
+
+TIMETAG 2019/07/25 15:11:21 UTC
+MK3DB_VERSION 0
++HEADER
+
+CORREL   WACO
+DATABASE 19JUL24XU
+SESSNAME I19205
+OBSTIME  2019/07/24
+UTSTART  1830
+DURATION 1
+DOY      205
+CORRTIME 2019/07/25
+CORRPASS 1
+EXPORT   Preliminary Report awaiting Svetloe data
+
++SUMMARY
+
+Qcode      % of Total  % of Correlated
+                Scans            Scans
+                                      
+5-9               52%              86%
+0                  8%              13%
+1-4,A-H,N         39%               0%
+removed            0%               - 
+
++CORRELATOR_NOTES
+
+The vgosDb for this session is available at
+https://rorf.usno.navy.mil/vgosDb/2019/19JUL24XU.tgz
+
+Fringe quality 0 for scan 205-1832 with source 1751+288 on Is-Wz:S.
+Fringe quality 0 for scan 205-1832 with source 1751+288 on Is-Wz:X.
+Fringe quality 0 for scan 205-1834 with source 0642+449 on Is-Wz:X.
+Fringe quality 0 for scan 205-1842 with source 1751+288 on Is-Wz:S.
+Fringe quality 0 for scan 205-1845 with source 0642+449 on Is-Wz:X.
+Fringe quality 0 for scan 205-1855 with source 0642+449 on Is-Wz:X.
+Fringe quality 0 for scan 205-1858 with source 1751+288 on Is-Wz:S.
+Fringe quality 0 for scan 205-1904 with source 0642+449 on Is-Wz:X.
+Fringe quality 0 for scan 205-1906 with source 1751+288 on Is-Wz:S.
+Fringe quality 0 for scan 205-1912 with source 0642+449 on Is-Wz:X.
+Fringe quality 0 for scan 205-1919 with source 0642+449 on Is-Wz:X.
+Fringe quality 0 for scan 205-1922 with source 1751+288 on Is-Wz:S.
+Fringe quality 0 for scan 205-1925 with source 0016+731 on Is-Wz:S.
+Fringe quality 0 for scan 205-1927 with source 0642+449 on Is-Wz:X.
+
++STATION_NOTES
+
+ISHIOKA  (Is/P): Ok.
+
+SVETLOE  (Sv/S): No data correlated.
+
+WETTZELL (Wz/V): Ok.
+
++DROP_CHANNELS
+
++MANUAL_PCAL
+
++CHANNELS
+
+ Channels: XR1U = band|polarization|BBC#|sideband
+
+XR1U/L BBC01 8212.99
+XR2U   BBC02 8252.99
+XR3U   BBC03 8352.99
+XR4U   BBC04 8512.99
+XR5U   BBC05 8732.99
+XR6U   BBC06 8852.99
+XR7U   BBC07 8912.99
+XR8U/L BBC08 8932.99
+SR1U   BBC09 2225.99
+SR2U   BBC10 2245.99
+SR3U   BBC11 2265.99
+SR4U   BBC12 2295.99
+SR5U   BBC13 2345.99
+SR6U   BBC14 2365.99
+
++CLOCKS
+
+Clocks: WACO
+
+Station  fmout-gps    Used        Rate  Comments
+            [usec]  [usec]   [sec/sec]
+Is           0.563   1.140  -8.734E-14
+Wz          -2.346   0.300  -1.801E-12  Reference
+Date: 2019/07/24 18:30:00
+
++QCODES
+
+Qcod  0 1 2 3 4 5 6 7  8  9 A B C D E F G H  N - Tot
+----------------------------------------------------
+PS:S  0 0 0 0 0 0 0 0  0  0 0 0 0 0 0 0 0 0 17 0  17
+PS:X  0 0 0 0 0 0 0 0  0  0 0 0 0 0 0 0 0 0 17 0  17
+PV:S  6 0 0 0 0 0 0 0  0 47 0 0 0 0 0 0 0 0  0 0  53
+PV:X  8 0 0 0 0 0 0 3 11 31 0 0 0 0 0 0 0 0  0 0  53
+SV:S  0 0 0 0 0 0 0 0  0  0 0 0 0 0 0 0 0 0 17 0  17
+SV:X  0 0 0 0 0 0 0 0  0  0 0 0 0 0 0 0 0 0 17 0  17
+----------------------------------------------------
+Tot  14 0 0 0 0 0 0 3 11 78 0 0 0 0 0 0 0 0 68 0 174
+QC = 0   Fringes not detected.
+   = 1-9 Fringes detected, no error condition. Higher #, better quality.
+   = B   Interpolation error in fourfit.
+   = D   No data in one or more frequency channels.
+   = E   Maximum fringe amplitude at edge of SBD, MBD, or rate window.
+   = F   "Fork" problem in processing.
+   = G   Fringe amp in a channel is <.5 times mean amp (only if SNR>20).
+   = H   Low Phase-cal amplitude in one or more channels.
+   = N   No valid correlator data.
+ Tot     Total number of scans in schedule.
+ Minus   Scans in original schedule file for which correlation was not
+         attempted, usually because of known station problems.
+
++SNR_RATIOS
+
+MEAN RATIOS = Observed SNR / Predicted SNR  for exp no. 7991
+
+ ...by baseline, over all sources:
+
+ bl     X     n       S     n
+
+ PV    0.68   45     0.90   47
+ PS    0.00    0     0.00    0
+ VS    0.00    0     0.00    0
+
++FOURFIT_CONTROL_FILE
+
+* Fourfit control file for i19205
+*
+sb_win -256.0 256.0 mb_win -256.0 256.0 dr_win -300.e-4 300.e-4
+pc_mode multitone
+pc_period 5
+
+if f_group X
+  ref_freq 8212.99
+
+if f_group S
+  ref_freq 2225.99
+
+* setup for Ishioka
+if station P and f_group X
+   pc_tonemask ghijklmn 127 127 127 127 127 127 127 127
+
+if station P and f_group S
+   pc_tonemask abcdef 239 239 239 239 239 239
+
+if f_group X
+  ref_freq 8212.99
+
+if f_group S
+  ref_freq 2225.99
+*
+* Is / P
+if station P
+lsb_offset   80.0
+* Wz / V
+if station V
+lsb_offset    0.0
+
+* Roxanne Inniss
+
++END
