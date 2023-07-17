@@ -267,6 +267,14 @@ def find_stations():
 
     station_sefds = pd.read_csv(
         'data/standard/equip.cat', delim_whitespace=True)[['Antenna', 'X_SEFD', 'S_SEFD']]
+
+    station_sefds['A_SEFD'] = station_sefds['S_SEFD']
+    station_sefds['B_SEFD'] = station_sefds['X_SEFD']
+    station_sefds['C_SEFD'] = station_sefds['X_SEFD']
+    station_sefds['D_SEFD'] = station_sefds['X_SEFD']
+
+    station_sefds.drop(columns=['X_SEFD', 'S_SEFD'], inplace=True)
+
     station_locations = pd.read_csv(
         'data/standard/position.cat', delim_whitespace=True)[['Name', 'X', 'Y', 'Z', 'Lat', 'Lon']]
     joined_df = pd.merge(station_locations, station_sefds,
@@ -283,4 +291,4 @@ def find_stations():
 if __name__ == '__main__':
     find_stations()
     # find_datapoints("data/sessions/session1/")
-    find_datapoints("data/sessions/19JUL24XA/")
+    # find_datapoints("data/sessions/19JUL24XA/")

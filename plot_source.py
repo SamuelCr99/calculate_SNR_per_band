@@ -9,7 +9,7 @@ from math import sqrt
 
 FIG_COUNT = 1
 
-def plot_source(source, baseline="", ignored_stations=[], bands=[0,1,2,3]):
+def plot_source(source, baseline="", station_information = "", ignored_stations=[], bands=[0,1,2,3]):
     """
     Plots uv coordinates of a source at a given baseline.
 
@@ -24,7 +24,9 @@ def plot_source(source, baseline="", ignored_stations=[], bands=[0,1,2,3]):
     global FIG_COUNT
 
     data = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
-    station_data = pd.read_csv('data/derived/stations.csv')
+    # if station_information == "":
+    #     print("Loading station data...")
+    #     station_information = pd.read_csv('data/derived/stations.csv')
 
     baseline_matches = find_index(source=source, baseline=baseline, ignored_stations=ignored_stations)
 
@@ -50,7 +52,7 @@ def plot_source(source, baseline="", ignored_stations=[], bands=[0,1,2,3]):
             coords_u.extend([u, -u])
             coords_v.extend([v, -v])
 
-            flux.extend(calculate_flux(point, data, station_data, band)*2)
+            flux.extend(calculate_flux(point, data, station_information, band)*2)
 
     coords_u = [u for u in coords_u if u == u]
     coords_v = [v for v in coords_v if v == v]

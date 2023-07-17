@@ -17,6 +17,17 @@ class list_box_element:
     def __str__(self):
         return f"{self.name} [{self.observations}]"
 
+def update_station_table(station_information, source_dict, source):
+    new_table = []
+    for station in source_dict[source]["stations"]:
+        a_sefd = station_information[station_information['name'] == station]['A_SEFD'].values[0]
+        b_sefd = station_information[station_information['name'] == station]['B_SEFD'].values[0]
+        c_sefd = station_information[station_information['name'] == station]['C_SEFD'].values[0]
+        d_sefd = station_information[station_information['name'] == station]['D_SEFD'].values[0]
+        new_table.append([station, source_dict[source]["stations"][station], a_sefd, b_sefd, c_sefd, d_sefd])
+    return new_table
+
+
 def find_datapoints_threaded(dir, window):
     """
     Asynchronous function for finding datapoints in the background. 
@@ -29,6 +40,7 @@ def find_datapoints_threaded(dir, window):
     """
     find_datapoints(dir)
     window.write_event_value("load_done",0)
+    
 
 
 def run_gui():
@@ -46,7 +58,8 @@ def run_gui():
     sg.theme("DarkGrey5")
     sg.SetOptions(font=("Andalde Mono", 12))
 
-    stations = list(set(pd.read_csv('data/derived/stations.csv')['name']))
+    station_information = pd.read_csv('data/derived/stations.csv')
+    stations = list(set(station_information['name']))
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True, icon="images/favicon.ico")
@@ -64,6 +77,9 @@ def run_gui():
     show_gif = False
     sort_alph_reverse = False
     sort_num_reverse = True
+    select_window = None
+    SEFD_row = 0
+    SEFD_col = 0
 
     # Event loop for the GUI
     while True:
@@ -97,46 +113,9 @@ def run_gui():
                 continue
             source = values["source_list"][0].name
 
-            # Make all check boxes and their columns invisible
-            main_window["check_box_col"].update(visible=False)
-            main_window["check_box_col_scroll"].update(visible=False)
-
-            for box in stations:
-                main_window[box].update(visible=False)
-                main_window[box].hide_row()
-                main_window[f"{box}_scroll"].update(visible=False)
-                main_window[f"{box}_scroll"].hide_row()
-
-            # Switch to scrollable column if more than 9 entries
-            scrollable = len(source_dict[source]['stations']) > 9
-
-            # Make only the available check boxes and the correct column visible
-            for box in source_dict[source]['stations']:
-                if scrollable:
-                    main_window[f"{box}_scroll"].update(visible=True)
-                    main_window[f"{box}_scroll"].unhide_row()
-                else:
-                    main_window[box].update(visible=True)
-                    main_window[box].unhide_row()
-
-            if scrollable:
-                main_window["check_box_col_scroll"].update(visible=True)
-            else:
-                main_window["check_box_col"].update(visible=True)
-
-            # Update the GUI
-            main_window["check_box_col"].contents_changed()
-            main_window["check_box_col_scroll"].contents_changed()
-            main_window["stations_col"].contents_changed()
+            new_table = update_station_table(station_information, source_dict, source)
+            main_window["stations_table"].update(new_table)
             main_window.refresh()
-
-        # Keep the check boxes synchronized between scrollable and not
-        # scrollable columns
-        if event in stations:
-            main_window[f"{event}_scroll"].update(value=values[event])
-
-        if event[:-7] in stations:
-            main_window[event[:-7]].update(value=values[event])
 
         ### Buttons events ###
 
@@ -159,13 +138,13 @@ def run_gui():
 
             # Ignore the stations that were unselected in the GUI
             ignored_stations = []
-            for box in stations:
-                if (not values[box]) and (not scrollable):
-                    ignored_stations.append(box)
-                elif (not values[f"{box}_scroll"]) and (scrollable):
-                    ignored_stations.append(box)
+            # for box in stations:
+            #     if (not values[box]) and (not scrollable):
+            #         ignored_stations.append(box)
+            #     elif (not values[f"{box}_scroll"]) and (scrollable):
+            #         ignored_stations.append(box)
 
-            return_message = plot_source(source.name, ignored_stations=ignored_stations, bands=band)
+            return_message = plot_source(source.name, station_information=station_information, ignored_stations=ignored_stations, bands=band)
             if return_message == "no_data_found":
                 sg.Popup("No data points found for this source using the selected stations and band.")
 
@@ -185,21 +164,10 @@ def run_gui():
         ### Load events ###
 
         if event == "load_done":
-            # When find datapoints is done, update the GUI, name of the window
-            # and source list. Also stop the loading animation
-            for box in stations:
-                main_window[box].update(visible=False)
-                main_window[box].hide_row()
-                main_window[f"{box}_scroll"].update(visible=False)
-                main_window[f"{box}_scroll"].hide_row()
-            main_window["check_box_col"].contents_changed()
-            main_window["check_box_col_scroll"].contents_changed()
-
             source_dict = find_station_matches()
             sources = list(map(lambda s: list_box_element(s,source_dict[s]['observations']), source_dict))
 
             sources.sort(key=lambda s: s.name)
-
             main_window["source_list"].update(values=sources)
 
             main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
@@ -208,9 +176,31 @@ def run_gui():
             show_gif = False
             sg.PopupAnimated(None)
 
-
         if show_gif:
             sg.PopupAnimated("images/loading.gif", time_between_frames=50)
+
+        if event[0] == "stations_table" and event[1] == "+CLICKED+":
+            SEFD_row, SEFD_col = event[2]
+
+            if SEFD_row == None or SEFD_col == None:
+                continue
+
+            if SEFD_col in [2,3,4,5] and SEFD_row != -1:
+                selected_station = main_window["stations_table"].get()[SEFD_row][0]
+                selected_band = chr(65+SEFD_col-2)
+                SEFD_col_name = f'{selected_band}_SEFD'
+                orig_SEFD = station_information.loc[station_information["name"] == selected_station, SEFD_col_name].to_list()[0]
+                event, values = sg.Window("Edit...",[[sg.Text(f"SEFD for band {selected_band} and station {selected_station}")],
+                                                     [sg.Input(default_text=orig_SEFD,key="new_SEFD_input"),sg.Button("Set",key="new_SEFD_set")]], finalize=True, icon="images/favicon.ico", disable_close=True).read(close=True)
+                
+                new_SEFD = values["new_SEFD_input"]
+                station_information.loc[station_information["name"] == main_window["stations_table"].get()[SEFD_row][0], SEFD_col_name] = new_SEFD
+
+                new_table = update_station_table(station_information, source_dict, source)
+
+                main_window["stations_table"].update(new_table)
+                main_window.refresh()
+            
 
 
 if __name__ == '__main__':

@@ -11,24 +11,16 @@ def create_layout(stations):
     Returns:
     The finished layout
     """
-
-    # Create all checkboxes for the stations. Need to be created now, as they
-    # cannot be added/removed from the GUI later.
     stations.sort()
-    check_boxes1 = list(map(lambda s: [sg.Checkbox(
-        s, default=True, visible=False, key=s, expand_x=True, enable_events=True)], stations))
-    check_boxes2 = list(map(lambda s: [sg.Checkbox(
-        s, default=True, visible=False, key=f"{s}_scroll", expand_x=True, enable_events=True)], stations))
-
-    stations_col = sg.Column([[sg.Column(check_boxes1, s=(260, 290), scrollable=False, key="check_box_col", element_justification="left", expand_x=True, expand_y=True, p=20),
-                               sg.Column(check_boxes2, s=(260, 290), scrollable=True, vertical_scroll_only=True, key="check_box_col_scroll", element_justification="left", expand_x=True, expand_y=True, p=20, visible=False)]], key="stations_col", s=(300, 340), scrollable=False)
+    headings = ["Stations", "Observations", "A SEFD", "B SEFD", "C SEFD", "D SEFD"]
+    table_col = sg.Table([[]],headings=headings, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE)
 
     sources_col = sg.Column([[sg.Listbox([[]], key="source_list", size=(30, 10), enable_events=True, expand_x=True)],
                              [sg.Button("Sort alphabetical", key="sort_alph"),sg.Button("Sort numerical", key="sort_num"),sg.Push()]], expand_x=True, p=20)
 
     # Currently the only column
     left_col = [[sg.Frame("Source", [[sources_col]], expand_x=True)],
-                [sg.Frame("Stations", [[stations_col]], expand_x=True)],
+                [sg.Frame("Stations", [[table_col]], expand_x=True)],
                 [sg.Frame("Band", [[sg.Radio("A", "band", key='A_band', default=True), sg.Radio("B", "band", key="B_band"), sg.Radio(
                     "C", "band", key="C_band"), sg.Radio("D", "band", key="D_band")]], expand_x=True)],
                 [sg.VPush()],
