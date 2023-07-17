@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from astropy.io import fits
 from math import radians
 
-image = get_image("fits/J0211-0145_C_2019_07_24_pet_map.fits")
+image = get_image("fits/J0029-0113_S_2004_04_30_yyk_map.fits")
 #image = get_image("fits/J0022+0608_S_2018_11_18_pet_map.fits")
 org, mdl, anl, gauss_list = sm().process(image)
 
@@ -49,10 +49,10 @@ delta_dec = data.header["CDELT2"]
 ### Test 3
 
 xs = list(range(512))*512
-ys = list(range(512))*512
+ys = xs.copy()
 ys.sort()
 
-flux = list(map(lambda x,y: gaussian.get_fourier_transform_value(x,y,scale_factor=512), xs, ys))
+flux = list(map(lambda x,y: abs(gaussian.get_fourier_transform_value(x,y,scale_factor=512)), xs, ys))
 
 RA = list(map(lambda x: radians(ref_val_RA + (x - ref_pix_RA) * delta_RA), xs))
 dec = list(map(lambda y: radians(ref_val_dec + (y - ref_pix_dec) * delta_dec), ys))

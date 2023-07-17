@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from find_index import find_index_of_source_baseline, find_index_of_source, find_index_of_source_ignore_stations
+from find_index import find_index
 from to_uv import convert_uv
 import pandas as pd
 import netCDF4 as nc
@@ -9,7 +9,7 @@ from math import sqrt
 
 FIG_COUNT = 1
 
-def plot_source(source, dir, ignored_stations=[], bands=[0,1,2,3], baseline=""):
+def plot_source(source, baseline="", ignored_stations=[], bands=[0,1,2,3]):
     """
     Plots uv coordinates of a source at a given baseline.
 
@@ -23,19 +23,10 @@ def plot_source(source, dir, ignored_stations=[], bands=[0,1,2,3], baseline=""):
 
     global FIG_COUNT
 
-    if dir[-1] != '/': dir += '/'
-
-    ref_freq = np.ma.getdata(nc.Dataset(
-        f'{dir}Observables/RefFreq_bX.nc', 'r')["RefFreq"]).tolist()[0]
-    uv_data = np.ma.getdata(nc.Dataset(
-        f'{dir}ObsDerived/UVFperAsec_bX.nc', 'r')['UVFperAsec']).tolist()
     data = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
     station_data = pd.read_csv('data/derived/stations.csv')
 
-    if baseline:
-        baseline_matches = find_index_of_source_baseline(source, baseline)
-    else:
-        baseline_matches = find_index_of_source_ignore_stations(source, ignored_stations)
+    baseline_matches = find_index(source=source, baseline=baseline, ignored_stations=ignored_stations)
 
     coords_u = []
     coords_v = []
@@ -46,7 +37,8 @@ def plot_source(source, dir, ignored_stations=[], bands=[0,1,2,3], baseline=""):
 
     for band in bands:
         for point in baseline_matches:
-            u_orig, v_orig = uv_data[point][0]*206264.81, uv_data[point][1]*206264.81
+            u_orig, v_orig = data.u.iloc[point], data.v.iloc[point]
+            ref_freq = data.ref_freq.iloc[point]
 
             if band == 0: freq = data.A_freq.iloc[point]
             elif band == 1: freq = data.B_freq.iloc[point]
@@ -58,7 +50,7 @@ def plot_source(source, dir, ignored_stations=[], bands=[0,1,2,3], baseline=""):
             coords_u.extend([u, -u])
             coords_v.extend([v, -v])
 
-            flux.extend(calculate_flux(point, data, station_data, band))
+            flux.extend(calculate_flux(point, data, station_data, band)*2)
 
     coords_u = [u for u in coords_u if u == u]
     coords_v = [v for v in coords_v if v == v]
@@ -95,14 +87,13 @@ def plot_source(source, dir, ignored_stations=[], bands=[0,1,2,3], baseline=""):
 
 
 if __name__ == '__main__':
-    source = "1803+784"
-    baseline = "GGAO12M/ISHIOKA"
+    source = "0017+200"
     session_path = 'data/sessions/session1/'
 
     if "/" not in session_path:
-        session_path = f"data/sessions/{session_path}/"
+        session_path = f"{session_path}"
     elif session_path[-1] != "/":
         session_path += "/"
 
-    plot_source(source, baseline, session_path, [], [3])
+    plot_source(source, session_path, [], [3])
     plt.show()

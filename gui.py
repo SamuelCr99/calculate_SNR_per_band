@@ -6,9 +6,10 @@ from layout import create_layout
 from plot_source import plot_source
 from init import find_datapoints
 import matplotlib.pyplot as plt
+import threading
 
 
-def find_datapoints_threaded(dir):
+def find_datapoints_threaded(dir, window):
     """
     Asynchronous function for finding datapoints in the background. 
 
@@ -18,10 +19,8 @@ def find_datapoints_threaded(dir):
     returns:
     No return values
     """
-    try:
-        find_datapoints(dir)
-    except:
-        pass
+    find_datapoints(dir)
+    window.write_event_value("load_done",0)
 
 
 def run_gui():
@@ -68,8 +67,10 @@ def run_gui():
                 # If the user has selected a new folder, start the loading animation
                 # and find the datapoints in the background
                 show_gif = True
-                main_window.perform_long_operation(
-                    lambda: find_datapoints_threaded(new_dir), "load_done")
+                thread_id = threading.Thread(target=find_datapoints_threaded,args=(new_dir,main_window),daemon=True)
+                thread_id.start()
+                #main_window.perform_long_operation(
+                #    lambda: find_datapoints_threaded(new_dir), "load_done")
 
         if event == "About...":
             sg.Popup("About info")
@@ -153,7 +154,7 @@ def run_gui():
                 elif (not values[f"{box}_scroll"]) and (scrollable):
                     ignored_stations.append(box)
 
-            return_message = plot_source(source, dir, ignored_stations=ignored_stations, bands=band)
+            return_message = plot_source(source, ignored_stations=ignored_stations, bands=band)
             if return_message == "no_data_found":
                 sg.Popup("No data points found for this source using the selected stations and band.")
             

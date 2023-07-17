@@ -1,18 +1,19 @@
-import pandas as pd
-from math import sqrt, degrees
+from math import sqrt
 
 
-def calculate_flux(index, general_data, station_data, band=-1):
+def calculate_flux(index, general_data, station_data, bands=[0,1,2,3]):
     """
     Calculates the flux of a source at a given index in the data/datapoints.csv file.
 
-    Pramaeters:
+    Parameters:
     index (int): The index of the source in the data/datapoints.csv file.
 
     Returns:
     list[float]: A list of the calculated fluxes for each band for the source at the given index.
 
     """
+    if not isinstance(bands, list):
+        bands = [bands]
 
     int_time = general_data.int_time.iloc[index]
     C = 1  # Currently assume C is always equal to 1
@@ -29,24 +30,20 @@ def calculate_flux(index, general_data, station_data, band=-1):
     SEFD2_S = float(
         station_data.S_SEFD.loc[station_data.name == stat2].iloc[0])
 
-    A_SNR = general_data.A_SNR.iloc[index]
-    A_band_width = general_data.A_bw.iloc[index]*10**6
-    A_flux = A_SNR * sqrt(SEFD1_S * SEFD2_S) / (C * sqrt(2*int_time*A_band_width)) if A_band_width != 0 else 0
+    flux = []
 
-    B_SNR = general_data.B_SNR.iloc[index]
-    B_band_width = general_data.B_bw.iloc[index]*10**6
-    B_flux = B_SNR * sqrt(SEFD1_X * SEFD2_X) / (C * sqrt(2*int_time*B_band_width)) if B_band_width != 0 else 0
+    for band in bands:
+        if band == 0:
+            SEFD1 = SEFD1_S
+            SEFD2 = SEFD2_S
+        else:
+            SEFD1 = SEFD1_X
+            SEFD2 = SEFD2_X
 
-    C_SNR = general_data.C_SNR.iloc[index]
-    C_band_width = general_data.C_bw.iloc[index]*10**6
-    C_flux = C_SNR * sqrt(SEFD1_X * SEFD2_X) / (C * sqrt(2*int_time*C_band_width)) if C_band_width != 0 else 0
+        band_letter = ["A","B","C","D"][band]
 
-    D_SNR = general_data.D_SNR.iloc[index]
-    D_band_width = general_data.D_bw.iloc[index]*10**6
-    D_flux = D_SNR * sqrt(SEFD1_X * SEFD2_X) / (C * sqrt(2*int_time*D_band_width)) if D_band_width != 0 else 0
+        SNR = general_data[f"{band_letter}_SNR"].iloc[index]
+        band_width = general_data[f"{band_letter}_bw"].iloc[index]*10**6
+        flux.append(SNR * sqrt(SEFD1 * SEFD2) / (C * sqrt(2*int_time*band_width)) if band_width != 0 else 0)
 
-
-    if band == -1:
-        return [A_flux, B_flux, C_flux, D_flux, A_flux, B_flux, C_flux, D_flux]
-    
-    return [[A_flux, B_flux, C_flux, D_flux][band]]*2
+    return flux

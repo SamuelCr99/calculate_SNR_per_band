@@ -63,6 +63,8 @@ def find_datapoints(dir):
     snr_info = nc.Dataset(f'{dir}Observables/SNR_bX.nc')
     corrinfo = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bX.nc')
     quality_code_ds = nc.Dataset(f'{dir}Observables/QualityCode_bX.nc')
+    ref_freq_ds = nc.Dataset(f'{dir}Observables/RefFreq_bX.nc')
+    uv_ds = nc.Dataset(f'{dir}ObsDerived/UVFperAsec_bX.nc')
 
     # Find source
     source = []
@@ -206,6 +208,14 @@ def find_datapoints(dir):
     # Find quality code
     qualcode = list(bytes_to_string(np.ma.getdata(quality_code_ds["QualityCode"]).tolist()))
 
+    # Find u and v
+    uv_data = np.ma.getdata(uv_ds['UVFperAsec']).tolist()
+    u = list(map(lambda u: u[0]*206264.81, uv_data))
+    v = list(map(lambda v: v[1]*206264.81, uv_data))
+
+    # Find reference frequency
+    ref_freq = np.ma.getdata(ref_freq_ds["RefFreq"]).tolist()*len(time)
+
     # Collect everything into a dataframe
     df = pd.DataFrame({"YMDHM": time,
                        "Second": second,
@@ -230,10 +240,12 @@ def find_datapoints(dir):
                        "C_bw": C_bw,
                        "D_bw": D_bw,
                        "int_time": int_time,
-                       "Q_code": qualcode})
+                       "Q_code": qualcode,
+                       "u": u,
+                       "v": v,
+                       "ref_freq": ref_freq})
 
-    datapoints_csv = df.to_csv(index=False)
-    datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + datapoints_csv
+    datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + df.to_csv(index=False)
     with open("data/derived/datapoints.csv","w") as file:
         file.write(datapoints_csv)
 
