@@ -9,6 +9,14 @@ import matplotlib.pyplot as plt
 import threading
 
 
+class list_box_element:
+    def __init__(self, name, observations):
+        self.name = name
+        self.observations = observations
+    
+    def __str__(self):
+        return f"{self.name} [{self.observations}]"
+
 def find_datapoints_threaded(dir, window):
     """
     Asynchronous function for finding datapoints in the background. 
@@ -42,7 +50,7 @@ def run_gui():
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True, icon="images/favicon.ico")
-    main_window.TKroot.minsize(360,620)
+    main_window.TKroot.minsize(380,620)
 
     # Fixes issue with layout on Windows 11
     plt.figure()
@@ -54,6 +62,8 @@ def run_gui():
     new_dir = ""
     scrollable = False
     show_gif = False
+    sort_alph_reverse = False
+    sort_num_reverse = True
 
     # Event loop for the GUI
     while True:
@@ -85,6 +95,7 @@ def run_gui():
             # Ignore event if no source was selected
             if values["source_list"] == []:
                 continue
+            source = values["source_list"][0].name
 
             # Make all check boxes and their columns invisible
             main_window["check_box_col"].update(visible=False)
@@ -97,10 +108,10 @@ def run_gui():
                 main_window[f"{box}_scroll"].hide_row()
 
             # Switch to scrollable column if more than 9 entries
-            scrollable = len(source_dict[values["source_list"]]) > 9
+            scrollable = len(source_dict[source]['stations']) > 9
 
             # Make only the available check boxes and the correct column visible
-            for box in source_dict[values["source_list"]]:
+            for box in source_dict[source]['stations']:
                 if scrollable:
                     main_window[f"{box}_scroll"].update(visible=True)
                     main_window[f"{box}_scroll"].unhide_row()
@@ -135,7 +146,7 @@ def run_gui():
                 sg.Popup("Please select a folder first!")
                 continue
 
-            source = values["source_list"]
+            source = values["source_list"][0]
             # Check that user has selected a source
             if source not in sources:
                 sg.Popup("Source not found! Please select one from the list.")
@@ -154,9 +165,21 @@ def run_gui():
                 elif (not values[f"{box}_scroll"]) and (scrollable):
                     ignored_stations.append(box)
 
-            return_message = plot_source(source, ignored_stations=ignored_stations, bands=band)
+            return_message = plot_source(source.name, ignored_stations=ignored_stations, bands=band)
             if return_message == "no_data_found":
                 sg.Popup("No data points found for this source using the selected stations and band.")
+
+        if event == "sort_alph": 
+            sources.sort(key=lambda s: s.name, reverse= sort_alph_reverse)
+            sort_alph_reverse = not sort_alph_reverse
+            sort_num_reverse = True
+            main_window["source_list"].update(values=sources)
+
+        if event == "sort_num":
+            sources.sort(key=lambda s: s.observations, reverse= sort_num_reverse)
+            sort_num_reverse = not sort_num_reverse
+            sort_alph_reverse = False
+            main_window["source_list"].update(values=sources)
             
 
         ### Load events ###
@@ -173,8 +196,10 @@ def run_gui():
             main_window["check_box_col_scroll"].contents_changed()
 
             source_dict = find_station_matches()
-            sources = list(source_dict.keys())
-            sources.sort()
+            sources = list(map(lambda s: list_box_element(s,source_dict[s]['observations']), source_dict))
+
+            sources.sort(key=lambda s: s.name)
+
             main_window["source_list"].update(values=sources)
 
             main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
@@ -182,6 +207,7 @@ def run_gui():
             dir = new_dir
             show_gif = False
             sg.PopupAnimated(None)
+
 
         if show_gif:
             sg.PopupAnimated("images/loading.gif", time_between_frames=50)

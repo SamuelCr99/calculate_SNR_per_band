@@ -17,7 +17,6 @@ def bytes_to_string(bytes):
         string += byte.decode("utf-8")
     return string
 
-
 def time_to_string(time):
     # Converts YMDHM time list to a nicely formatted string
     h = time[3]
@@ -245,6 +244,9 @@ def find_datapoints(dir):
                        "v": v,
                        "ref_freq": ref_freq})
 
+    # Sort out rows with too low quality
+    df = df.loc[(df.Q_code.astype(int) > 5)]
+    
     datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + df.to_csv(index=False)
     with open("data/derived/datapoints.csv","w") as file:
         file.write(datapoints_csv)

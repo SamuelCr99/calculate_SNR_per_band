@@ -32,9 +32,6 @@ def find_index(source="", baseline="", ignored_stations=[]):
     if source:
         df = df.loc[(df.Source == source)]
 
-    # Sort out rows with too low quality
-    df = df.loc[(df.Q_code > 5)]
-
     return df.index.tolist()
 
 
