@@ -12,8 +12,8 @@ def create_layout(stations):
     The finished layout
     """
     stations.sort()
-    headings = ["Stations", "Observations", "A SEFD", "B SEFD", "C SEFD", "D SEFD"]
-    table_col = sg.Table([[]],headings=headings, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE)
+    headings = ["Sel.", "Stations", "Obs.", "A SEFD", "B SEFD", "C SEFD", "D SEFD"]
+    table_col = sg.Table([[]],headings=headings, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE, expand_x=True, p=20)
 
     sources_col = sg.Column([[sg.Listbox([[]], key="source_list", size=(30, 10), enable_events=True, expand_x=True)],
                              [sg.Button("Sort alphabetical", key="sort_alph"),sg.Button("Sort numerical", key="sort_num"),sg.Push()]], expand_x=True, p=20)
@@ -26,7 +26,7 @@ def create_layout(stations):
                 [sg.VPush()],
                 [sg.Push(), sg.Button("Plot", key="plot"), sg.Button("Cancel", key="cancel")]]
 
-    menu = [["&File", ["&Open folder", "&Exit"]],
+    menu = [["&File", ["&Open folder", "&Save configuration","&Exit"]],
             ["&Help", "&About..."]]
 
     layout = [[sg.MenubarCustom(menu)],

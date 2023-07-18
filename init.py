@@ -284,6 +284,8 @@ def find_stations():
     joined_df = joined_df.rename(
         columns={'Name': 'name', 'X': 'x', 'Y': 'y', 'Z': 'z', 'Lon': 'lon', 'Lat': 'lat'})
 
+    joined_df["selected"] = [1]*len(joined_df["name"])
+
     # Write to csv file
     joined_df.to_csv("data/derived/stations.csv", index=False)
 
