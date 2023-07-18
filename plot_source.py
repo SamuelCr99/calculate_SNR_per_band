@@ -65,10 +65,10 @@ def plot_source(source, baseline="", station_information = "", ignored_stations=
     # Only dots
     plt.figure(FIG_COUNT)
     FIG_COUNT += 1
-    x = plt.scatter(coords_u, coords_v, c=flux, marker=".")
-    cursor = mplcursors.cursor(x,hover=mplcursors.HoverMode.Transient)
+    uv_plot = plt.scatter(coords_u, coords_v, c=flux, marker=".")
+    uv_cursor = mplcursors.cursor(uv_plot,hover=mplcursors.HoverMode.Transient)
 
-    cursor.connect(
+    uv_cursor.connect(
         "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
     plt.xlabel("U [lambda]")
     plt.ylabel("V [lambda]")
@@ -86,7 +86,10 @@ def plot_source(source, baseline="", station_information = "", ignored_stations=
         colors = sum(list(map(lambda b: [base_colors[b]]*2*len(baseline_matches), bands)),[])
     else:
         colors = "black"
-    plt.scatter(distance,flux, marker=".", c=colors)
+    flux_density_plot = plt.scatter(distance,flux, marker=".", c=colors)
+    flux_cursor = mplcursors.cursor(flux_density_plot,hover=mplcursors.HoverMode.Transient)
+    flux_cursor.connect(
+        "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
     plt.xlabel("sqrt(U^2+V^2) [lambda]")
     plt.ylabel("Flux density")
     plt.title(f"Flux density vs. sqrt(U^2+V^2) for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
