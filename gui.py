@@ -6,7 +6,6 @@ from layout import create_layout
 from plot_source import plot_source
 from init import find_datapoints
 import matplotlib.pyplot as plt
-import threading
 
 
 class list_box_element:
@@ -27,21 +26,6 @@ def update_station_table(station_information, stations):
         d_sefd = station_information[station_information['name'] == station]['D_SEFD'].values[0]
         new_table.append([activated, station, stations[station], a_sefd, b_sefd, c_sefd, d_sefd])
     return new_table
-
-
-def find_datapoints_threaded(dir, window):
-    """
-    Asynchronous function for finding datapoints in the background. 
-
-    Parameters:
-    dir (str): Path to the folder containing the data
-
-    returns:
-    No return values
-    """
-    find_datapoints(dir)
-    window.write_event_value("load_done",0)
-    
 
 
 def run_gui():
@@ -65,7 +49,7 @@ def run_gui():
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True, icon="images/favicon.ico")
-    main_window.TKroot.minsize(630,620)
+    main_window.TKroot.minsize(630,770)
 
     # Fixes issue with layout on Windows 11
     plt.figure()
@@ -92,13 +76,11 @@ def run_gui():
         if event == "Open folder":
             new_dir = askdirectory(initialdir="data/sessions")
             if new_dir != dir and new_dir:
-                # If the user has selected a new folder, start the loading animation
-                # and find the datapoints in the background
-                show_gif = True
-                thread_id = threading.Thread(target=find_datapoints_threaded,args=(new_dir,main_window),daemon=True)
-                thread_id.start()
-                #main_window.perform_long_operation(
-                #    lambda: find_datapoints_threaded(new_dir), "load_done")
+                main_window["loading_text"].update(value="Loading...")
+                main_window.set_title(f"Quasar Viewer - Loading...")
+                main_window.refresh()
+                find_datapoints(new_dir)
+                main_window.write_event_value("load_done",0)
 
         if event == "Save configuration":
             station_information.to_csv("data/derived/stations.csv", index=False)
@@ -120,7 +102,7 @@ def run_gui():
         if event == "source_list":
 
             # Ignore event if no source was selected
-            if values["source_list"] == []:
+            if not values["source_list"]:
                 continue
             source = values["source_list"][0]
             new_table = update_station_table(station_information, source_dict[source.name]["stations"])
@@ -135,8 +117,12 @@ def run_gui():
                 sg.Popup("Please select a folder first!")
                 continue
 
-            source = values["source_list"][0]
-            # Check that user has selected a source
+           # Check that user has selected a source
+            if not values["source_list"]:
+                sg.Popup("No source selected! Please select one from the list.")
+                continue
+
+            # Check that user has selected a valid source
             if source not in sources:
                 sg.Popup("Source not found! Please select one from the list.")
                 continue
@@ -158,17 +144,21 @@ def run_gui():
             sort_alph_reverse = not sort_alph_reverse
             sort_num_reverse = True
             main_window["source_list"].update(values=sources)
+            main_window["source_list"].set_value([source])
 
         if event == "sort_num":
             sources.sort(key=lambda s: s.observations, reverse= sort_num_reverse)
             sort_num_reverse = not sort_num_reverse
             sort_alph_reverse = False
             main_window["source_list"].update(values=sources)
+            main_window["source_list"].set_value([source])
             
 
         ### Load events ###
 
         if event == "load_done":
+            source = None
+            main_window["stations_table"].update([[]])
             source_dict = find_station_matches()
             sources = list(map(lambda s: list_box_element(s,source_dict[s]['observations']), source_dict))
 
@@ -176,10 +166,9 @@ def run_gui():
             main_window["source_list"].update(values=sources)
 
             main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
-            main_window.refresh()
             dir = new_dir
-            show_gif = False
-            sg.PopupAnimated(None)
+            main_window["loading_text"].update(value="")
+            main_window.refresh()
 
         if show_gif:
             sg.PopupAnimated("images/loading.gif", time_between_frames=50)
