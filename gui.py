@@ -206,23 +206,23 @@ def run_gui():
 
                 # Sort by observations
                 if SEFD_col == 2:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: stat[1], reverse=reverse))
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: int(stat[1]), reverse=reverse))
 
                 # Sort by A SEFD
                 if SEFD_col == 3:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["A_SEFD"].iloc[0], reverse=reverse))
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(station_information.loc[station_information["name"] == stat[0]]["A_SEFD"].iloc[0]), reverse=reverse))
                 
                 # Sort by B SEFD
                 if SEFD_col == 4:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["B_SEFD"].iloc[0], reverse=reverse))
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(station_information.loc[station_information["name"] == stat[0]]["B_SEFD"].iloc[0]), reverse=reverse))
                 
                 # Sort by C SEFD
                 if SEFD_col == 5:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["C_SEFD"].iloc[0], reverse=reverse))
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(station_information.loc[station_information["name"] == stat[0]]["C_SEFD"].iloc[0]), reverse=reverse))
                 
                 # Sort by D SEFD
                 if SEFD_col == 6:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["D_SEFD"].iloc[0], reverse=reverse))
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(station_information.loc[station_information["name"] == stat[0]]["D_SEFD"].iloc[0]), reverse=reverse))
 
                 sort_stat_reverse = [False]*7
                 sort_stat_reverse[SEFD_col] = not reverse
@@ -251,10 +251,9 @@ def run_gui():
                 
                 edit_popup = sg.Window("Edit...",[[sg.Text(f"SEFD for band {selected_band} and station {selected_station}")],
                                                   [sg.Input(default_text=orig_SEFD,key="new_SEFD_input"),sg.Button("Set",key="new_SEFD_set")],
-                                                  [sg.Text("Invalid input!",key="invalid_input",visible=False,text_color="red")]], finalize=True, icon="images/favicon.ico")
+                                                  [sg.Text("Invalid input!",key="invalid_input",visible=False,text_color="red")]], finalize=True, icon="images/favicon.ico", modal=True)
                 edit_popup["new_SEFD_input"].bind("<Return>", "_enter")
                 edit_popup["invalid_input"].hide_row()
-                main_window.disable()
 
                 while True:
                     event, values = edit_popup.Read()
@@ -274,12 +273,10 @@ def run_gui():
 
                         station_information.loc[station_information["name"] == selected_station, SEFD_col_name] = new_SEFD
                         new_table = update_station_table(station_information, source_dict[source.name]["stations"])
-                        main_window.enable()
                         main_window["stations_table"].update(new_table)
                         main_window.refresh()
                         edit_popup.close()
                     
-                    main_window.enable()
                     break
 
 
