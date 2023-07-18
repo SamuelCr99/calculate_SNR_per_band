@@ -64,7 +64,7 @@ def run_gui():
     stations = list(set(station_information['name']))
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
-                            margins=[0, 0], resizable=True, finalize=True, icon="images/favicon.ico", enable_close_attempted_event=True)
+                            margins=[0, 0], resizable=True, finalize=True, icon="images/favicon.ico")
     main_window.TKroot.minsize(630,620)
 
     # Fixes issue with layout on Windows 11
@@ -108,8 +108,7 @@ def run_gui():
         if event == "About...":
             sg.Popup("About info")
 
-        if event == sg.WIN_CLOSE_ATTEMPTED_EVENT or event == "cancel" or event == "Exit":
-            print("Close attempt event")
+        if event == sg.WIN_CLOSED or event == "cancel" or event == "Exit":
             if not station_information.equals(saved_station_information):
                 a = sg.popup_yes_no("Do you wish to save the changes made?")
                 if a == "Yes": 
@@ -189,11 +188,16 @@ def run_gui():
         if event[0] == "stations_table" and event[1] == "+CLICKED+":
             SEFD_row, SEFD_col = event[2]
 
+            # Unusable clicks
             if SEFD_row == None or SEFD_col == None or SEFD_col == -1:
                 continue
             
+            # Sort by columns
             elif SEFD_row == -1:
-                # Sort rows after specific column
+                
+                # Sort by selected
+                if SEFD_col == 0:
+                    station_information.sort_values(by="selected",inplace=True,ignore_index=True)
                 continue
 
             elif SEFD_col == 0:
@@ -220,6 +224,7 @@ def run_gui():
                                                   [sg.Text("Invalid input!",key="invalid_input",visible=False,text_color="red")]], finalize=True, icon="images/favicon.ico")
                 edit_popup["new_SEFD_input"].bind("<Return>", "_enter")
                 edit_popup["invalid_input"].hide_row()
+                # main_window.disable()
 
                 while True:
                     event, values = edit_popup.Read()
@@ -239,9 +244,12 @@ def run_gui():
 
                         station_information.loc[station_information["name"] == selected_station, SEFD_col_name] = new_SEFD
                         new_table = update_station_table(station_information, source_dict[source.name]["stations"])
+                        # main_window.enable()
                         main_window["stations_table"].update(new_table)
                         main_window.refresh()
                         edit_popup.close()
+                    
+                    # main_window.enable()
                     break
 
 

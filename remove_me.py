@@ -3,10 +3,12 @@ import numpy as np
 import mplcursors
 np.random.seed(42)
 
-fig, ax = plt.subplots()
-ax.scatter(*np.random.random((2, 26)))
-ax.set_title("Mouse over a point")
 
-mplcursors.cursor([0,1,2,3],hover=True)
+
+lines = plt.plot(range(3), range(3), "o")
+labels = ["a", "b", "c"]
+cursor = mplcursors.cursor(lines, hover=mplcursors.HoverMode.Transient)
+cursor.connect(
+    "add", lambda sel: sel.annotation.set_text(labels[sel.index]))
 
 plt.show()

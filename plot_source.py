@@ -6,6 +6,7 @@ import netCDF4 as nc
 import numpy as np
 from calculate_flux import calculate_flux
 from math import sqrt
+import mplcursors
 
 FIG_COUNT = 1
 
@@ -29,6 +30,7 @@ def plot_source(source, baseline="", station_information = "", ignored_stations=
     #     station_information = pd.read_csv('data/derived/stations.csv')
 
     baseline_matches = find_index(source=source, baseline=baseline, ignored_stations=ignored_stations)
+    baselines = []
 
     coords_u = []
     coords_v = []
@@ -52,8 +54,9 @@ def plot_source(source, baseline="", station_information = "", ignored_stations=
             coords_u.extend([u, -u])
             coords_v.extend([v, -v])
 
-            flux.extend(calculate_flux(point, data, station_information, band)*2)
-
+            curr_flux = calculate_flux(point, data, station_information, band)
+            flux.extend(curr_flux*2)
+            baselines.extend([data.Station1.iloc[point] + "-" + data.Station2.iloc[point] + ' ' + str(curr_flux)]*2)
     coords_u = [u for u in coords_u if u == u]
     coords_v = [v for v in coords_v if v == v]
     if len(coords_u) == 0 or len(coords_v) == 0:
@@ -62,7 +65,11 @@ def plot_source(source, baseline="", station_information = "", ignored_stations=
     # Only dots
     plt.figure(FIG_COUNT)
     FIG_COUNT += 1
-    plt.scatter(coords_u, coords_v, c=flux, marker=".")
+    x = plt.scatter(coords_u, coords_v, c=flux, marker=".")
+    cursor = mplcursors.cursor(x,hover=mplcursors.HoverMode.Transient)
+
+    cursor.connect(
+        "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
     plt.xlabel("U [lambda]")
     plt.ylabel("V [lambda]")
     plt.colorbar()
