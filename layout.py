@@ -13,7 +13,7 @@ def create_layout(stations):
     """
     stations.sort()
     headings = ["Sel.", "Stations", "Obs.", "A SEFD", "B SEFD", "C SEFD", "D SEFD"]
-    table_col = sg.Table([[]],headings=headings, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE, expand_x=True, expand_y=True, p=20, alternating_row_color="grey25")
+    table_col = sg.Table([[]],headings=headings, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE, expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
     sources_col = sg.Column([[sg.Listbox([[]], key="source_list", size=(30, 10), enable_events=True, expand_x=True)],
                              [sg.Button("Sort alphabetical", key="sort_alph"),sg.Button("Sort numerical", key="sort_num"),sg.Push()]
