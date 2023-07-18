@@ -75,11 +75,10 @@ def run_gui():
     sources = []
     dir = ""
     new_dir = ""
-    scrollable = False
     show_gif = False
     sort_alph_reverse = False
     sort_num_reverse = True
-    select_window = None
+    sort_stat_reverse = [False]*7
     SEFD_row = 0
     SEFD_col = 0
     source = None
@@ -195,10 +194,41 @@ def run_gui():
             # Sort by columns
             elif SEFD_row == -1:
                 
+                reverse = sort_stat_reverse[SEFD_col]
+
                 # Sort by selected
                 if SEFD_col == 0:
-                    station_information.sort_values(by="selected",inplace=True,ignore_index=True)
-                continue
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["selected"].iloc[0], reverse=reverse))
+                
+                # Sort by name
+                if SEFD_col == 1:
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: stat[0], reverse=reverse))
+
+                # Sort by observations
+                if SEFD_col == 2:
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: stat[1], reverse=reverse))
+
+                # Sort by A SEFD
+                if SEFD_col == 3:
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["A_SEFD"].iloc[0], reverse=reverse))
+                
+                # Sort by B SEFD
+                if SEFD_col == 4:
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["B_SEFD"].iloc[0], reverse=reverse))
+                
+                # Sort by C SEFD
+                if SEFD_col == 5:
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["C_SEFD"].iloc[0], reverse=reverse))
+                
+                # Sort by D SEFD
+                if SEFD_col == 6:
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["D_SEFD"].iloc[0], reverse=reverse))
+
+                sort_stat_reverse = [False]*7
+                sort_stat_reverse[SEFD_col] = not reverse
+                new_table = update_station_table(station_information, source_dict[source.name]["stations"])
+                main_window["stations_table"].update(new_table)
+                main_window.refresh()
 
             elif SEFD_col == 0:
                 selected_station = main_window["stations_table"].get()[SEFD_row][1]
@@ -224,7 +254,7 @@ def run_gui():
                                                   [sg.Text("Invalid input!",key="invalid_input",visible=False,text_color="red")]], finalize=True, icon="images/favicon.ico")
                 edit_popup["new_SEFD_input"].bind("<Return>", "_enter")
                 edit_popup["invalid_input"].hide_row()
-                # main_window.disable()
+                main_window.disable()
 
                 while True:
                     event, values = edit_popup.Read()
@@ -244,12 +274,12 @@ def run_gui():
 
                         station_information.loc[station_information["name"] == selected_station, SEFD_col_name] = new_SEFD
                         new_table = update_station_table(station_information, source_dict[source.name]["stations"])
-                        # main_window.enable()
+                        main_window.enable()
                         main_window["stations_table"].update(new_table)
                         main_window.refresh()
                         edit_popup.close()
                     
-                    # main_window.enable()
+                    main_window.enable()
                     break
 
 
