@@ -52,12 +52,18 @@ xs = list(range(512))*512
 ys = xs.copy()
 ys.sort()
 
-flux = list(map(lambda x, y: abs(
-    gaussian.get_fourier_transform_value(x, y, scale_factor=512)), xs, ys))
+# flux = list(map(lambda x, y: abs(
+#     gaussian.get_fourier_transform_value(x, y, scale_factor=512)), xs, ys))
 
 RA = list(map(lambda x: radians(ref_val_RA + (x - ref_pix_RA) * delta_RA), xs))
 dec = list(map(lambda y: radians(ref_val_dec + (y - ref_pix_dec) * delta_dec), ys))
 
-plt.scatter(RA, dec, c=flux)
-plt.colorbar()
-plt.show()
+# plt.scatter(RA, dec, c=flux)
+# plt.colorbar()
+# plt.show()
+
+# Test 4
+
+l = list(map(lambda x: radians(ref_val_RA + (x - ref_pix_RA) * delta_RA), xs))
+
+
