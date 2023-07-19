@@ -51,6 +51,8 @@ def plot_source(source, data, baseline="", station_information="", ignored_stati
             elif band == 3:
                 freq = data.D_freq.iloc[point]
 
+            if freq == None: 
+                continue
             u, v = convert_uv(u_orig, v_orig, ref_freq, freq)
 
             coords_u.extend([u, -u])
@@ -60,6 +62,8 @@ def plot_source(source, data, baseline="", station_information="", ignored_stati
             flux.extend(curr_flux*2)
             baselines.extend(
                 [f'{data.Station1.iloc[point]}-{data.Station2.iloc[point]} {list(map(lambda x: round(x,3), curr_flux))}']*2)
+
+
     coords_u = [u for u in coords_u if u == u]
     coords_v = [v for v in coords_v if v == v]
     if len(coords_u) == 0 or len(coords_v) == 0:
