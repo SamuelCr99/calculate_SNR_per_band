@@ -80,7 +80,8 @@ def run_gui():
     stations = list(set(station_information['name']))
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
-                            margins=[0, 0], resizable=True, finalize=True, icon="images/favicon.ico")
+                            margins=[0, 0], resizable=True, finalize=True,
+                            icon="images/favicon.ico", enable_close_attempted_event=True)
     main_window.TKroot.minsize(630, 720)
 
     # Fixes issue with layout on Windows 11
@@ -151,14 +152,16 @@ def run_gui():
         if event == "About...":
             sg.Popup("About info")
 
-        # Close the program
-        if event == sg.WIN_CLOSED or event == "cancel" or event == "Exit":
+        # Close the program and save config
+        if event == sg.WIN_CLOSE_ATTEMPTED_EVENT or event == "cancel" or event == "Exit":
             if not station_information.equals(saved_station_information):
-                a = sg.popup_yes_no(
-                    "You have unsaved changed. Do you wish to save?")
+                a,_ = sg.Window("Unsaved changes", [[sg.Text("You have unsaved changes. Do you wish to save?")],
+                                                    [sg.Button("Yes",k="Yes"),sg.Button("No",k="No"),sg.Button("Cancel",k="Cancel")]], finalize=True, icon="images/favicon.ico", modal=True).read(close=True)
                 if a == "Yes":
                     station_information.to_csv(
                         "data/derived/stations.csv", index=False)
+                if a == "Cancel":
+                    continue
             break
 
         ### Source list events ###
