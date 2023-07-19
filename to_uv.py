@@ -105,7 +105,18 @@ def to_uv(lon, lat, X1, Y1, Z1, X2, Y2, Z2, el, az, freq, alg=0):
 
 
 def convert_uv(u, v, orig_freq, new_freq):
-    # Rescales u-v coordinates from one frequency to another
+    """
+    Converts from one set of u-v coordinates with one frequency to another
+
+    Parameters:
+    u(float): The original u coordinate
+    v(float): The original v coordinate
+    orig_freq(float): The original frequency
+    new_freq(float): The target frequency
+
+    Returns:
+    Target u-v coordinates as floats 
+    """
     orig_omega = 299792458/orig_freq
     new_omega = 299792458/new_freq
 

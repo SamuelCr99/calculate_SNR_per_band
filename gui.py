@@ -1,16 +1,16 @@
+import os
 import PySimpleGUI as sg
 import pandas as pd
-import os
+import matplotlib.pyplot as plt
 from tkinter.filedialog import askdirectory
 from gui_utility.find_station_matches import find_station_matches
 from layout import create_layout
 from plot_source import plot_source
 from init import find_datapoints, find_stations
-import matplotlib.pyplot as plt
 
 
 class list_box_element:
-    # Class for representing the sources 
+    # Class for representing the sources in the list box
     def __init__(self, name, observations):
         self.name = name
         self.observations = observations
@@ -68,6 +68,7 @@ def run_gui():
     sg.theme("DarkGrey5")
     sg.SetOptions(font=("Andalde Mono", 12))
 
+    # Retrieve config if it exists, else create one
     try:
         station_information = pd.read_csv('data/derived/stations.csv')
     except:
@@ -75,6 +76,7 @@ def run_gui():
         station_information = pd.read_csv('data/derived/stations.csv')
     saved_station_information = station_information.copy(deep=True)
     
+    # Create the main GUI window
     stations = list(set(station_information['name']))
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
@@ -87,12 +89,11 @@ def run_gui():
     # Static variables for the event loop
     source_dict = {}
     sources = []
+    source = None
     dir = ""
-    new_dir = ""
     sort_alph_reverse = False
     sort_num_reverse = True
     sort_stat_reverse = [False]*7
-    source = None
 
     # Event loop for the GUI
     while True:
@@ -222,7 +223,7 @@ def run_gui():
 
             # Try to plot
             return_message = plot_source(
-                source.name, datapoint_df, station_information=station_information, ignored_stations=ignored_stations, bands=band)
+                source.name, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band)
             if return_message == "no_data_found":
                 sg.Popup(
                     "No data points found for this source using the selected stations and band.")

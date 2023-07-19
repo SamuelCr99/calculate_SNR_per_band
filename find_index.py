@@ -1,6 +1,3 @@
-import pandas as pd
-
-
 def find_index(source="", df="", baseline="", ignored_stations=[]):
     """
     Find all rows in a DataFrame that match a given source and/or baseline
