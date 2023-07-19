@@ -35,7 +35,7 @@ def is_float(v):
         return False
 
 
-def find_datapoints(dir):
+def find_datapoints(dir, save_to_csv=False):
     """
     Finds all information about all observations
 
@@ -247,9 +247,14 @@ def find_datapoints(dir):
     # Sort out rows with too low quality
     df = df.loc[(df.Q_code.astype(int) > 5)]
     
-    datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + df.to_csv(index=False)
-    with open("data/derived/datapoints.csv","w") as file:
-        file.write(datapoints_csv)
+    if save_to_csv:
+        datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + df.to_csv(index=False)
+        with open("data/derived/datapoints.csv","w") as file:
+            file.write(datapoints_csv)
+
+    df.reset_index(inplace=True)
+
+    return df
 
 def find_stations():
     """

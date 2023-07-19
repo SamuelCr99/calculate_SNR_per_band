@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def find_station_matches():
+def find_station_matches(df):
     """
     Creates a dictionary mapping every source to a list of stations that have 
     data for that source. 
@@ -14,9 +14,6 @@ def find_station_matches():
     data for that source.
 
     """
-    df = pd.read_csv('data/derived/datapoints.csv',
-                     skiprows=1)[['Station1', 'Station2', 'Source']]
-
     d = {}
     for _, row in df.iterrows():
         source = row['Source']
@@ -39,8 +36,5 @@ def find_station_matches():
 
     return d
 
-
-if __name__ == '__main__':
-    d = find_station_matches()
 
 

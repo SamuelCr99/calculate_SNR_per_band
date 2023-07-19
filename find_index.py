@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def find_index(source="", baseline="", ignored_stations=[]):
+def find_index(source="", df="",baseline="", ignored_stations=[]):
     """
     Find all rows in a datapoints.csv that match a given source and/or baseline
 
@@ -16,7 +16,7 @@ def find_index(source="", baseline="", ignored_stations=[]):
     Returns:
     A list of indices of rows in datapoints.csv that match the given source and baseline.
     """
-    df = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
+    # df = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
 
     # Find all rows that don't contain the stations in ignored_stations
     for station in ignored_stations:
@@ -35,8 +35,3 @@ def find_index(source="", baseline="", ignored_stations=[]):
     return df.index.tolist()
 
 
-if __name__ == '__main__':
-    source = "1803+784"
-    baseline = "GGAO12M/ISHIOKA"
-    matching_stations = find_index(source=source, baseline=baseline)
-    print(matching_stations)

@@ -4,7 +4,7 @@ from tkinter.filedialog import askdirectory
 from gui_utility.find_station_matches import find_station_matches
 from layout import create_layout
 from plot_source import plot_source
-from init import find_datapoints
+from init import find_datapoints, find_stations
 import matplotlib.pyplot as plt
 
 
@@ -79,12 +79,22 @@ def run_gui():
                 main_window["loading_text"].update(value="Loading...")
                 main_window.set_title(f"Quasar Viewer - Loading...")
                 main_window.refresh()
-                find_datapoints(new_dir)
+                datapoint_df = find_datapoints(new_dir)
                 main_window.write_event_value("load_done",0)
 
         if event == "Save configuration":
             station_information.to_csv("data/derived/stations.csv", index=False)
             saved_station_information = station_information.copy(deep=True)
+
+        if event == "Restore":
+            a = sg.popup_yes_no("Restoring will remove all configurations set. Do you wish to continue?")
+            if a == "Yes":
+                find_stations()
+                station_information = pd.read_csv("data/derived/stations.csv")
+                saved_station_information = station_information.copy(deep=True)
+                new_table = update_station_table(station_information, source_dict[source.name]["stations"])
+                main_window["stations_table"].update(new_table)
+                main_window.refresh()
 
         if event == "About...":
             sg.Popup("About info")
@@ -135,7 +145,7 @@ def run_gui():
             # Ignore the stations that were unselected in the GUI
             ignored_stations = station_information.loc[station_information["selected"]==0]["name"].to_list()
 
-            return_message = plot_source(source.name, station_information=station_information, ignored_stations=ignored_stations, bands=band)
+            return_message = plot_source(source.name, datapoint_df,station_information=station_information, ignored_stations=ignored_stations, bands=band)
             if return_message == "no_data_found":
                 sg.Popup("No data points found for this source using the selected stations and band.")
 
@@ -158,8 +168,8 @@ def run_gui():
 
         if event == "load_done":
             source = None
-            main_window["stations_table"].update([[]])
-            source_dict = find_station_matches()
+            main_window["stations_table"].update([])
+            source_dict = find_station_matches(datapoint_df)
             sources = list(map(lambda s: list_box_element(s,source_dict[s]['observations']), source_dict))
 
             sources.sort(key=lambda s: s.name)
@@ -178,6 +188,10 @@ def run_gui():
 
             # Unusable clicks
             if SEFD_row == None or SEFD_col == None or SEFD_col == -1:
+                continue
+
+            # Clicking when no data is in the table should do nothing
+            if all(not e for e in main_window["stations_table"].get()):
                 continue
             
             # Sort by columns
@@ -238,11 +252,13 @@ def run_gui():
                 SEFD_col_name = f'{selected_band}_SEFD'
                 orig_SEFD = station_information.loc[station_information["name"] == selected_station, SEFD_col_name].iloc[0]
                 
-                edit_popup = sg.Window("Edit...",[[sg.Text(f"SEFD for band {selected_band} and station {selected_station}")],
-                                                  [sg.Input(default_text=orig_SEFD,key="new_SEFD_input"),sg.Button("Set",key="new_SEFD_set")],
+                edit_popup = sg.Window("Edit...",[[sg.Text("Station:", s=(8,1)),sg.Text(selected_station)],
+                                                  [sg.Text("Band:", s=(8,1)),sg.Text(selected_band)],
+                                                  [sg.Text("SEFD: ", s=(8,1)),sg.Input(default_text=orig_SEFD,key="new_SEFD_input"),sg.Button("Set",key="new_SEFD_set")],
                                                   [sg.Text("Invalid input!",key="invalid_input",visible=False,text_color="red")]], finalize=True, icon="images/favicon.ico", modal=True)
                 edit_popup["new_SEFD_input"].bind("<Return>", "_enter")
                 edit_popup["invalid_input"].hide_row()
+                edit_popup["new_SEFD_input"].set_focus()
 
                 while True:
                     event, values = edit_popup.Read()
@@ -254,6 +270,9 @@ def run_gui():
                                 new_SEFD = str(int(new_SEFD))
                             else:
                                 new_SEFD = str(float(new_SEFD))
+                                SEFD_int, SEFD_frac = new_SEFD.split(".")
+                                if not int(SEFD_frac):
+                                    new_SEFD = int(SEFD_int)
                         except:
                             edit_popup["invalid_input"].update(visible=True)
                             edit_popup["invalid_input"].unhide_row()

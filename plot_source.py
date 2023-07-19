@@ -7,10 +7,11 @@ import numpy as np
 from calculate_flux import calculate_flux
 from math import sqrt
 import mplcursors
+from init import find_datapoints
 
 FIG_COUNT = 1
 
-def plot_source(source, baseline="", station_information = "", ignored_stations=[], bands=[0,1,2,3]):
+def plot_source(source, data,baseline="",station_information = "", ignored_stations=[], bands=[0,1,2,3]):
     """
     Plots uv coordinates of a source at a given baseline.
 
@@ -24,12 +25,7 @@ def plot_source(source, baseline="", station_information = "", ignored_stations=
 
     global FIG_COUNT
 
-    data = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
-    # if station_information == "":
-    #     print("Loading station data...")
-    #     station_information = pd.read_csv('data/derived/stations.csv')
-
-    baseline_matches = find_index(source=source, baseline=baseline, ignored_stations=ignored_stations)
+    baseline_matches = find_index(source=source, df=data, baseline=baseline, ignored_stations=ignored_stations)
     baselines = []
 
     coords_u = []
@@ -56,7 +52,7 @@ def plot_source(source, baseline="", station_information = "", ignored_stations=
 
             curr_flux = calculate_flux(point, data, station_information, band)
             flux.extend(curr_flux*2)
-            baselines.extend([data.Station1.iloc[point] + "-" + data.Station2.iloc[point] + ' ' + str(curr_flux)]*2)
+            baselines.extend([f'{data.Station1.iloc[point]}-{data.Station2.iloc[point]} {list(map(lambda x: round(x,3), curr_flux))}']*2)
     coords_u = [u for u in coords_u if u == u]
     coords_v = [v for v in coords_v if v == v]
     if len(coords_u) == 0 or len(coords_v) == 0:
@@ -99,13 +95,10 @@ def plot_source(source, baseline="", station_information = "", ignored_stations=
 
 
 if __name__ == '__main__':
-    source = "0017+200"
-    session_path = 'data/sessions/session1/'
+    station_information = pd.read_csv('data/derived/stations.csv')
+    source = "0016+731"
+    session_path = 'data/sessions/19JUL24XA/'
+    data = find_datapoints(session_path)
 
-    if "/" not in session_path:
-        session_path = f"{session_path}"
-    elif session_path[-1] != "/":
-        session_path += "/"
-
-    plot_source(source, session_path, [], [3])
+    plot_source(source, data, station_information=station_information,bands=3)
     plt.show()

@@ -13,10 +13,10 @@ def create_layout(stations):
     """
     stations.sort()
     headings = ["Sel.", "Stations", "Obs.", "A SEFD", "B SEFD", "C SEFD", "D SEFD"]
-    table_col = sg.Table([[]],headings=headings, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE, expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
+    table_col = sg.Table([],headings=headings, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_NONE, expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
     sources_col = sg.Column([[sg.Listbox([[]], key="source_list", size=(30, 10), enable_events=True, expand_x=True)],
-                             [sg.Button("Sort alphabetical", key="sort_alph"),sg.Button("Sort numerical", key="sort_num"),sg.Push()]
+                             [sg.Button("Sort alphabetical", key="sort_alph"),sg.Button("Sort by observations", key="sort_num"),sg.Push()]
                              ], expand_x=True, p=20)
 
 
@@ -27,10 +27,10 @@ def create_layout(stations):
                     "C", "band", key="C_band"), sg.Radio("D", "band", key="D_band")]], expand_x=True)],
                 [sg.Text(text="", key="loading_text", text_color="white", font=("Andalde Mono", 16)), sg.Push(), sg.Button("Plot", key="plot"), sg.Button("Cancel", key="cancel")]]
 
-    menu = [["&File", ["&Open folder", "&Save configuration","&Exit"]],
+    menu = [["&File", ["&Open folder", "&Save configuration", "&Restore", "&Exit"]],
             ["&Help", "&About..."]]
 
-    layout = [[sg.MenubarCustom(menu)],
+    layout = [[sg.MenubarCustom(menu, text_color="black", bar_background_color="white", background_color="white", bar_text_color="black")],
               [sg.Column(left_col, expand_x=True, expand_y=True)]]
 
     return layout
