@@ -3,21 +3,21 @@ import pandas as pd
 
 def find_index(source="", df="", baseline="", ignored_stations=[]):
     """
-    Find all rows in a datapoints.csv that match a given source and/or baseline
+    Find all rows in a DataFrame that match a given source and/or baseline
 
-    Gives the indices of the matching rows, excluding the rows that either
-    contains one of the ignored stations or that has a Quality Code of 5 or less
+    Gives the indices of the matching rows, excluding the rows that contains one
+    of the ignored stations.
 
     Parameters:
     source(string): The B1950 name of the source to find
+    df(DataFrame): A Pandas DataFrame to search through
     baseline(string): The baseline to search for, on the form "name/name"
     ignored_stations(list): A list with the names of the stations to ignore
 
     Returns:
-    A list of indices of rows in datapoints.csv that match the given source and baseline.
+    A list of indices of rows that match the given source and baseline.
     """
-    # df = pd.read_csv("data/derived/datapoints.csv", skiprows=1)
-
+    
     # Find all rows that don't contain the stations in ignored_stations
     for station in ignored_stations:
         df = df.loc[(df.Station1 != station) & (df.Station2 != station)]

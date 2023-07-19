@@ -299,6 +299,10 @@ def find_stations():
     joined_df["selected"] = [1]*len(joined_df["name"])
 
     # Write to csv file
+    data_folders = os.listdir('data/')
+    if 'derived' not in data_folders:
+        os.mkdir('data/derived')
+
     joined_df.to_csv("data/derived/stations.csv", index=False)
 
 

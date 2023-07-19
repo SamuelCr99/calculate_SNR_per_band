@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 import pandas as pd
+import os
 from tkinter.filedialog import askdirectory
 from gui_utility.find_station_matches import find_station_matches
 from layout import create_layout
@@ -18,6 +19,16 @@ class list_box_element:
 
 
 def update_station_table(station_information, stations):
+    """
+    Generates a table that can be used in the GUI
+
+    Parameters:
+    station_information(DataFrame): Information regarding *all* stations
+    stations(dict): A dictionary with the wanted stations as keys
+
+    Returns:
+    A list of lists for the table
+    """
     new_table = []
     for station in stations:
         activated = "X" if station_information[station_information['name']
@@ -46,6 +57,12 @@ def run_gui():
     No return values
     """
 
+    # Check that script is run from correct directory
+    folders = os.listdir()
+    if "data" not in folders:
+        raise Exception("Data folder not found, make sure script is being run from correct path")
+
+
     # Launch the GUI window
     sg.theme("DarkGrey5")
     sg.SetOptions(font=("Andalde Mono", 12))
@@ -56,6 +73,7 @@ def run_gui():
         find_stations()
         station_information = pd.read_csv('data/derived/stations.csv')
     saved_station_information = station_information.copy(deep=True)
+    
     stations = list(set(station_information['name']))
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
@@ -70,7 +88,6 @@ def run_gui():
     sources = []
     dir = ""
     new_dir = ""
-    show_gif = False
     sort_alph_reverse = False
     sort_num_reverse = True
     sort_stat_reverse = [False]*7
@@ -122,20 +139,37 @@ def run_gui():
                         "data/derived/stations.csv", index=False)
             break
 
-        ### Settings events ###
+        ### Source list events ###
 
         if event == "source_list":
 
             # Ignore event if no source was selected
             if not values["source_list"]:
                 continue
+
+            # Update the stations table
             source = values["source_list"][0]
             new_table = update_station_table(
                 station_information, source_dict[source.name]["stations"])
             main_window["stations_table"].update(new_table)
             main_window.refresh()
 
-        ### Buttons events ###
+        if event == "sort_alph":
+            sources.sort(key=lambda s: s.name, reverse=sort_alph_reverse)
+            sort_alph_reverse = not sort_alph_reverse
+            sort_num_reverse = True
+            main_window["source_list"].update(values=sources)
+            main_window["source_list"].set_value([source])
+
+        if event == "sort_num":
+            sources.sort(key=lambda s: s.observations,
+                         reverse=sort_num_reverse)
+            sort_num_reverse = not sort_num_reverse
+            sort_alph_reverse = False
+            main_window["source_list"].update(values=sources)
+            main_window["source_list"].set_value([source])
+
+        ### Plot event ###
 
         if event == "plot":
             # Check that user has selected a folder
@@ -168,40 +202,23 @@ def run_gui():
                 sg.Popup(
                     "No data points found for this source using the selected stations and band.")
 
-        if event == "sort_alph":
-            sources.sort(key=lambda s: s.name, reverse=sort_alph_reverse)
-            sort_alph_reverse = not sort_alph_reverse
-            sort_num_reverse = True
-            main_window["source_list"].update(values=sources)
-            main_window["source_list"].set_value([source])
-
-        if event == "sort_num":
-            sources.sort(key=lambda s: s.observations,
-                         reverse=sort_num_reverse)
-            sort_num_reverse = not sort_num_reverse
-            sort_alph_reverse = False
-            main_window["source_list"].update(values=sources)
-            main_window["source_list"].set_value([source])
-
         ### Load events ###
 
         if event == "load_done":
+            # Update source info
             source = None
-            main_window["stations_table"].update([])
             source_dict = find_station_matches(datapoint_df)
             sources = list(map(lambda s: list_box_element(
                 s, source_dict[s]['observations']), source_dict))
-
             sources.sort(key=lambda s: s.name)
-            main_window["source_list"].update(values=sources)
-
-            main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
+            
+            # Reset/update GUI
             dir = new_dir
+            main_window["stations_table"].update([])
+            main_window["source_list"].update(values=sources)
+            main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
             main_window["loading_text"].update(value="")
             main_window.refresh()
-
-        if show_gif:
-            sg.PopupAnimated("images/loading.gif", time_between_frames=50)
 
         if event[0] == "stations_table" and event[1] == "+CLICKED+":
             SEFD_row, SEFD_col = event[2]
@@ -254,39 +271,42 @@ def run_gui():
                     source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(
                         station_information.loc[station_information["name"] == stat[0]]["D_SEFD"].iloc[0]), reverse=reverse))
 
+                # Update list
                 sort_stat_reverse = [False]*7
                 sort_stat_reverse[SEFD_col] = not reverse
+
+                # Update GUI
                 new_table = update_station_table(
                     station_information, source_dict[source.name]["stations"])
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
+            # Select/deselect station
             elif SEFD_col == 0:
-                selected_station = main_window["stations_table"].get()[
-                    SEFD_row][1]
-                selected = station_information.loc[station_information["name"]
-                                                   == selected_station, "selected"].iloc[0]
+                # Update selection
+                selected_station = main_window["stations_table"].get()[SEFD_row][1]
+                selected = station_information.loc[station_information["name"] == selected_station, "selected"].iloc[0]
 
                 if selected:
-                    station_information.loc[station_information["name"]
-                                            == selected_station, "selected"] = 0
+                    station_information.loc[station_information["name"] == selected_station, "selected"] = 0
                 else:
-                    station_information.loc[station_information["name"]
-                                            == selected_station, "selected"] = 1
+                    station_information.loc[station_information["name"] == selected_station, "selected"] = 1
 
-                new_table = update_station_table(
-                    station_information, source_dict[source.name]["stations"])
+                # Update GUI
+                new_table = update_station_table(station_information, source_dict[source.name]["stations"])
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
+            # Edit SEFD values
             elif SEFD_col in [3, 4, 5, 6]:
-                selected_station = main_window["stations_table"].get()[
-                    SEFD_row][1]
+                # Get stats of the selected cell
+                selected_station = main_window["stations_table"].get()[SEFD_row][1]
                 selected_band = chr(65+SEFD_col-3)
                 SEFD_col_name = f'{selected_band}_SEFD'
                 orig_SEFD = station_information.loc[station_information["name"]
                                                     == selected_station, SEFD_col_name].iloc[0]
 
+                # Popup to ask user to fill in new value
                 edit_popup = sg.Window("Edit...", [[sg.Text("Station:", s=(8, 1)), sg.Text(selected_station)],
                                                    [sg.Text("Band:", s=(8, 1)), sg.Text(
                                                        selected_band)],
@@ -297,11 +317,14 @@ def run_gui():
                 edit_popup["invalid_input"].hide_row()
                 edit_popup["new_SEFD_input"].set_focus()
 
+                # Event loop for popup
                 while True:
                     event, values = edit_popup.Read()
 
                     if event == "new_SEFD_set" or event == "new_SEFD_input_enter":
                         new_SEFD = values["new_SEFD_input"]
+
+                        # Only allow numbers
                         try:
                             if new_SEFD.isdigit():
                                 new_SEFD = str(int(new_SEFD))
