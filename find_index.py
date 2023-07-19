@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def find_index(source="", df="",baseline="", ignored_stations=[]):
+def find_index(source="", df="", baseline="", ignored_stations=[]):
     """
     Find all rows in a datapoints.csv that match a given source and/or baseline
 
@@ -26,12 +26,11 @@ def find_index(source="", df="",baseline="", ignored_stations=[]):
     if baseline:
         station1 = baseline.split("/")[0]
         station2 = baseline.split("/")[1]
-        df = df.loc[(df['Station1'] == station1) & (df['Station2'] == station2)]
+        df = df.loc[(df['Station1'] == station1) &
+                    (df['Station2'] == station2)]
 
     # Find all rows that contain the selected source
     if source:
         df = df.loc[(df.Source == source)]
 
     return df.index.tolist()
-
-

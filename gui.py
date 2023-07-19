@@ -12,19 +12,26 @@ class list_box_element:
     def __init__(self, name, observations):
         self.name = name
         self.observations = observations
-    
+
     def __str__(self):
         return f"{self.name} [{self.observations}]"
+
 
 def update_station_table(station_information, stations):
     new_table = []
     for station in stations:
-        activated = "X" if station_information[station_information['name'] == station]["selected"].values[0] else ""
-        a_sefd = station_information[station_information['name'] == station]['A_SEFD'].values[0]
-        b_sefd = station_information[station_information['name'] == station]['B_SEFD'].values[0]
-        c_sefd = station_information[station_information['name'] == station]['C_SEFD'].values[0]
-        d_sefd = station_information[station_information['name'] == station]['D_SEFD'].values[0]
-        new_table.append([activated, station, stations[station], a_sefd, b_sefd, c_sefd, d_sefd])
+        activated = "X" if station_information[station_information['name']
+                                               == station]["selected"].values[0] else ""
+        a_sefd = station_information[station_information['name']
+                                     == station]['A_SEFD'].values[0]
+        b_sefd = station_information[station_information['name']
+                                     == station]['B_SEFD'].values[0]
+        c_sefd = station_information[station_information['name']
+                                     == station]['C_SEFD'].values[0]
+        d_sefd = station_information[station_information['name']
+                                     == station]['D_SEFD'].values[0]
+        new_table.append(
+            [activated, station, stations[station], a_sefd, b_sefd, c_sefd, d_sefd])
     return new_table
 
 
@@ -43,13 +50,17 @@ def run_gui():
     sg.theme("DarkGrey5")
     sg.SetOptions(font=("Andalde Mono", 12))
 
-    station_information = pd.read_csv('data/derived/stations.csv')
+    try:
+        station_information = pd.read_csv('data/derived/stations.csv')
+    except:
+        find_stations()
+        station_information = pd.read_csv('data/derived/stations.csv')
     saved_station_information = station_information.copy(deep=True)
     stations = list(set(station_information['name']))
     layout = create_layout(stations)
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True, icon="images/favicon.ico")
-    main_window.TKroot.minsize(630,720)
+    main_window.TKroot.minsize(630, 720)
 
     # Fixes issue with layout on Windows 11
     plt.figure()
@@ -80,19 +91,22 @@ def run_gui():
                 main_window.set_title(f"Quasar Viewer - Loading...")
                 main_window.refresh()
                 datapoint_df = find_datapoints(new_dir)
-                main_window.write_event_value("load_done",0)
+                main_window.write_event_value("load_done", 0)
 
         if event == "Save configuration":
-            station_information.to_csv("data/derived/stations.csv", index=False)
+            station_information.to_csv(
+                "data/derived/stations.csv", index=False)
             saved_station_information = station_information.copy(deep=True)
 
         if event == "Restore":
-            a = sg.popup_yes_no("Restoring will remove all configurations set. Do you wish to continue?")
+            a = sg.popup_yes_no(
+                "Restoring will remove all configurations set. Do you wish to continue?")
             if a == "Yes":
                 find_stations()
                 station_information = pd.read_csv("data/derived/stations.csv")
                 saved_station_information = station_information.copy(deep=True)
-                new_table = update_station_table(station_information, source_dict[source.name]["stations"])
+                new_table = update_station_table(
+                    station_information, source_dict[source.name]["stations"])
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
@@ -101,11 +115,12 @@ def run_gui():
 
         if event == sg.WIN_CLOSED or event == "cancel" or event == "Exit":
             if not station_information.equals(saved_station_information):
-                a = sg.popup_yes_no("You have unsaved changed. Do you wish to save?")
-                if a == "Yes": 
-                    station_information.to_csv("data/derived/stations.csv", index=False)
+                a = sg.popup_yes_no(
+                    "You have unsaved changed. Do you wish to save?")
+                if a == "Yes":
+                    station_information.to_csv(
+                        "data/derived/stations.csv", index=False)
             break
-
 
         ### Settings events ###
 
@@ -115,7 +130,8 @@ def run_gui():
             if not values["source_list"]:
                 continue
             source = values["source_list"][0]
-            new_table = update_station_table(station_information, source_dict[source.name]["stations"])
+            new_table = update_station_table(
+                station_information, source_dict[source.name]["stations"])
             main_window["stations_table"].update(new_table)
             main_window.refresh()
 
@@ -143,26 +159,29 @@ def run_gui():
                     values['C_band'], values['D_band']].index(True)
 
             # Ignore the stations that were unselected in the GUI
-            ignored_stations = station_information.loc[station_information["selected"]==0]["name"].to_list()
+            ignored_stations = station_information.loc[station_information["selected"] == 0]["name"].to_list(
+            )
 
-            return_message = plot_source(source.name, datapoint_df,station_information=station_information, ignored_stations=ignored_stations, bands=band)
+            return_message = plot_source(
+                source.name, datapoint_df, station_information=station_information, ignored_stations=ignored_stations, bands=band)
             if return_message == "no_data_found":
-                sg.Popup("No data points found for this source using the selected stations and band.")
+                sg.Popup(
+                    "No data points found for this source using the selected stations and band.")
 
-        if event == "sort_alph": 
-            sources.sort(key=lambda s: s.name, reverse= sort_alph_reverse)
+        if event == "sort_alph":
+            sources.sort(key=lambda s: s.name, reverse=sort_alph_reverse)
             sort_alph_reverse = not sort_alph_reverse
             sort_num_reverse = True
             main_window["source_list"].update(values=sources)
             main_window["source_list"].set_value([source])
 
         if event == "sort_num":
-            sources.sort(key=lambda s: s.observations, reverse= sort_num_reverse)
+            sources.sort(key=lambda s: s.observations,
+                         reverse=sort_num_reverse)
             sort_num_reverse = not sort_num_reverse
             sort_alph_reverse = False
             main_window["source_list"].update(values=sources)
             main_window["source_list"].set_value([source])
-            
 
         ### Load events ###
 
@@ -170,7 +189,8 @@ def run_gui():
             source = None
             main_window["stations_table"].update([])
             source_dict = find_station_matches(datapoint_df)
-            sources = list(map(lambda s: list_box_element(s,source_dict[s]['observations']), source_dict))
+            sources = list(map(lambda s: list_box_element(
+                s, source_dict[s]['observations']), source_dict))
 
             sources.sort(key=lambda s: s.name)
             main_window["source_list"].update(values=sources)
@@ -193,76 +213,93 @@ def run_gui():
             # Clicking when no data is in the table should do nothing
             if all(not e for e in main_window["stations_table"].get()):
                 continue
-            
+
             # Sort by columns
             elif SEFD_row == -1:
-                
+
                 reverse = sort_stat_reverse[SEFD_col]
 
                 # Sort by selected
                 if SEFD_col == 0:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["selected"].iloc[0], reverse=reverse))
-                
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(
+                    ), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["selected"].iloc[0], reverse=reverse))
+
                 # Sort by name
                 if SEFD_col == 1:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: stat[0], reverse=reverse))
+                    source_dict[source.name]["stations"] = dict(sorted(
+                        source_dict[source.name]["stations"].items(), key=lambda stat: stat[0], reverse=reverse))
 
                 # Sort by observations
                 if SEFD_col == 2:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: int(stat[1]), reverse=reverse))
+                    source_dict[source.name]["stations"] = dict(sorted(
+                        source_dict[source.name]["stations"].items(), key=lambda stat: int(stat[1]), reverse=reverse))
 
                 # Sort by A SEFD
                 if SEFD_col == 3:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(station_information.loc[station_information["name"] == stat[0]]["A_SEFD"].iloc[0]), reverse=reverse))
-                
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(
+                        station_information.loc[station_information["name"] == stat[0]]["A_SEFD"].iloc[0]), reverse=reverse))
+
                 # Sort by B SEFD
                 if SEFD_col == 4:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(station_information.loc[station_information["name"] == stat[0]]["B_SEFD"].iloc[0]), reverse=reverse))
-                
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(
+                        station_information.loc[station_information["name"] == stat[0]]["B_SEFD"].iloc[0]), reverse=reverse))
+
                 # Sort by C SEFD
                 if SEFD_col == 5:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(station_information.loc[station_information["name"] == stat[0]]["C_SEFD"].iloc[0]), reverse=reverse))
-                
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(
+                        station_information.loc[station_information["name"] == stat[0]]["C_SEFD"].iloc[0]), reverse=reverse))
+
                 # Sort by D SEFD
                 if SEFD_col == 6:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(station_information.loc[station_information["name"] == stat[0]]["D_SEFD"].iloc[0]), reverse=reverse))
+                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(
+                        station_information.loc[station_information["name"] == stat[0]]["D_SEFD"].iloc[0]), reverse=reverse))
 
                 sort_stat_reverse = [False]*7
                 sort_stat_reverse[SEFD_col] = not reverse
-                new_table = update_station_table(station_information, source_dict[source.name]["stations"])
+                new_table = update_station_table(
+                    station_information, source_dict[source.name]["stations"])
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
             elif SEFD_col == 0:
-                selected_station = main_window["stations_table"].get()[SEFD_row][1]
-                selected = station_information.loc[station_information["name"] == selected_station, "selected"].iloc[0]
+                selected_station = main_window["stations_table"].get()[
+                    SEFD_row][1]
+                selected = station_information.loc[station_information["name"]
+                                                   == selected_station, "selected"].iloc[0]
 
                 if selected:
-                    station_information.loc[station_information["name"] == selected_station, "selected"] = 0
+                    station_information.loc[station_information["name"]
+                                            == selected_station, "selected"] = 0
                 else:
-                    station_information.loc[station_information["name"] == selected_station, "selected"] = 1
+                    station_information.loc[station_information["name"]
+                                            == selected_station, "selected"] = 1
 
-                new_table = update_station_table(station_information, source_dict[source.name]["stations"])
+                new_table = update_station_table(
+                    station_information, source_dict[source.name]["stations"])
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
-            elif SEFD_col in [3,4,5,6]:
-                selected_station = main_window["stations_table"].get()[SEFD_row][1]
+            elif SEFD_col in [3, 4, 5, 6]:
+                selected_station = main_window["stations_table"].get()[
+                    SEFD_row][1]
                 selected_band = chr(65+SEFD_col-3)
                 SEFD_col_name = f'{selected_band}_SEFD'
-                orig_SEFD = station_information.loc[station_information["name"] == selected_station, SEFD_col_name].iloc[0]
-                
-                edit_popup = sg.Window("Edit...",[[sg.Text("Station:", s=(8,1)),sg.Text(selected_station)],
-                                                  [sg.Text("Band:", s=(8,1)),sg.Text(selected_band)],
-                                                  [sg.Text("SEFD: ", s=(8,1)),sg.Input(default_text=orig_SEFD,key="new_SEFD_input"),sg.Button("Set",key="new_SEFD_set")],
-                                                  [sg.Text("Invalid input!",key="invalid_input",visible=False,text_color="red")]], finalize=True, icon="images/favicon.ico", modal=True)
+                orig_SEFD = station_information.loc[station_information["name"]
+                                                    == selected_station, SEFD_col_name].iloc[0]
+
+                edit_popup = sg.Window("Edit...", [[sg.Text("Station:", s=(8, 1)), sg.Text(selected_station)],
+                                                   [sg.Text("Band:", s=(8, 1)), sg.Text(
+                                                       selected_band)],
+                                                   [sg.Text("SEFD: ", s=(8, 1)), sg.Input(
+                                                       default_text=orig_SEFD, key="new_SEFD_input"), sg.Button("Set", key="new_SEFD_set")],
+                                                   [sg.Text("Invalid input!", key="invalid_input", visible=False, text_color="red")]], finalize=True, icon="images/favicon.ico", modal=True)
                 edit_popup["new_SEFD_input"].bind("<Return>", "_enter")
                 edit_popup["invalid_input"].hide_row()
                 edit_popup["new_SEFD_input"].set_focus()
 
                 while True:
                     event, values = edit_popup.Read()
-                
+
                     if event == "new_SEFD_set" or event == "new_SEFD_input_enter":
                         new_SEFD = values["new_SEFD_input"]
                         try:
@@ -279,12 +316,14 @@ def run_gui():
                             edit_popup.refresh()
                             continue
 
-                        station_information.loc[station_information["name"] == selected_station, SEFD_col_name] = new_SEFD
-                        new_table = update_station_table(station_information, source_dict[source.name]["stations"])
+                        station_information.loc[station_information["name"]
+                                                == selected_station, SEFD_col_name] = new_SEFD
+                        new_table = update_station_table(
+                            station_information, source_dict[source.name]["stations"])
                         main_window["stations_table"].update(new_table)
                         main_window.refresh()
                         edit_popup.close()
-                    
+
                     break
 
 

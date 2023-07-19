@@ -35,6 +35,3 @@ def find_station_matches(df):
         d[source]['observations'] += 1
 
     return d
-
-
-

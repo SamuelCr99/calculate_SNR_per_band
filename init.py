@@ -17,6 +17,7 @@ def bytes_to_string(bytes):
         string += byte.decode("utf-8")
     return string
 
+
 def time_to_string(time):
     # Converts YMDHM time list to a nicely formatted string
     h = time[3]
@@ -26,6 +27,7 @@ def time_to_string(time):
     if m < 10:
         m = f"0{m}"
     return f"{time[0]}/{time[1]}/{time[2]}-{h}:{m}"
+
 
 def is_float(v):
     try:
@@ -52,7 +54,8 @@ def find_datapoints(dir, save_to_csv=False):
     No return values!
     """
 
-    if dir[-1] != '/': dir += '/'
+    if dir[-1] != '/':
+        dir += '/'
 
     # Import datasets
     baseline_ds = nc.Dataset(f'{dir}Observables/Baseline.nc')
@@ -91,7 +94,8 @@ def find_datapoints(dir, save_to_csv=False):
     C_channels = []
     D_channels = []
     if is_float(channel_info["ChannelFreq"][0]):
-        frequency_matrix = [np.ma.getdata(channel_info["ChannelFreq"]).tolist()]*len(time)
+        frequency_matrix = [np.ma.getdata(
+            channel_info["ChannelFreq"]).tolist()]*len(time)
 
     else:
         frequency_matrix = np.ma.getdata(channel_info["ChannelFreq"]).tolist()
@@ -205,7 +209,8 @@ def find_datapoints(dir, save_to_csv=False):
     int_time = np.ma.getdata(corrinfo["EffectiveDuration"]).tolist()
 
     # Find quality code
-    qualcode = list(bytes_to_string(np.ma.getdata(quality_code_ds["QualityCode"]).tolist()))
+    qualcode = list(bytes_to_string(np.ma.getdata(
+        quality_code_ds["QualityCode"]).tolist()))
 
     # Find u and v
     uv_data = np.ma.getdata(uv_ds['UVFperAsec']).tolist()
@@ -246,15 +251,17 @@ def find_datapoints(dir, save_to_csv=False):
 
     # Sort out rows with too low quality
     df = df.loc[(df.Q_code.astype(int) > 5)]
-    
+
     if save_to_csv:
-        datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + df.to_csv(index=False)
-        with open("data/derived/datapoints.csv","w") as file:
+        datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + df.to_csv(
+            index=False)
+        with open("data/derived/datapoints.csv", "w") as file:
             file.write(datapoints_csv)
 
     df.reset_index(inplace=True)
 
     return df
+
 
 def find_stations():
     """

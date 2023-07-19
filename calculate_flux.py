@@ -1,7 +1,7 @@
 from math import sqrt
 
 
-def calculate_flux(index, general_data, station_data, bands=[0,1,2,3]):
+def calculate_flux(index, general_data, station_data, bands=[0, 1, 2, 3]):
     """
     Calculates the flux of a source at a given index in the data/datapoints.csv file.
 
@@ -24,13 +24,16 @@ def calculate_flux(index, general_data, station_data, bands=[0,1,2,3]):
     flux = []
 
     for band in bands:
-        band_letter = ["A","B","C","D"][band]
+        band_letter = ["A", "B", "C", "D"][band]
 
         SNR = general_data[f"{band_letter}_SNR"].iloc[index]
         band_width = general_data[f"{band_letter}_bw"].iloc[index]*10**6
-        SEFD1 = float(station_data[f"{band_letter}_SEFD"].loc[station_data.name == stat1].iloc[0])
-        SEFD2 = float(station_data[f"{band_letter}_SEFD"].loc[station_data.name == stat2].iloc[0])
+        SEFD1 = float(
+            station_data[f"{band_letter}_SEFD"].loc[station_data.name == stat1].iloc[0])
+        SEFD2 = float(
+            station_data[f"{band_letter}_SEFD"].loc[station_data.name == stat2].iloc[0])
 
-        flux.append(SNR * sqrt(SEFD1 * SEFD2) / (C * sqrt(2*int_time*band_width)) if band_width != 0 else 0)
+        flux.append(SNR * sqrt(SEFD1 * SEFD2) /
+                    (C * sqrt(2*int_time*band_width)) if band_width != 0 else 0)
 
     return flux
