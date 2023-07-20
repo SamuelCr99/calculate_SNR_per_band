@@ -10,16 +10,6 @@ from plot_source import plot_source
 from init import find_datapoints, find_stations
 
 
-class list_box_element:
-    # Class for representing the sources in the list box
-    def __init__(self, name, observations):
-        self.name = name
-        self.observations = observations
-
-    def __str__(self):
-        return f"{self.name} [{self.observations}]"
-
-
 def update_station_table(station_information, stations, highlights, band):
     """
     Generates a table that can be used in the GUI
@@ -99,7 +89,7 @@ def run_gui():
     source_dict = {}
     source = ""
     band = 0
-    sort_stat_reverse = [False]*4
+    sort_stat_reverse = [False]*5
     sort_source_reverse = [False]*2
     highlights = []
 
@@ -279,10 +269,11 @@ def run_gui():
 
                 # Sort by highlight
                 if click_col == 4:
-                    pass
+                    source_dict[source]["stations"] = dict(sorted(source_dict[source]["stations"].items(),
+                                                                  key=lambda stat: stat[0] in highlights, reverse=reverse))
 
                 # Update list
-                sort_stat_reverse = [False]*4
+                sort_stat_reverse = [False]*5
                 sort_stat_reverse[click_col] = not reverse
 
                 # Update GUI
@@ -420,7 +411,7 @@ def run_gui():
 
             # Try to plot
             return_message = plot_source(
-                source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band)
+                source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
             if return_message == "no_data_found":
                 sg.Popup(
                     "No data points found for this source using the selected stations and band.",

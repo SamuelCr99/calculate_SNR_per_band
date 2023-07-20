@@ -81,7 +81,13 @@ def plot_source(source, data, station_information, highlighted_stations = [],bas
             baselines.extend(
                 [f'{data.Station1.iloc[point]}-{data.Station2.iloc[point]} {list(map(lambda x: round(x,3), curr_flux))}']*2)
 
-            if data.Station1.iloc[point] in highlighted_stations and data.Station2.iloc[point] in highlighted_stations: 
+
+            if len(highlighted_stations) == 1 and (data.Station1.iloc[point] in highlighted_stations or data.Station2.iloc[point] in highlighted_stations):
+                highlighted_u.extend([u,-u])
+                highlighted_v.extend([v,-v])
+                highlighted_flux.extend(curr_flux*2)
+
+            elif data.Station1.iloc[point] in highlighted_stations and data.Station2.iloc[point] in highlighted_stations: 
                 highlighted_u.extend([u,-u])
                 highlighted_v.extend([v,-v])
                 highlighted_flux.extend(curr_flux*2)
@@ -101,7 +107,7 @@ def plot_source(source, data, station_information, highlighted_stations = [],bas
     FIG_COUNT += 1
     uv_plot = plt.scatter(coords_u, coords_v, c=flux, marker=".")
     plt.colorbar(label="Flux density")
-    plt.scatter(highlighted_u,highlighted_v, marker='*', c=highlighted_flux)
+    plt.scatter(highlighted_u,highlighted_v, marker='*', c=highlighted_flux, s=50)
 
     # Adds arrows and annotations to all points
     uv_cursor = mplcursors.cursor(
