@@ -7,10 +7,7 @@ from to_uv import convert_uv
 from calculate_flux import calculate_flux
 from init import find_datapoints
 
-FIG_COUNT = 1
-
-
-def plot_source(source, data, station_information, highlighted_stations = [],baseline="", ignored_stations=[], bands=[0, 1, 2, 3]):
+def plot_source(source, data, station_information, highlighted_stations = [], baseline="", ignored_stations=[], bands=[0, 1, 2, 3]):
     """
     Plots uv coordinates of a source
 
@@ -28,8 +25,6 @@ def plot_source(source, data, station_information, highlighted_stations = [],bas
     Returns:
     No return values!
     """
-
-    global FIG_COUNT
 
     ### Generate data ###
 
@@ -96,15 +91,11 @@ def plot_source(source, data, station_information, highlighted_stations = [],bas
     coords_u = [u for u in coords_u if u == u]
     coords_v = [v for v in coords_v if v == v]
 
-    # Make sure we are plotting something
-    if len(coords_u) == 0 or len(coords_v) == 0:
-        return "no_data_found"
-
     ### Scatter plot ###
 
     # Create figure and plot
-    figure1 = plt.figure(FIG_COUNT)
-    FIG_COUNT += 1
+    figure1 = plt.figure(0)
+    figure1.clf()
     uv_plot = plt.scatter(coords_u, coords_v, c=flux, marker=".")
     plt.colorbar(label="Flux density")
     plt.scatter(highlighted_u,highlighted_v, marker='*', c=highlighted_flux, s=50)
@@ -129,8 +120,7 @@ def plot_source(source, data, station_information, highlighted_stations = [],bas
     ### Distance plot ###
 
     # Create distance plot
-    plt.figure(FIG_COUNT)
-    FIG_COUNT += 1
+    plt.figure(1)
 
     # Colors to use for the bands
     base_colors = ['red', 'blue', 'green', 'yellow']
@@ -163,12 +153,8 @@ def plot_source(source, data, station_information, highlighted_stations = [],bas
         # Create empty scatter plots so the legend will be added correctly
         plt.legend(handles=list(map(lambda b: plt.scatter(
             [], [], c=base_colors[b], label=f'Band {chr(ord("A")+b)}'), bands)))
-
     
-    return figure1
-
-    # Show the plots
-    plt.show(block=False)
+    # return figure1, figure2
 
 
 if __name__ == '__main__':

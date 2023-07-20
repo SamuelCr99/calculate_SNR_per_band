@@ -10,7 +10,6 @@ from plot_source import plot_source
 from init import find_datapoints, find_stations
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-
 def draw_fig(canvas, fig, canvas_toolbar):
     if canvas.children:
         for child in canvas.winfo_children():
@@ -19,10 +18,10 @@ def draw_fig(canvas, fig, canvas_toolbar):
         for child in canvas_toolbar.winfo_children():
             child.destroy()
     figure_canvas_agg = FigureCanvasTkAgg(fig, master=canvas)
-    figure_canvas_agg.draw()
     toolbar = Toolbar(figure_canvas_agg, canvas_toolbar)
-    toolbar.update()
     figure_canvas_agg.get_tk_widget().pack(side='right', fill='both', expand=1)
+    figure_canvas_agg.draw()
+    toolbar.update()
 
 class Toolbar(NavigationToolbar2Tk):
     def __init__(self, *args, **kwargs):
@@ -104,6 +103,14 @@ def run_gui():
     # Fixes issue with layout on Windows 11
     plt.figure()
 
+    # Variables for settings plot sizes
+    fig1 = plt.figure(0)
+    fig2 = plt.figure(1)
+    DPI1 = float(fig1.get_dpi())
+    fig1.set_size_inches(1000/DPI1,800/DPI1)
+    DPI2 = float(fig2.get_dpi())
+    fig2.set_size_inches(1000/DPI2,800/DPI2)
+
     # Static variables for the event loop
     dir = ""
     source_dict = {}
@@ -171,6 +178,7 @@ def run_gui():
                     station_information, source_dict[source]["stations"],
                     highlights, band)
                 main_window["stations_table"].update(new_table)
+                main_window.write_event_value("plot", True)
                 main_window.refresh()
 
         # Display about info
@@ -232,6 +240,7 @@ def run_gui():
                     station_information, source_dict[source]["stations"],
                     highlights, band)
                 main_window["stations_table"].update(new_table)
+                main_window.write_event_value("plot", True)
                 main_window.refresh()
                 
         ### Band selection event ###
@@ -245,6 +254,7 @@ def run_gui():
                     station_information, source_dict[source]["stations"],
                     highlights, band)
                 main_window["stations_table"].update(new_table)
+                main_window.write_event_value("plot", True)
                 main_window.refresh()
 
         ### Station selection events ###
@@ -319,6 +329,7 @@ def run_gui():
                     station_information, source_dict[source]["stations"],
                      highlights, band)
                 main_window["stations_table"].update(new_table)
+                main_window.write_event_value("plot", True)
                 main_window.refresh()
 
             # Edit SEFD values
@@ -372,6 +383,7 @@ def run_gui():
                             station_information, source_dict[source]["stations"],
                             highlights, band)
                         main_window["stations_table"].update(new_table)
+                        main_window.write_event_value("plot", True)
                         main_window.refresh()
 
                         # Close popup
@@ -397,6 +409,7 @@ def run_gui():
                 new_table = update_station_table(station_information, source_dict[source]["stations"],
                                                  highlights, band)
                 main_window["stations_table"].update(new_table)
+                main_window.write_event_value("plot", True)
                 main_window.refresh()
 
         ### Plot event ###
@@ -426,21 +439,21 @@ def run_gui():
                     values['C_band'], values['D_band']].index(True)
 
             # Ignore the stations that were unselected in the GUI
-            ignored_stations = station_information.loc[station_information["selected"] == 0]["name"].to_list(
-            )
+            ignored_stations = station_information.loc[station_information["selected"] == 0]["name"].to_list()
 
-            # Try to plot
-            return_message = plot_source(
+            # Plot
+            # fig1, fig2 = plot_source(
+            #     source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
+            plot_source(
                 source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
-            if return_message == "no_data_found":
-                sg.Popup(
-                    "No data points found for this source using the selected stations and band.",
-                    icon="images/favicon.ico")
-            else:
-                fig = return_message
-                DPI = float(fig.get_dpi())
-                fig.set_size_inches(505/DPI,505/DPI)
-                draw_fig(main_window["fig"].TKCanvas, fig, main_window["toolbar"].TKCanvas)
+            # DPI1 = float(fig1.get_dpi())
+            # fig1.set_size_inches(1000/DPI1,800/DPI1)
+            # DPI2 = float(fig2.get_dpi())
+            # fig2.set_size_inches(1000/DPI2,800/DPI2)
+
+            # Display plots in canvases
+            draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
+            # draw_fig(main_window["fig2"].TKCanvas, fig2, main_window["toolbar2"].TKCanvas)
 
 
 if __name__ == '__main__':
