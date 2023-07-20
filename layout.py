@@ -12,8 +12,9 @@ def create_layout(stations):
     The finished layout
     """
     stations.sort()
-    headings = ["Sel.", "Stations", "Obs.", "SEFD"]
-    table_col = sg.Table([], headings=headings, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_NONE,
+    headings = ["Sel.", "Stations", "Obs.", "SEFD", "★"]
+    col_widths = [4,10,4,10,4]
+    table_col = sg.Table([], headings=headings, col_widths=col_widths, auto_size_columns=False, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_NONE,
                          expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
     source_headings = ["Source", "Obs."]

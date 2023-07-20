@@ -20,7 +20,7 @@ class list_box_element:
         return f"{self.name} [{self.observations}]"
 
 
-def update_station_table(station_information, stations, band):
+def update_station_table(station_information, stations, highlights, band):
     """
     Generates a table that can be used in the GUI
 
@@ -44,7 +44,8 @@ def update_station_table(station_information, stations, band):
         d_sefd = station_information[station_information['name']
                                      == station]['D_SEFD'].values[0]
         sefd = [a_sefd,b_sefd,c_sefd,d_sefd][band]
-        new_table.append([activated, station, stations[station], sefd])
+        highlight = "X" if station in highlights else ""
+        new_table.append([activated, station, stations[station], sefd, highlight])
     return new_table
 
 def update_sources_table(sources):
@@ -88,18 +89,19 @@ def run_gui():
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True,
                             icon="images/favicon.ico", enable_close_attempted_event=True)
-    main_window.TKroot.minsize(400, 720)
+    main_window.TKroot.minsize(440, 720)
 
     # Fixes issue with layout on Windows 11
     plt.figure()
 
     # Static variables for the event loop
-    source_dict = {}
-    source = None
-    band = 0
     dir = ""
+    source_dict = {}
+    source = ""
+    band = 0
     sort_stat_reverse = [False]*4
     sort_source_reverse = [False]*2
+    highlights = []
 
     # Event loop for the GUI
     while True:
@@ -127,12 +129,13 @@ def run_gui():
                     main_window.refresh()
                     continue
 
-                # Update source info
+                # Update static variables
+                dir = new_dir
                 source = None
                 source_dict = find_station_matches(datapoint_df)
+                highlights = []
                 
                 # Reset/update GUI
-                dir = new_dir
                 main_window["stations_table"].update([])
                 main_window["sources_table"].update(update_sources_table(source_dict))
                 main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
@@ -155,7 +158,8 @@ def run_gui():
                 station_information = pd.read_csv("data/derived/stations.csv")
                 saved_station_information = station_information.copy(deep=True)
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"], band)
+                    station_information, source_dict[source]["stations"],
+                    highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
@@ -176,7 +180,7 @@ def run_gui():
                     continue
             break
 
-        ### Source list events ###
+        ### Source selection events ###
 
         # Source selected
         if event[0] == "sources_table" and event[1] == "+CLICKED+":
@@ -212,52 +216,28 @@ def run_gui():
 
             # Update the stations table
             else:
+                highlights = []
                 source = main_window["sources_table"].get()[click_row][0]
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"], band)
+                    station_information, source_dict[source]["stations"],
+                    highlights, band)
+                main_window["stations_table"].update(new_table)
+                main_window.refresh()
+                
+        ### Band selection event ###
+        
+        if re.search("[A-D]_band",str(event)):
+            band = ["A","B","C","D"].index(event.split("_")[0])
+
+            # Update GUI (if table is set)
+            if not all(not e for e in main_window["stations_table"].get()):
+                new_table = update_station_table(
+                    station_information, source_dict[source]["stations"],
+                    highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
-
-        ### Plot event ###
-
-        if event == "plot":
-            # Check that user has selected a folder
-            if not dir:
-                sg.Popup("Please select a folder first!",
-                         icon="images/favicon.ico")
-                continue
-
-           # Check that user has selected a source
-            if not source:
-                sg.Popup("No source selected! Please select one from the list.",
-                         icon="images/favicon.ico")
-                continue
-
-            # Check that user has selected a valid source
-            if source not in source_dict:
-                sg.Popup("Source not found! Please select one from the list.",
-                         icon="images/favicon.ico")
-                continue
-
-            # Find which band the user has selected, selected station will have
-            # a value of True, all others False
-            band = [values['A_band'], values['B_band'],
-                    values['C_band'], values['D_band']].index(True)
-
-            # Ignore the stations that were unselected in the GUI
-            ignored_stations = station_information.loc[station_information["selected"] == 0]["name"].to_list(
-            )
-
-            # Try to plot
-            return_message = plot_source(
-                source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band)
-            if return_message == "no_data_found":
-                sg.Popup(
-                    "No data points found for this source using the selected stations and band.",
-                    icon="images/favicon.ico")
-
-        ### Table click events ###
+        ### Station selection events ###
 
         if event[0] == "stations_table" and event[1] == "+CLICKED+":
             click_row, click_col = event[2]
@@ -297,13 +277,18 @@ def run_gui():
                     source_dict[source]["stations"] = dict(sorted(source_dict[source]["stations"].items(), key=lambda stat: float(
                         station_information.loc[station_information["name"] == stat[0]][col_name].iloc[0]), reverse=reverse))
 
+                # Sort by highlight
+                if click_col == 4:
+                    pass
+
                 # Update list
                 sort_stat_reverse = [False]*4
                 sort_stat_reverse[click_col] = not reverse
 
                 # Update GUI
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"], band)
+                    station_information, source_dict[source]["stations"],
+                     highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
@@ -319,7 +304,9 @@ def run_gui():
                     station_information.loc[station_information["name"] == selected_station, "selected"] = 1
 
                 # Update GUI
-                new_table = update_station_table(station_information, source_dict[source]["stations"], band)
+                new_table = update_station_table(
+                    station_information, source_dict[source]["stations"],
+                     highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
@@ -371,7 +358,8 @@ def run_gui():
                         
                         # Update GUI
                         new_table = update_station_table(
-                            station_information, source_dict[source]["stations"], band)
+                            station_information, source_dict[source]["stations"],
+                            highlights, band)
                         main_window["stations_table"].update(new_table)
                         main_window.refresh()
 
@@ -379,19 +367,64 @@ def run_gui():
                         edit_popup.close()
                     break
 
-        ### Band selection event ###
-        
-        if re.search("[A-D]_band",str(event)):
-            band = ["A","B","C","D"].index(event.split("_")[0])
+            # Select/deselect highlight
+            elif click_col == 4:
+                # Update selection
+                selected_station = main_window["stations_table"].get()[click_row][1]
 
-            # Update GUI (if table is set)
-            if not all(not e for e in main_window["stations_table"].get()):
-                new_table = update_station_table(
-                    station_information, source_dict[source]["stations"], band)
+                if selected_station in highlights:
+                    highlights.remove(selected_station)
+                else:
+                    # Check maximum two highlights
+                    if len(highlights) > 1:
+                        sg.Popup("You can only select two highlights!",
+                                icon="images/favicon.ico")
+                        continue
+                    highlights.append(selected_station)
+
+                # Update GUI
+                new_table = update_station_table(station_information, source_dict[source]["stations"],
+                                                 highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
+        ### Plot event ###
 
+        if event == "plot":
+            # Check that user has selected a folder
+            if not dir:
+                sg.Popup("Please select a folder first!",
+                         icon="images/favicon.ico")
+                continue
+
+           # Check that user has selected a source
+            if not source:
+                sg.Popup("No source selected! Please select one from the list.",
+                         icon="images/favicon.ico")
+                continue
+
+            # Check that user has selected a valid source
+            if source not in source_dict:
+                sg.Popup("Source not found! Please select one from the list.",
+                         icon="images/favicon.ico")
+                continue
+
+            # Find which band the user has selected, selected station will have
+            # a value of True, all others False
+            band = [values['A_band'], values['B_band'],
+                    values['C_band'], values['D_band']].index(True)
+
+            # Ignore the stations that were unselected in the GUI
+            ignored_stations = station_information.loc[station_information["selected"] == 0]["name"].to_list(
+            )
+
+            # Try to plot
+            return_message = plot_source(
+                source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band)
+            if return_message == "no_data_found":
+                sg.Popup(
+                    "No data points found for this source using the selected stations and band.",
+                    icon="images/favicon.ico")
 
 
 if __name__ == '__main__':

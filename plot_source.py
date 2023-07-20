@@ -10,7 +10,7 @@ from init import find_datapoints
 FIG_COUNT = 1
 
 
-def plot_source(source, data, station_information, baseline="", ignored_stations=[], bands=[0, 1, 2, 3]):
+def plot_source(source, data, station_information, highlighted_stations = [],baseline="", ignored_stations=[], bands=[0, 1, 2, 3]):
     """
     Plots uv coordinates of a source
 
@@ -45,6 +45,9 @@ def plot_source(source, data, station_information, baseline="", ignored_stations
     coords_u = []
     coords_v = []
     flux = []
+    highlighted_u = []
+    highlighted_v = []
+    highlighted_flux = []
 
     for band in bands:
         for point in matches:
@@ -78,6 +81,11 @@ def plot_source(source, data, station_information, baseline="", ignored_stations
             baselines.extend(
                 [f'{data.Station1.iloc[point]}-{data.Station2.iloc[point]} {list(map(lambda x: round(x,3), curr_flux))}']*2)
 
+            if data.Station1.iloc[point] in highlighted_stations and data.Station2.iloc[point] in highlighted_stations: 
+                highlighted_u.extend([u,-u])
+                highlighted_v.extend([v,-v])
+                highlighted_flux.extend(curr_flux*2)
+
     # Remove NaN values
     coords_u = [u for u in coords_u if u == u]
     coords_v = [v for v in coords_v if v == v]
@@ -92,6 +100,8 @@ def plot_source(source, data, station_information, baseline="", ignored_stations
     plt.figure(FIG_COUNT)
     FIG_COUNT += 1
     uv_plot = plt.scatter(coords_u, coords_v, c=flux, marker=".")
+    plt.colorbar(label="Flux density")
+    plt.scatter(highlighted_u,highlighted_v, marker='*', c=highlighted_flux)
 
     # Adds arrows and annotations to all points
     uv_cursor = mplcursors.cursor(
@@ -102,7 +112,6 @@ def plot_source(source, data, station_information, baseline="", ignored_stations
     # Add text
     plt.xlabel("U [fringes/radian]")
     plt.ylabel("V [fringes/radian]")
-    plt.colorbar(label="Flux density")
     bands_letters = list(map(lambda b: chr(ord('A')+b), bands))
     plt.figtext(
         0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
