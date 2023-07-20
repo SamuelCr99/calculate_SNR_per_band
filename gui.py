@@ -138,7 +138,8 @@ def run_gui():
         # Restore old stations info config
         if event == "Restore":
             a = sg.popup_yes_no(
-                "Restoring will remove all configurations set. Do you wish to continue?")
+                "Restoring will remove all configurations set. Do you wish to continue?",
+                icon="images/favicon.ico")
             if a == "Yes":
                 find_stations()
                 station_information = pd.read_csv("data/derived/stations.csv")
@@ -150,7 +151,8 @@ def run_gui():
 
         # Display about info
         if event == "About...":
-            sg.Popup("About info")
+            sg.Popup("About info",
+                     icon="images/favicon.ico")
 
         # Close the program and save config
         if event == sg.WIN_CLOSE_ATTEMPTED_EVENT or event == "cancel" or event == "Exit":
@@ -202,17 +204,20 @@ def run_gui():
         if event == "plot":
             # Check that user has selected a folder
             if not dir:
-                sg.Popup("Please select a folder first!")
+                sg.Popup("Please select a folder first!",
+                         icon="images/favicon.ico")
                 continue
 
            # Check that user has selected a source
             if not values["source_list"]:
-                sg.Popup("No source selected! Please select one from the list.")
+                sg.Popup("No source selected! Please select one from the list.",
+                         icon="images/favicon.ico")
                 continue
 
             # Check that user has selected a valid source
             if source not in sources:
-                sg.Popup("Source not found! Please select one from the list.")
+                sg.Popup("Source not found! Please select one from the list.",
+                         icon="images/favicon.ico")
                 continue
 
             # Find which band the user has selected, selected station will have
@@ -229,7 +234,8 @@ def run_gui():
                 source.name, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band)
             if return_message == "no_data_found":
                 sg.Popup(
-                    "No data points found for this source using the selected stations and band.")
+                    "No data points found for this source using the selected stations and band.",
+                    icon="images/favicon.ico")
 
         ### Table click events ###
 
