@@ -103,7 +103,7 @@ def plot_source(source, data, station_information, highlighted_stations = [],bas
     ### Scatter plot ###
 
     # Create figure and plot
-    plt.figure(FIG_COUNT)
+    figure1 = plt.figure(FIG_COUNT)
     FIG_COUNT += 1
     uv_plot = plt.scatter(coords_u, coords_v, c=flux, marker=".")
     plt.colorbar(label="Flux density")
@@ -163,6 +163,9 @@ def plot_source(source, data, station_information, highlighted_stations = [],bas
         # Create empty scatter plots so the legend will be added correctly
         plt.legend(handles=list(map(lambda b: plt.scatter(
             [], [], c=base_colors[b], label=f'Band {chr(ord("A")+b)}'), bands)))
+
+    
+    return figure1
 
     # Show the plots
     plt.show(block=False)

@@ -29,10 +29,13 @@ def create_layout(stations):
                           expand_x=True, expand_y=True)],
                 [sg.Text(text="", key="loading_text", text_color="white", font=("Andalde Mono", 16)), sg.Push(), sg.Button("Plot", key="plot"), sg.Button("Cancel", key="cancel")]]
 
+    right_col = [[sg.Canvas(key="fig")],
+                 [sg.Canvas(key="toolbar",s=(500,500))]]
+
     menu = [["&File", ["&Open folder", "&Save configuration", "&Restore", "&Exit"]],
             ["&Help", "&About..."]]
 
     layout = [[sg.MenubarCustom(menu, text_color="black", bar_background_color="white", background_color="white", bar_text_color="black")],
-              [sg.Column(left_col, expand_x=True, expand_y=True)]]
+              [sg.Column(left_col, expand_x=True, expand_y=True),sg.Column([[sg.Frame("Figure", right_col)]])]]
 
     return layout

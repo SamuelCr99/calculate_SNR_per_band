@@ -8,7 +8,25 @@ from gui_utility.find_station_matches import find_station_matches
 from layout import create_layout
 from plot_source import plot_source
 from init import find_datapoints, find_stations
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
+
+def draw_fig(canvas, fig, canvas_toolbar):
+    if canvas.children:
+        for child in canvas.winfo_children():
+            child.destroy()
+    if canvas_toolbar.children:
+        for child in canvas_toolbar.winfo_children():
+            child.destroy()
+    figure_canvas_agg = FigureCanvasTkAgg(fig, master=canvas)
+    figure_canvas_agg.draw()
+    toolbar = Toolbar(figure_canvas_agg, canvas_toolbar)
+    toolbar.update()
+    figure_canvas_agg.get_tk_widget().pack(side='right', fill='both', expand=1)
+
+class Toolbar(NavigationToolbar2Tk):
+    def __init__(self, *args, **kwargs):
+        super(Toolbar, self).__init__(*args, **kwargs)
 
 def update_station_table(station_information, stations, highlights, band):
     """
@@ -43,6 +61,8 @@ def update_sources_table(sources):
     for source in sources: 
         new_table.append([source, sources[source]['observations']])
     return new_table
+
+
 
 def run_gui():
     """
@@ -416,6 +436,11 @@ def run_gui():
                 sg.Popup(
                     "No data points found for this source using the selected stations and band.",
                     icon="images/favicon.ico")
+            else:
+                fig = return_message
+                DPI = float(fig.get_dpi())
+                fig.set_size_inches(505/DPI,505/DPI)
+                draw_fig(main_window["fig"].TKCanvas, fig, main_window["toolbar"].TKCanvas)
 
 
 if __name__ == '__main__':
