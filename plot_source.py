@@ -100,9 +100,9 @@ def plot_source(source, data, station_information, baseline="", ignored_stations
         "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
     
     # Add text
-    plt.xlabel("U [lambda]")
-    plt.ylabel("V [lambda]")
-    plt.colorbar()
+    plt.xlabel("U [fringes/radian]")
+    plt.ylabel("V [fringes/radian]")
+    plt.colorbar(label="Flux density")
     bands_letters = list(map(lambda b: chr(ord('A')+b), bands))
     plt.figtext(
         0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
@@ -137,7 +137,7 @@ def plot_source(source, data, station_information, baseline="", ignored_stations
         "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
     
     # Add text
-    plt.xlabel("sqrt(U^2+V^2) [lambda]")
+    plt.xlabel("sqrt(U^2+V^2) [fringes/radian]")
     plt.ylabel("Flux density")
     plt.title(
         f"Flux density vs. sqrt(U^2+V^2) for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")

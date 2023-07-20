@@ -2,6 +2,7 @@ import os
 import PySimpleGUI as sg
 import pandas as pd
 import matplotlib.pyplot as plt
+import re
 from tkinter.filedialog import askdirectory
 from gui_utility.find_station_matches import find_station_matches
 from layout import create_layout
@@ -19,7 +20,7 @@ class list_box_element:
         return f"{self.name} [{self.observations}]"
 
 
-def update_station_table(station_information, stations):
+def update_station_table(station_information, stations, band):
     """
     Generates a table that can be used in the GUI
 
@@ -42,10 +43,15 @@ def update_station_table(station_information, stations):
                                      == station]['C_SEFD'].values[0]
         d_sefd = station_information[station_information['name']
                                      == station]['D_SEFD'].values[0]
-        new_table.append(
-            [activated, station, stations[station], a_sefd, b_sefd, c_sefd, d_sefd])
+        sefd = [a_sefd,b_sefd,c_sefd,d_sefd][band]
+        new_table.append([activated, station, stations[station], sefd])
     return new_table
 
+def update_sources_table(sources):
+    new_table = []
+    for source in sources: 
+        new_table.append([source, sources[source]['observations']])
+    return new_table
 
 def run_gui():
     """
@@ -82,19 +88,18 @@ def run_gui():
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True,
                             icon="images/favicon.ico", enable_close_attempted_event=True)
-    main_window.TKroot.minsize(630, 720)
+    main_window.TKroot.minsize(400, 720)
 
     # Fixes issue with layout on Windows 11
     plt.figure()
 
     # Static variables for the event loop
     source_dict = {}
-    sources = []
     source = None
+    band = 0
     dir = ""
-    sort_alph_reverse = False
-    sort_num_reverse = True
-    sort_stat_reverse = [False]*7
+    sort_stat_reverse = [False]*4
+    sort_source_reverse = [False]*2
 
     # Event loop for the GUI
     while True:
@@ -112,19 +117,24 @@ def run_gui():
                 main_window.refresh()
 
                 # Load data (takes time)
-                datapoint_df = find_datapoints(new_dir)
+                try:
+                    datapoint_df = find_datapoints(new_dir)
+                except:
+                    sg.Popup("Something went wrong! Please select a valid vgosDB directory.",
+                             icon="images/favicon.ico")
+                    main_window["loading_text"].update(value="")
+                    main_window.set_title(f"Quasar Viewer")
+                    main_window.refresh()
+                    continue
 
                 # Update source info
                 source = None
                 source_dict = find_station_matches(datapoint_df)
-                sources = list(map(lambda s: list_box_element(
-                    s, source_dict[s]['observations']), source_dict))
-                sources.sort(key=lambda s: s.name)
                 
                 # Reset/update GUI
                 dir = new_dir
                 main_window["stations_table"].update([])
-                main_window["source_list"].update(values=sources)
+                main_window["sources_table"].update(update_sources_table(source_dict))
                 main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
                 main_window["loading_text"].update(value="")
                 main_window.refresh()
@@ -145,7 +155,7 @@ def run_gui():
                 station_information = pd.read_csv("data/derived/stations.csv")
                 saved_station_information = station_information.copy(deep=True)
                 new_table = update_station_table(
-                    station_information, source_dict[source.name]["stations"])
+                    station_information, source_dict[source]["stations"], band)
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
@@ -169,35 +179,45 @@ def run_gui():
         ### Source list events ###
 
         # Source selected
-        if event == "source_list":
+        if event[0] == "sources_table" and event[1] == "+CLICKED+":
+            click_row, click_col = event[2]
 
-            # Ignore event if no source was selected
-            if not values["source_list"]:
+            # Unusable clicks
+            if click_row == None or click_col == None or click_col == -1:
                 continue
 
+            # Clicking when no data is in the table should do nothing
+            elif all(not e for e in main_window["sources_table"].get()):
+                continue
+
+            elif click_row == -1:
+
+                reverse = sort_source_reverse[click_col]
+
+                # Sort by selected
+                if click_col == 0:
+                    source_dict = dict(sorted(source_dict.items(
+                    ), key=lambda source: source[0], reverse=reverse))
+
+                # Sort by name
+                if click_col == 1:
+                    source_dict = dict(sorted(source_dict.items(
+                    ),key=lambda source: source[1]["observations"], reverse=reverse))
+
+                reverse = not reverse
+                sort_source_reverse = [False]*2
+                sort_source_reverse[click_col] = reverse
+                main_window["sources_table"].update(update_sources_table(source_dict))
+                main_window.refresh()
+
             # Update the stations table
-            source = values["source_list"][0]
-            new_table = update_station_table(
-                station_information, source_dict[source.name]["stations"])
-            main_window["stations_table"].update(new_table)
-            main_window.refresh()
+            else:
+                source = main_window["sources_table"].get()[click_row][0]
+                new_table = update_station_table(
+                    station_information, source_dict[source]["stations"], band)
+                main_window["stations_table"].update(new_table)
+                main_window.refresh()
 
-        # Sort the sources by name
-        if event == "sort_alph":
-            sources.sort(key=lambda s: s.name, reverse=sort_alph_reverse)
-            sort_alph_reverse = not sort_alph_reverse
-            sort_num_reverse = True
-            main_window["source_list"].update(values=sources)
-            main_window["source_list"].set_value([source])
-
-        # Sort the sources by observations
-        if event == "sort_num":
-            sources.sort(key=lambda s: s.observations,
-                         reverse=sort_num_reverse)
-            sort_num_reverse = not sort_num_reverse
-            sort_alph_reverse = False
-            main_window["source_list"].update(values=sources)
-            main_window["source_list"].set_value([source])
 
         ### Plot event ###
 
@@ -209,13 +229,13 @@ def run_gui():
                 continue
 
            # Check that user has selected a source
-            if not values["source_list"]:
+            if not source:
                 sg.Popup("No source selected! Please select one from the list.",
                          icon="images/favicon.ico")
                 continue
 
             # Check that user has selected a valid source
-            if source not in sources:
+            if source not in source_dict:
                 sg.Popup("Source not found! Please select one from the list.",
                          icon="images/favicon.ico")
                 continue
@@ -231,7 +251,7 @@ def run_gui():
 
             # Try to plot
             return_message = plot_source(
-                source.name, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band)
+                source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band)
             if return_message == "no_data_found":
                 sg.Popup(
                     "No data points found for this source using the selected stations and band.",
@@ -257,46 +277,33 @@ def run_gui():
 
                 # Sort by selected
                 if click_col == 0:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(
+                    source_dict[source]["stations"] = dict(sorted(source_dict[source]["stations"].items(
                     ), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["selected"].iloc[0], reverse=reverse))
 
                 # Sort by name
                 if click_col == 1:
-                    source_dict[source.name]["stations"] = dict(sorted(
-                        source_dict[source.name]["stations"].items(), key=lambda stat: stat[0], reverse=reverse))
+                    source_dict[source]["stations"] = dict(sorted(
+                        source_dict[source]["stations"].items(), key=lambda stat: stat[0], reverse=reverse))
 
                 # Sort by observations
                 if click_col == 2:
-                    source_dict[source.name]["stations"] = dict(sorted(
-                        source_dict[source.name]["stations"].items(), key=lambda stat: int(stat[1]), reverse=reverse))
+                    source_dict[source]["stations"] = dict(sorted(
+                        source_dict[source]["stations"].items(), key=lambda stat: int(stat[1]), reverse=reverse))
 
-                # Sort by A SEFD
+                # Sort by SEFD
                 if click_col == 3:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(
-                        station_information.loc[station_information["name"] == stat[0]]["A_SEFD"].iloc[0]), reverse=reverse))
-
-                # Sort by B SEFD
-                if click_col == 4:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(
-                        station_information.loc[station_information["name"] == stat[0]]["B_SEFD"].iloc[0]), reverse=reverse))
-
-                # Sort by C SEFD
-                if click_col == 5:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(
-                        station_information.loc[station_information["name"] == stat[0]]["C_SEFD"].iloc[0]), reverse=reverse))
-
-                # Sort by D SEFD
-                if click_col == 6:
-                    source_dict[source.name]["stations"] = dict(sorted(source_dict[source.name]["stations"].items(), key=lambda stat: float(
-                        station_information.loc[station_information["name"] == stat[0]]["D_SEFD"].iloc[0]), reverse=reverse))
+                    selected_band = chr(65+click_col-3)
+                    col_name = f'{selected_band}_SEFD'
+                    source_dict[source]["stations"] = dict(sorted(source_dict[source]["stations"].items(), key=lambda stat: float(
+                        station_information.loc[station_information["name"] == stat[0]][col_name].iloc[0]), reverse=reverse))
 
                 # Update list
-                sort_stat_reverse = [False]*7
+                sort_stat_reverse = [False]*4
                 sort_stat_reverse[click_col] = not reverse
 
                 # Update GUI
                 new_table = update_station_table(
-                    station_information, source_dict[source.name]["stations"])
+                    station_information, source_dict[source]["stations"], band)
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
@@ -312,15 +319,15 @@ def run_gui():
                     station_information.loc[station_information["name"] == selected_station, "selected"] = 1
 
                 # Update GUI
-                new_table = update_station_table(station_information, source_dict[source.name]["stations"])
+                new_table = update_station_table(station_information, source_dict[source]["stations"], band)
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
 
             # Edit SEFD values
-            elif click_col in [3, 4, 5, 6]:
+            elif click_col == 3:
                 # Get stats of the selected cell
                 selected_station = main_window["stations_table"].get()[click_row][1]
-                selected_band = chr(65+click_col-3)
+                selected_band = chr(65+band)
                 click_col_name = f'{selected_band}_SEFD'
                 orig_SEFD = station_information.loc[station_information["name"]
                                                     == selected_station, click_col_name].iloc[0]
@@ -364,13 +371,27 @@ def run_gui():
                         
                         # Update GUI
                         new_table = update_station_table(
-                            station_information, source_dict[source.name]["stations"])
+                            station_information, source_dict[source]["stations"], band)
                         main_window["stations_table"].update(new_table)
                         main_window.refresh()
 
                         # Close popup
                         edit_popup.close()
                     break
+
+        ### Band selection event ###
+        
+        if re.search("[A-D]_band",str(event)):
+            band = ["A","B","C","D"].index(event.split("_")[0])
+
+            # Update GUI (if table is set)
+            if not all(not e for e in main_window["stations_table"].get()):
+                new_table = update_station_table(
+                    station_information, source_dict[source]["stations"], band)
+                main_window["stations_table"].update(new_table)
+                main_window.refresh()
+
+
 
 
 if __name__ == '__main__':
