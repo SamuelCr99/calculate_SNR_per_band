@@ -29,20 +29,21 @@ def create_layout(stations):
                           expand_x=True, expand_y=True)],
                 [sg.Text(text="", key="loading_text", text_color="white", font=("Andalde Mono", 16))]]
 
-    figure1_tab = [[sg.Canvas(key="fig1", s=(1000,800), background_color="red")],
-                   [sg.Canvas(key="toolbar1", s=(1000,40),background_color="blue")]]
+    figure1_tab = [[sg.Canvas(key="fig1",s=(1000,800),background_color="white")],
+                   [sg.Canvas(key="toolbar1",s=(1000,40),background_color="white")]]
     
-    figure2_tab = [[sg.Canvas(key="fig2", s=(1000,800), background_color="white")],
-                   [sg.Canvas(key="toolbar2", s=(1000,40), background_color="white")]]
+    figure2_tab = [[sg.Canvas(key="fig2",s=(1000,800),background_color="white")],
+                   [sg.Canvas(key="toolbar2",s=(1000,40),background_color="white")]]
     
-    figure_tabgroup = [[sg.Tab("Flux density", figure1_tab, background_color="green", expand_x=True, expand_y=True)], [sg.Tab("Distance", figure2_tab, background_color="white")]]
+    figure_tabgroup = [[sg.Tab("Flux density", figure1_tab, background_color="white")], [sg.Tab("Distance", figure2_tab, background_color="white")]]
     
-    right_col = [[sg.TabGroup(figure_tabgroup)]]
+    right_col = [[sg.TabGroup(figure_tabgroup)],
+                 [sg.VPush()]]
 
     menu = [["&File", ["&Open folder", "&Save configuration", "&Restore", "&Exit"]],
             ["&Help", "&About..."]]
 
     layout = [[sg.MenubarCustom(menu, text_color="black", bar_background_color="white", background_color="white", bar_text_color="black")],
-              [sg.Column(left_col, expand_x=True, expand_y=True),sg.Column(right_col, expand_x=True, expand_y=True, background_color="black")]]
+              [sg.Column(left_col, expand_x=True, expand_y=True),sg.Column(right_col, expand_x=True, expand_y=True)]]
 
     return layout

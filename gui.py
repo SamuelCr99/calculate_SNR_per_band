@@ -442,14 +442,8 @@ def run_gui():
             ignored_stations = station_information.loc[station_information["selected"] == 0]["name"].to_list()
 
             # Plot
-            # fig1, fig2 = plot_source(
-            #     source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
             plot_source(
                 source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
-            # DPI1 = float(fig1.get_dpi())
-            # fig1.set_size_inches(1000/DPI1,800/DPI1)
-            # DPI2 = float(fig2.get_dpi())
-            # fig2.set_size_inches(1000/DPI2,800/DPI2)
 
             # Display plots in canvases
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
