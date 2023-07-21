@@ -98,7 +98,7 @@ def run_gui():
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True,
                             icon="images/favicon.ico", enable_close_attempted_event=True)
-    main_window.TKroot.minsize(1470, 920)
+    main_window.TKroot.minsize(1320, 820)
 
     # Fixes issue with layout on Windows 11
     plt.figure()
@@ -107,9 +107,9 @@ def run_gui():
     fig1 = plt.figure(0)
     fig2 = plt.figure(1)
     DPI1 = float(fig1.get_dpi())
-    fig1.set_size_inches(1000/DPI1,800/DPI1)
+    fig1.set_size_inches(900/DPI1,700/DPI1)
     DPI2 = float(fig2.get_dpi())
-    fig2.set_size_inches(1000/DPI2,800/DPI2)
+    fig2.set_size_inches(900/DPI2,700/DPI2)
 
     # Static variables for the event loop
     dir = ""

@@ -29,11 +29,11 @@ def create_layout(stations):
                           expand_x=True, expand_y=True)],
                 [sg.Text(text="", key="loading_text", text_color="white", font=("Andalde Mono", 16))]]
 
-    figure1_tab = [[sg.Canvas(key="fig1", s=(1000,800), background_color="red", expand_x=True, expand_y=True)],
-                   [sg.Canvas(key="toolbar1", s=(1000,40),background_color="blue", expand_x=True)]]
+    figure1_tab = [[sg.Canvas(key="fig1", background_color="red", expand_x=True, expand_y=True)],
+                   [sg.Canvas(key="toolbar1",background_color="blue", expand_x=True)]]
     
-    figure2_tab = [[sg.Canvas(key="fig2", s=(1000,800), background_color="white", expand_x=True, expand_y=True)],
-                   [sg.Canvas(key="toolbar2", s=(1000,40), background_color="white", expand_x=True)]]
+    figure2_tab = [[sg.Canvas(key="fig2", background_color="white", expand_x=True, expand_y=True)],
+                   [sg.Canvas(key="toolbar2", background_color="white", expand_x=True)]]
     
     figure_tabgroup = [[sg.Tab("Flux density", figure1_tab, background_color="green")], [sg.Tab("Distance", figure2_tab, background_color="white")]]
     
@@ -43,6 +43,6 @@ def create_layout(stations):
             ["&Help", "&About..."]]
 
     layout = [[sg.MenubarCustom(menu, text_color="black", bar_background_color="white", background_color="white", bar_text_color="black")],
-              [sg.Column(left_col, expand_x=True, expand_y=True),sg.Column(right_col, expand_x=True, expand_y=True, background_color="black")]]
+              [sg.Column(left_col, expand_x=False, expand_y=True, justification="left", vertical_alignment="top", background_color="yellow"),sg.Column(right_col, expand_x=True, expand_y=True, justification="left", background_color="black")]]
 
     return layout
