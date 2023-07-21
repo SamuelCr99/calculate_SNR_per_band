@@ -29,15 +29,15 @@ def create_layout(stations):
                           expand_x=True, expand_y=True)],
                 [sg.Text(text="", key="loading_text", text_color="white", font=("Andalde Mono", 16))]]
 
-    figure1_tab = [[sg.Canvas(key="fig1", s=(1000,800), background_color="red")],
-                   [sg.Canvas(key="toolbar1", s=(1000,40),background_color="blue")]]
+    figure1_tab = [[sg.Canvas(key="fig1", s=(1000,800), background_color="red", expand_x=True, expand_y=True)],
+                   [sg.Canvas(key="toolbar1", s=(1000,40),background_color="blue", expand_x=True)]]
     
-    figure2_tab = [[sg.Canvas(key="fig2", s=(1000,800), background_color="white")],
-                   [sg.Canvas(key="toolbar2", s=(1000,40), background_color="white")]]
+    figure2_tab = [[sg.Canvas(key="fig2", s=(1000,800), background_color="white", expand_x=True, expand_y=True)],
+                   [sg.Canvas(key="toolbar2", s=(1000,40), background_color="white", expand_x=True)]]
     
-    figure_tabgroup = [[sg.Tab("Flux density", figure1_tab, background_color="green", expand_x=True, expand_y=True)], [sg.Tab("Distance", figure2_tab, background_color="white")]]
+    figure_tabgroup = [[sg.Tab("Flux density", figure1_tab, background_color="green")], [sg.Tab("Distance", figure2_tab, background_color="white")]]
     
-    right_col = [[sg.TabGroup(figure_tabgroup)]]
+    right_col = [[sg.TabGroup(figure_tabgroup, expand_x=True, expand_y=True, background_color="purple")]]
 
     menu = [["&File", ["&Open folder", "&Save configuration", "&Restore", "&Exit"]],
             ["&Help", "&About..."]]
