@@ -34,14 +34,14 @@ def calculate_flux(index, general_data, station_data, bands=[0, 1, 2, 3]):
 
         # Band-specific constants to use
         SNR = general_data[f"{band_letter}_SNR"].iloc[index]
-        band_width = general_data[f"{band_letter}_bw"].iloc[index]*10**6
+        band_width = general_data[f"{band_letter}_bw"].iloc[index]*(10**6)
         SEFD1 = float(
             station_data[f"{band_letter}_SEFD"].loc[station_data.name == stat1].iloc[0])
         SEFD2 = float(
             station_data[f"{band_letter}_SEFD"].loc[station_data.name == stat2].iloc[0])
 
         # Equation for flux density
-        flux.append(SNR * sqrt(SEFD1 * SEFD2) /
+        flux.append((SNR * sqrt(SEFD1 * SEFD2)) /
                     (C * sqrt(2*int_time*band_width)) if band_width != 0 else 0)
 
     return flux

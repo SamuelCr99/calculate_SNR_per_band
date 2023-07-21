@@ -98,7 +98,7 @@ def run_gui():
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True,
                             icon="images/favicon.ico", enable_close_attempted_event=True)
-    main_window.TKroot.minsize(440, 720)
+    main_window.TKroot.minsize(1470, 920)
 
     # Fixes issue with layout on Windows 11
     plt.figure()
@@ -116,8 +116,8 @@ def run_gui():
     source_dict = {}
     source = ""
     band = 0
-    sort_stat_reverse = [False]*5
-    sort_source_reverse = [False]*2
+    sort_stat_reverse = [True, False, True, True, True]
+    sort_source_reverse = [False, True]
     highlights = []
 
     # Event loop for the GUI
@@ -227,7 +227,7 @@ def run_gui():
                     ),key=lambda source: source[1]["observations"], reverse=reverse))
 
                 reverse = not reverse
-                sort_source_reverse = [False]*2
+                sort_source_reverse = [False, True]
                 sort_source_reverse[click_col] = reverse
                 main_window["sources_table"].update(update_sources_table(source_dict))
                 main_window.refresh()
@@ -303,7 +303,7 @@ def run_gui():
                                                                   key=lambda stat: stat[0] in highlights, reverse=reverse))
 
                 # Update list
-                sort_stat_reverse = [False]*5
+                sort_stat_reverse = [True, False, True, True, True]
                 sort_stat_reverse[click_col] = not reverse
 
                 # Update GUI
@@ -453,7 +453,7 @@ def run_gui():
 
             # Display plots in canvases
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
-            # draw_fig(main_window["fig2"].TKCanvas, fig2, main_window["toolbar2"].TKCanvas)
+            draw_fig(main_window["fig2"].TKCanvas, fig2, main_window["toolbar2"].TKCanvas)
 
 
 if __name__ == '__main__':

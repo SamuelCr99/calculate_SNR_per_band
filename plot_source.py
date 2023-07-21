@@ -43,6 +43,7 @@ def plot_source(source, data, station_information, highlighted_stations = [], ba
     highlighted_u = []
     highlighted_v = []
     highlighted_flux = []
+    highlighted_matches = []
 
     for band in bands:
         for point in matches:
@@ -78,11 +79,13 @@ def plot_source(source, data, station_information, highlighted_stations = [], ba
 
 
             if len(highlighted_stations) == 1 and (data.Station1.iloc[point] in highlighted_stations or data.Station2.iloc[point] in highlighted_stations):
+                if point not in highlighted_matches: highlighted_matches.append(point)
                 highlighted_u.extend([u,-u])
                 highlighted_v.extend([v,-v])
                 highlighted_flux.extend(curr_flux*2)
 
             elif data.Station1.iloc[point] in highlighted_stations and data.Station2.iloc[point] in highlighted_stations: 
+                if point not in highlighted_matches: highlighted_matches.append(point)
                 highlighted_u.extend([u,-u])
                 highlighted_v.extend([v,-v])
                 highlighted_flux.extend(curr_flux*2)
@@ -96,9 +99,11 @@ def plot_source(source, data, station_information, highlighted_stations = [], ba
     # Create figure and plot
     figure1 = plt.figure(0)
     figure1.clf()
-    uv_plot = plt.scatter(coords_u, coords_v, c=flux, marker=".")
+    uv_plot = plt.scatter(coords_u, coords_v, c=flux, marker=".", vmin=0, cmap='jet')
+
+    if len(highlighted_u):
+        plt.scatter(highlighted_u,highlighted_v, marker='*', c = highlighted_flux, vmin=0, vmax=max(flux), s=50, cmap='jet')
     plt.colorbar(label="Flux density")
-    plt.scatter(highlighted_u,highlighted_v, marker='*', c=highlighted_flux, s=50)
 
     # Adds arrows and annotations to all points
     uv_cursor = mplcursors.cursor(
@@ -115,25 +120,30 @@ def plot_source(source, data, station_information, highlighted_stations = [], ba
     plt.title(
         f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
 
-    distance = list(map(lambda u, v: sqrt(u**2+v**2), coords_u, coords_v))
-
     ### Distance plot ###
+    distance = list(map(lambda u, v: sqrt(u**2+v**2), coords_u, coords_v))
+    highlighted_distance = list(map(lambda u, v: sqrt(u**2+v**2), highlighted_u, highlighted_v))
 
     # Create distance plot
-    plt.figure(1)
+    figure2 = plt.figure(1)
+    figure2.clf()
 
     # Colors to use for the bands
-    base_colors = ['red', 'blue', 'green', 'yellow']
+    base_colors = ['blue', 'green', 'yellow', 'red']
 
     # If there are multiple bands shown they should be color coded
     if len(bands) > 1:
         colors = sum(
             list(map(lambda b: [base_colors[b]]*2*len(matches), bands)), [])
+        highlighted_colors = sum(
+            list(map(lambda b: [base_colors[b]]*2*len(highlighted_matches), bands)), [])
     else:
         colors = "black"
-    
+        highlighted_colors = "black"
     # Plot
     distance_plot = plt.scatter(distance, flux, marker=".", c=colors)
+    if len(highlighted_u):
+        plt.scatter(highlighted_distance,highlighted_flux, marker='*', s=50, c=highlighted_colors)
     
     # Adds arrows and annotations to the points
     distance_cursor = mplcursors.cursor(
@@ -159,9 +169,9 @@ def plot_source(source, data, station_information, highlighted_stations = [], ba
 
 if __name__ == '__main__':
     station_information = pd.read_csv('data/derived/stations.csv')
-    source = "0016+731"
-    session_path = 'data/sessions/19JUL24XA/'
+    source = "1803+784"
+    session_path = 'data/sessions/session1/'
     data = find_datapoints(session_path)
 
-    plot_source(source, data, station_information=station_information, bands=3)
+    plot_source(source, data, station_information=station_information, bands=[0,1,2,3], highlighted_stations=["WESTFORD", "ISHIOKA"])
     plt.show()
