@@ -50,10 +50,10 @@ u_mod = list(map(lambda u: delta_RA*u, u_mes))
 v_mod = list(map(lambda v: delta_dec*v, v_mes))
 
 flux_pred = list(map(lambda u,v: abs(A*pi/sqrt(a*b)*e**(-2*pi*1j*(x0*u+y0*v) -pi**2/a*(u*cos(t)+v*sin(t))**2 -pi**2/b*(v*cos(t)-u*sin(t))**2)), u_mod, v_mod))
-flux_ratio = list(map(lambda mes, pred: mes/pred, flux_mes, flux_pred))
+flux_ratio = list(map(lambda mes, pred: pred/mes, flux_mes, flux_pred))
 
 
-plt.scatter(u_mes, v_mes,c=flux_pred, s = 10)
+plt.scatter(u_mes, v_mes,c=flux_ratio, s = 10, norm=matplotlib.colors.LogNorm())
 plt.colorbar()
 plt.show()
 

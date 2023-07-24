@@ -113,14 +113,6 @@ def run_gui():
     # Fixes issue with layout on Windows 11
     plt.figure()
 
-    # Variables for settings plot sizes
-    fig1 = plt.figure(0)
-    fig2 = plt.figure(1)
-    DPI1 = float(fig1.get_dpi())
-    fig1.set_size_inches(900/DPI1,700/DPI1)
-    DPI2 = float(fig2.get_dpi())
-    fig2.set_size_inches(900/DPI2,700/DPI2)
-
     # Static variables for the event loop
     dir = ""
     source_dict = {}
@@ -130,6 +122,8 @@ def run_gui():
     sort_source_reverse = [False, True]
     highlights = []
     is_abcd = True
+    fig1 = plt.figure(0)
+    fig2 = plt.figure(1)
 
     # Event loop for the GUI
     while True:
@@ -148,7 +142,7 @@ def run_gui():
                 main_window.refresh()
 
                 # Check if it is a ABCD session or an SX session
-                is_abcd =  "QualityCode_bS.nc" not in os.listdir(f"{new_dir}/Observables")
+                is_abcd =  "Observables/QualityCode_bS.nc" not in os.listdir(f"{new_dir}/")
 
                 # Load data (takes time)
                 try:
@@ -179,6 +173,10 @@ def run_gui():
                 main_window["D_band"].update(visible=is_abcd)
                 main_window["S_band"].update(visible=not is_abcd)
                 main_window["X_band"].update(visible=not is_abcd)
+
+                fig1.clf()
+                draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
+                draw_fig(main_window["fig2"].TKCanvas, fig2, main_window["toolbar2"].TKCanvas)
 
                 main_window.refresh()
 
