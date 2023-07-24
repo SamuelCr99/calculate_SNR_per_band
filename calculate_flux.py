@@ -30,7 +30,7 @@ def calculate_flux(index, general_data, station_data, bands=[0, 1, 2, 3]):
     flux = []
 
     for band in bands:
-        band_letter = ["A", "B", "C", "D"][band]
+        band_letter = ["A","B","C","D","S","X"][band]
 
         # Band-specific constants to use
         SNR = general_data[f"{band_letter}_SNR"].iloc[index]

@@ -23,26 +23,30 @@ def create_layout(stations):
 
     # Currently the only column
     left_col = [[sg.Frame("Source", [[sources_col]], expand_x=True, expand_y=True)],
-                [sg.Frame("Band", [[sg.Radio("A", "band", key='A_band', enable_events=True, default=True), sg.Radio("B", "band", key="B_band", enable_events=True), sg.Radio(
-                    "C", "band", key="C_band", enable_events=True), sg.Radio("D", "band", key="D_band", enable_events=True)]], expand_x=True)],
+                [sg.Frame("Band", [[sg.Radio("A", "band", key='A_band', enable_events=True, default=True),
+                                    sg.Radio("B", "band", key="B_band", enable_events=True),
+                                    sg.Radio("C", "band", key="C_band", enable_events=True),
+                                    sg.Radio("D", "band", key="D_band", enable_events=True),
+                                    sg.Radio("S", "band", key="S_band", enable_events=True, visible=False),
+                                    sg.Radio("X", "band", key="X_band", enable_events=True, visible=False)]], expand_x=True)],
                 [sg.Frame("Stations", [[table_col]],
                           expand_x=True, expand_y=True)],
                 [sg.Text(text="", key="loading_text", text_color="white", font=("Andalde Mono", 16))]]
 
-    figure1_tab = [[sg.Canvas(key="fig1", background_color="red", expand_x=True, expand_y=True)],
-                   [sg.Canvas(key="toolbar1",background_color="blue", expand_x=True)]]
+    figure1_tab = [[sg.Canvas(key="fig1", background_color="white", expand_x=True, expand_y=True)],
+                   [sg.Canvas(key="toolbar1",background_color="white", expand_x=True)]]
     
     figure2_tab = [[sg.Canvas(key="fig2", background_color="white", expand_x=True, expand_y=True)],
                    [sg.Canvas(key="toolbar2", background_color="white", expand_x=True)]]
     
-    figure_tabgroup = [[sg.Tab("Flux density", figure1_tab, background_color="green")], [sg.Tab("Distance", figure2_tab, background_color="white")]]
+    figure_tabgroup = [[sg.Tab("Flux density", figure1_tab, background_color="white")], [sg.Tab("Distance", figure2_tab, background_color="white")]]
     
-    right_col = [[sg.TabGroup(figure_tabgroup, expand_x=True, expand_y=True, background_color="purple")]]
+    right_col = [[sg.TabGroup(figure_tabgroup, expand_x=True, expand_y=True)]]
 
-    menu = [["&File", ["&Open folder", "&Save configuration", "&Restore", "&Exit"]],
+    menu = [["&File", ["&Open session", "&Save configuration", "&Restore", "&Exit"]],
             ["&Help", "&About..."]]
 
     layout = [[sg.MenubarCustom(menu, text_color="black", bar_background_color="white", background_color="white", bar_text_color="black")],
-              [sg.Column(left_col, expand_x=False, expand_y=True, justification="left", vertical_alignment="top", background_color="yellow"),sg.Column(right_col, expand_x=True, expand_y=True, justification="left", background_color="black")]]
+              [sg.Column(left_col, expand_x=True, expand_y=True, key="left_col"),sg.Column(right_col, expand_x=True, expand_y=True, key="right_col")]]
 
     return layout

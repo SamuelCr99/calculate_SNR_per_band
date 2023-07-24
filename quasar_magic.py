@@ -1,8 +1,12 @@
 from QuasarModel.tools import get_image_from_path as get_image
 from QuasarModel.source_model import SourceModel as sm
 import matplotlib.pyplot as plt
+import matplotlib
+import pandas as pd
 from astropy.io import fits
 from math import radians,sin,cos,sqrt,pi,e
+from plot_source import plot_source
+from init import find_datapoints
 
 # image = get_image("fits/J0029-0113_S_2004_04_30_yyk_map.fits")
 # image = get_image("fits/J0022+0608_S_2018_11_18_pet_map.fits")
@@ -31,16 +35,25 @@ print(delta_dec)
 print(b)
 print(image.shape[0])
 
-u_ls = list(map(lambda i: (i-num_points/2)/(num_points/2)*10**8, range(num_points)))*num_points
-v_ls = list(map(lambda i: (i-num_points/2)/(num_points/2)*10**8, range(num_points)))*num_points
-v_ls.sort()
+# u_ls = list(map(lambda i: (i-num_points/2)/(num_points/2)*10**8, range(num_points)))*num_points
+# v_ls = list(map(lambda i: (i-num_points/2)/(num_points/2)*10**8, range(num_points)))*num_points
+# v_ls.sort()
 
-u_mod = list(map(lambda u: delta_RA*u, u_ls))
-v_mod = list(map(lambda v: delta_dec*v, v_ls))
+# Get the measued values
+station_information = pd.read_csv('data/derived/stations.csv')
+source = "0133+476"
+session_path = 'data/sessions/session1/'
+data = find_datapoints(session_path)
+u_mes, v_mes, flux_mes = plot_source(source, data, station_information=station_information, bands=[0], return_coords=True)
 
-flux = list(map(lambda u,v: abs(A*pi/sqrt(a*b)*e**(-2*pi*1j*(x0*u+y0*v) -pi**2/a*(u*cos(t)+v*sin(t))**2 -pi**2/b*(v*cos(t)-u*sin(t))**2)), u_mod, v_mod))
+u_mod = list(map(lambda u: delta_RA*u, u_mes))
+v_mod = list(map(lambda v: delta_dec*v, v_mes))
 
-plt.scatter(u_ls,v_ls,c=flux)
+flux_pred = list(map(lambda u,v: abs(A*pi/sqrt(a*b)*e**(-2*pi*1j*(x0*u+y0*v) -pi**2/a*(u*cos(t)+v*sin(t))**2 -pi**2/b*(v*cos(t)-u*sin(t))**2)), u_mod, v_mod))
+flux_ratio = list(map(lambda mes, pred: mes/pred, flux_mes, flux_pred))
+
+
+plt.scatter(u_mes, v_mes,c=flux_pred, s = 10)
 plt.colorbar()
 plt.show()
 

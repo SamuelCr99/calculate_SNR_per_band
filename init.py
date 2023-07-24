@@ -36,8 +36,7 @@ def is_float(v):
     except:
         return False
 
-
-def find_datapoints(dir, save_to_csv=False):
+def find_datapoints_abcd(dir, save_to_csv=False):
     """
     Finds all information about all observations
 
@@ -262,6 +261,112 @@ def find_datapoints(dir, save_to_csv=False):
 
     return df
 
+def find_datapoints_sx(dir, save_to_csv=False):
+
+    if dir[-1] != '/':
+        dir += '/'
+
+    # Import datasets
+    baseline_ds = nc.Dataset(f'{dir}Observables/Baseline.nc')
+    timeutc_ds = nc.Dataset(f'{dir}Observables/TimeUTC.nc')
+    source_ds = nc.Dataset(f'{dir}Observables/Source.nc')
+    quality_code_s_ds = nc.Dataset(f'{dir}Observables/QualityCode_bS.nc')
+    quality_code_x_ds = nc.Dataset(f'{dir}Observables/QualityCode_bX.nc')
+    uv_s_ds = nc.Dataset(f'{dir}ObsDerived/UVFperAsec_bS.nc') 
+    uv_x_ds = nc.Dataset(f'{dir}ObsDerived/UVFperAsec_bX.nc')
+    channel_info_s = nc.Dataset(f'{dir}Observables/ChannelInfo_bS.nc')
+    channel_info_x = nc.Dataset(f'{dir}Observables/ChannelInfo_bX.nc')
+    snr_info_s = nc.Dataset(f'{dir}Observables/SNR_bS.nc')
+    snr_info_x = nc.Dataset(f'{dir}Observables/SNR_bX.nc')
+    corrinfo = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bS.nc') # Might need one for each
+
+    # Find source
+    source = []
+    for elem in np.ma.getdata(source_ds["Source"]).tolist():
+        source.append(bytes_to_string(elem))
+
+    # Find time
+    time = []
+    for elem in np.ma.getdata(timeutc_ds["YMDHM"]):
+        time.append(time_to_string(elem))
+    second = []
+    for elem in np.ma.getdata(timeutc_ds["Second"]):
+        second.append(elem)
+
+    # Find stations
+    stat1 = []
+    stat2 = []
+    for elem in np.ma.getdata(baseline_ds["Baseline"]).tolist():
+        stat1.append(bytes_to_string(elem[0]).replace(" ", ""))
+        stat2.append(bytes_to_string(elem[1]).replace(" ", ""))
+
+    # Find quality code
+    qualcode_s = list(bytes_to_string(np.ma.getdata(
+        quality_code_s_ds["QualityCode"]).tolist()))
+    qualcode_x = list(bytes_to_string(np.ma.getdata(
+        quality_code_x_ds["QualityCode"]).tolist()))
+    
+    # Find u and v
+    uv_data_s = np.ma.getdata(uv_s_ds['UVFperAsec']).tolist()
+    uv_data_x = np.ma.getdata(uv_x_ds['UVFperAsec']).tolist()
+
+    u_s = list(map(lambda u: u[0]*206264.81, uv_data_s))
+    v_s = list(map(lambda v: v[1]*206264.81, uv_data_s))
+    
+    u_x = list(map(lambda u: u[0]*206264.81, uv_data_x))
+    v_x = list(map(lambda v: v[1]*206264.81, uv_data_x))
+
+    # Find SNR
+    S_SNR = np.ma.getdata(snr_info_s["SNR"]).tolist()
+    X_SNR = np.ma.getdata(snr_info_x["SNR"]).tolist()
+    
+    # Find integration time
+    int_time = np.ma.getdata(corrinfo["EffectiveDuration"]).tolist()
+
+    # Find bandwidth
+    N_S = len(np.ma.getdata(channel_info_s["ChannelFreq"]))
+    N_X = len(np.ma.getdata(channel_info_x["ChannelFreq"]))
+
+    S_bw = [N_S*32]*len(time)
+    X_bw = [N_X*32]*len(time)
+
+    # Collect everything into a dataframe
+    df = pd.DataFrame({"YMDHM": time,
+                       "Second": second,
+                       "Source": source,
+                       "Station1": stat1,
+                       "Station2": stat2,
+                       "Q_code_S": qualcode_s,
+                       "Q_code_X": qualcode_x,
+                       "S_u": u_s,
+                       "S_v": v_s,
+                       "X_u": u_x,
+                       "X_v": v_x,
+                       "S_SNR": S_SNR,
+                       "X_SNR": X_SNR,
+                       "S_bw": S_bw,
+                       "X_bw": X_bw,
+                       "int_time": int_time})
+
+    # Sort out rows with too low quality
+    df = df.loc[(df.Q_code_S.astype(int) > 5)]
+    df = df.loc[(df.Q_code_X.astype(int) > 5)]
+
+    if save_to_csv:
+        datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + df.to_csv(
+            index=False)
+        with open("data/derived/datapoints.csv", "w") as file:
+            file.write(datapoints_csv)
+
+    df.reset_index(inplace=True)
+
+    return df
+
+def find_datapoints(dir, is_abcd=True):
+    if is_abcd:
+        return find_datapoints_abcd(dir)
+    else:
+        return find_datapoints_sx(dir)
 
 def find_stations():
     """
@@ -284,8 +389,6 @@ def find_stations():
     station_sefds['B_SEFD'] = station_sefds['X_SEFD']
     station_sefds['C_SEFD'] = station_sefds['X_SEFD']
     station_sefds['D_SEFD'] = station_sefds['X_SEFD']
-
-    station_sefds.drop(columns=['X_SEFD', 'S_SEFD'], inplace=True)
 
     station_locations = pd.read_csv(
         'data/standard/position.cat', delim_whitespace=True)[['Name', 'X', 'Y', 'Z', 'Lat', 'Lon']]

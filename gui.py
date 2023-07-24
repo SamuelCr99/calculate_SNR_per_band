@@ -10,6 +10,11 @@ from plot_source import plot_source
 from init import find_datapoints, find_stations
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
+def repack(widget, option):
+    pack_info = widget.pack_info()
+    pack_info.update(option)
+    widget.pack(**pack_info)
+
 def draw_fig(canvas, fig, canvas_toolbar):
     if canvas.children:
         for child in canvas.winfo_children():
@@ -50,7 +55,11 @@ def update_station_table(station_information, stations, highlights, band):
                                      == station]['C_SEFD'].values[0]
         d_sefd = station_information[station_information['name']
                                      == station]['D_SEFD'].values[0]
-        sefd = [a_sefd,b_sefd,c_sefd,d_sefd][band]
+        s_sefd = station_information[station_information['name']
+                                     == station]['S_SEFD'].values[0]
+        x_sefd = station_information[station_information['name']
+                                     == station]['X_SEFD'].values[0]
+        sefd = [a_sefd,b_sefd,c_sefd,d_sefd,s_sefd,x_sefd][band]
         highlight = "X" if station in highlights else ""
         new_table.append([activated, station, stations[station], sefd, highlight])
     return new_table
@@ -60,8 +69,6 @@ def update_sources_table(sources):
     for source in sources: 
         new_table.append([source, sources[source]['observations']])
     return new_table
-
-
 
 def run_gui():
     """
@@ -100,6 +107,9 @@ def run_gui():
                             icon="images/favicon.ico", enable_close_attempted_event=True)
     main_window.TKroot.minsize(1320, 820)
 
+    # Fixes so the left column doesn't expand
+    repack(main_window["left_col"].Widget, {'fill':'y', 'expand':0, 'before':main_window["right_col"].Widget})
+
     # Fixes issue with layout on Windows 11
     plt.figure()
 
@@ -119,6 +129,7 @@ def run_gui():
     sort_stat_reverse = [True, False, True, True, True]
     sort_source_reverse = [False, True]
     highlights = []
+    is_abcd = True
 
     # Event loop for the GUI
     while True:
@@ -127,7 +138,8 @@ def run_gui():
         ### Menu bar events ###
 
         # Open the vgosDB
-        if event == "Open folder":
+        if event == "Open session":
+
             new_dir = askdirectory(initialdir="data/sessions")
             if new_dir != dir and new_dir:
                 # Tell the user that we are loading data
@@ -135,9 +147,12 @@ def run_gui():
                 main_window.set_title(f"Quasar Viewer - Loading...")
                 main_window.refresh()
 
+                # Check if it is a ABCD session or an SX session
+                is_abcd =  "QualityCode_bS.nc" not in os.listdir(f"{new_dir}/Observables")
+
                 # Load data (takes time)
                 try:
-                    datapoint_df = find_datapoints(new_dir)
+                    datapoint_df = find_datapoints(new_dir, is_abcd=is_abcd)
                 except:
                     sg.Popup("Something went wrong! Please select a valid vgosDB directory.",
                              icon="images/favicon.ico")
@@ -157,6 +172,14 @@ def run_gui():
                 main_window["sources_table"].update(update_sources_table(source_dict))
                 main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
                 main_window["loading_text"].update(value="")
+                
+                main_window["A_band"].update(visible=is_abcd)
+                main_window["B_band"].update(visible=is_abcd)
+                main_window["C_band"].update(visible=is_abcd)
+                main_window["D_band"].update(visible=is_abcd)
+                main_window["S_band"].update(visible=not is_abcd)
+                main_window["X_band"].update(visible=not is_abcd)
+
                 main_window.refresh()
 
         # Save the stations info config
@@ -245,8 +268,8 @@ def run_gui():
                 
         ### Band selection event ###
         
-        if re.search("[A-D]_band",str(event)):
-            band = ["A","B","C","D"].index(event.split("_")[0])
+        if re.search("[A-DSX]_band",str(event)):
+            band = ["A","B","C","D","S","X"].index(event.split("_")[0])
 
             # Update GUI (if table is set)
             if not all(not e for e in main_window["stations_table"].get()):
@@ -334,9 +357,15 @@ def run_gui():
 
             # Edit SEFD values
             elif click_col == 3:
+                # Warn when changing S and X band SEFDs
+                if band in [4,5]:
+                    sg.Popup(f"You cannot change the SEFD value of the {['S','X'][band-4]} band!",
+                            icon="images/favicon.ico")
+                    continue
+
                 # Get stats of the selected cell
                 selected_station = main_window["stations_table"].get()[click_row][1]
-                selected_band = chr(65+band)
+                selected_band = ["A","B","C","D","S","X"][band]
                 click_col_name = f'{selected_band}_SEFD'
                 orig_SEFD = station_information.loc[station_information["name"]
                                                     == selected_station, click_col_name].iloc[0]
@@ -436,7 +465,12 @@ def run_gui():
             # Find which band the user has selected, selected station will have
             # a value of True, all others False
             band = [values['A_band'], values['B_band'],
-                    values['C_band'], values['D_band']].index(True)
+                    values['C_band'], values['D_band'],
+                    values['S_band'], values['X_band']].index(True)
+
+            # Check that the selected band is in the currently visible list
+            if (is_abcd and band in [4,5]) or (not is_abcd and band in [0,1,2,3]):
+                continue
 
             # Ignore the stations that were unselected in the GUI
             ignored_stations = station_information.loc[station_information["selected"] == 0]["name"].to_list()
