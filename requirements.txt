@@ -1,0 +1,6 @@
+PySimpleGUI>=4.60.5
+matplotlib>=3.7.1
+pandas>=2.0.2
+mplcursors>=0.5.2
+astropy>=5.3
+Pillow >= 9.5.0
