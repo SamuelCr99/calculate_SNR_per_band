@@ -8,12 +8,12 @@ from math import radians,sin,cos,sqrt,pi,e
 from plot_source import plot_source
 from init import find_datapoints
 
-# image = get_image("fits/J0029-0113_S_2004_04_30_yyk_map.fits")
-# image = get_image("fits/J0022+0608_S_2018_11_18_pet_map.fits")
-# data = fits.open("fits/J0022+0608_S_2018_11_18_pet_map.fits")[0]
-# data = fits.open("fits/J0211-0145_C_2019_07_24_pet_map.fits")[0]
-image = get_image("fits/J0136+4751_S_2021_01_27_pet_map.fits")
-data = fits.open("fits/J0136+4751_S_2021_01_27_pet_map.fits")[0]
+# image = get_image("data/fits/J0029-0113_S_2004_04_30_yyk_map.fits")
+# image = get_image("data/fits/J0022+0608_S_2018_11_18_pet_map.fits")
+# data = fits.open("data/fits/J0022+0608_S_2018_11_18_pet_map.fits")[0]
+# data = fits.open("data/fits/J0211-0145_C_2019_07_24_pet_map.fits")[0]
+image = get_image("data/fits/J0136+4751_S_2021_01_27_pet_map.fits")
+data = fits.open("data/fits/J0136+4751_S_2021_01_27_pet_map.fits")[0]
 org, mdl, anl, gauss_list = sm().process(image)
 
 gaussian = gauss_list[0]
@@ -52,8 +52,14 @@ v_mod = list(map(lambda v: delta_dec*v, v_mes))
 flux_pred = list(map(lambda u,v: abs(A*pi/sqrt(a*b)*e**(-2*pi*1j*(x0*u+y0*v) -pi**2/a*(u*cos(t)+v*sin(t))**2 -pi**2/b*(v*cos(t)-u*sin(t))**2)), u_mod, v_mod))
 flux_ratio = list(map(lambda mes, pred: pred/mes, flux_mes, flux_pred))
 
+s = 0
+for p, m in zip(flux_pred, flux_mes):
+    s += p/m
 
-plt.scatter(u_mes, v_mes,c=flux_ratio, s = 10, norm=matplotlib.colors.LogNorm())
+print(s/len(flux_pred))
+
+
+plt.scatter(u_mes, v_mes,c=flux_ratio, s = 10)#, norm=matplotlib.colors.LogNorm())
 plt.colorbar()
 plt.show()
 
@@ -75,7 +81,7 @@ plt.show()
 
 # Test 2
 
-# data = fits.open("fits/J0211-0145_C_2019_07_24_pet_map.fits")[0]
+# data = fits.open("data/fits/J0211-0145_C_2019_07_24_pet_map.fits")[0]
 
 # CRPIX1: Reference point in pixels for RA
 # CRVAL1: Reference point in degrees for RA

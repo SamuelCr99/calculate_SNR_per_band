@@ -34,7 +34,7 @@ def calculate_flux(index, general_data, station_data, bands=[0, 1, 2, 3]):
 
         # Band-specific constants to use
         SNR = general_data[f"{band_letter}_SNR"].iloc[index]
-        band_width = general_data[f"{band_letter}_bw"].iloc[index]*(10**6)
+        band_width = general_data[f"{band_letter}_bw"].iloc[index]
         SEFD1 = float(
             station_data[f"{band_letter}_SEFD"].loc[station_data.name == stat1].iloc[0])
         SEFD2 = float(

@@ -3,11 +3,12 @@ import PySimpleGUI as sg
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
-from tkinter.filedialog import askdirectory
+from tkinter.filedialog import askdirectory, askopenfilename
 from gui_utility.find_station_matches import find_station_matches
 from layout import create_layout
 from plot_source import plot_source
 from init import find_datapoints, find_stations
+from source_model2 import SourceModel2
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 def repack(widget, option):
@@ -117,6 +118,7 @@ def run_gui():
     dir = ""
     source_dict = {}
     source = ""
+    source_model = None
     band = 0
     sort_stat_reverse = [True, False, True, True, True]
     sort_source_reverse = [False, True]
@@ -124,6 +126,7 @@ def run_gui():
     is_abcd = True
     fig1 = plt.figure(0)
     fig2 = plt.figure(1)
+    fig3 = plt.figure(2)
 
     # Event loop for the GUI
     while True:
@@ -142,7 +145,8 @@ def run_gui():
                 main_window.refresh()
 
                 # Check if it is a ABCD session or an SX session
-                is_abcd =  "Observables/QualityCode_bS.nc" not in os.listdir(f"{new_dir}/")
+                is_abcd = ("Observables" in os.listdir(f"{new_dir}/")) and (
+                    "QualityCode_bS.nc" not in os.listdir(f"{new_dir}/Observables/"))
 
                 # Load data (takes time)
                 try:
@@ -175,10 +179,30 @@ def run_gui():
                 main_window["X_band"].update(visible=not is_abcd)
 
                 fig1.clf()
+                fig2.clf()
+                fig3.clf()
                 draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
                 draw_fig(main_window["fig2"].TKCanvas, fig2, main_window["toolbar2"].TKCanvas)
+                draw_fig(main_window["fig3"].TKCanvas, fig3, main_window["toolbar3"].TKCanvas)
 
                 main_window.refresh()
+
+        # Open fits file
+        if event == "Open fits":
+            new_dir = askopenfilename(initialdir="data/fits")
+
+            # Tell the user that we are loading data
+            main_window["loading_text"].update(value="Loading...")
+            main_window.refresh()
+
+            try:
+                source_model = SourceModel2(new_dir)
+            except:
+                sg.Popup("Something went wrong! Please select a valid fits file.",
+                             icon="images/favicon.ico")
+
+            main_window["loading_text"].update(value="")
+            main_window.refresh()
 
         # Save the stations info config
         if event == "Save configuration":
@@ -439,6 +463,12 @@ def run_gui():
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
 
+        ### Debug event ###
+
+        if event == "set_scale":
+            source_model.scale = float(values["scale"][0])
+            main_window.write_event_value("plot", True)
+
         ### Plot event ###
 
         if event == "plot":
@@ -475,11 +505,12 @@ def run_gui():
 
             # Plot
             plot_source(
-                source, datapoint_df, station_information, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
+                source, datapoint_df, station_information, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
 
             # Display plots in canvases
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
             draw_fig(main_window["fig2"].TKCanvas, fig2, main_window["toolbar2"].TKCanvas)
+            draw_fig(main_window["fig3"].TKCanvas, fig3, main_window["toolbar3"].TKCanvas)
 
 
 if __name__ == '__main__':

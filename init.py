@@ -199,10 +199,12 @@ def find_datapoints_abcd(dir, save_to_csv=False):
         D_SNR.append(curr_D_SNR)
 
     # Find bandwidth
-    A_bw = list(map(lambda ch: 32*len(ch), A_channels))
-    B_bw = list(map(lambda ch: 32*len(ch), B_channels))
-    C_bw = list(map(lambda ch: 32*len(ch), C_channels))
-    D_bw = list(map(lambda ch: 32*len(ch), D_channels))
+    bw_per_band = np.ma.getdata(channel_info["SampleRate"]).tolist()[0]/2
+
+    A_bw = list(map(lambda ch: bw_per_band*len(ch), A_channels))
+    B_bw = list(map(lambda ch: bw_per_band*len(ch), B_channels))
+    C_bw = list(map(lambda ch: bw_per_band*len(ch), C_channels))
+    D_bw = list(map(lambda ch: bw_per_band*len(ch), D_channels))
 
     # Find integration time
     int_time = np.ma.getdata(corrinfo["EffectiveDuration"]).tolist()
@@ -327,8 +329,11 @@ def find_datapoints_sx(dir, save_to_csv=False):
     N_S = len(np.ma.getdata(channel_info_s["ChannelFreq"]))
     N_X = len(np.ma.getdata(channel_info_x["ChannelFreq"]))
 
-    S_bw = [N_S*32]*len(time)
-    X_bw = [N_X*32]*len(time)
+    bw_per_band_s = np.ma.getdata(channel_info_s["SampleRate"]).tolist()[0]/2
+    bw_per_band_x = np.ma.getdata(channel_info_x["SampleRate"]).tolist()[0]/2
+
+    S_bw = [N_S*bw_per_band_s]*len(time)
+    X_bw = [N_X*bw_per_band_x]*len(time)
 
     # Collect everything into a dataframe
     df = pd.DataFrame({"YMDHM": time,
