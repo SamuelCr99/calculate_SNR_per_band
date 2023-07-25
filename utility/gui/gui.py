@@ -1,15 +1,20 @@
+if __name__ == '__main__':
+    raise ValueError("Do not run this file, run main.py")
+
 import os
 import PySimpleGUI as sg
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
 from tkinter.filedialog import askdirectory, askopenfilename
-from gui_utility.find_station_matches import find_station_matches
+from find_station_matches import find_station_matches
 from layout import create_layout
+from calculate_flux import calculate_flux
 from plot_source import plot_source
 from init import find_datapoints, find_stations
-from source_model2 import SourceModel2
+from source_model_wrapper import SourceModelWrapper
 from least_square_fit import least_square_fit
+from data import DataWrapper
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 def repack(widget, option):
@@ -150,7 +155,7 @@ def run_gui():
 
                 # Load data (takes time)
                 try:
-                    datapoint_df = find_datapoints(new_dir, is_abcd=is_abcd)
+                    datapoints = DataWrapper(find_datapoints(new_dir, is_abcd=is_abcd))
                 except:
                     sg.Popup("Something went wrong! Please select a valid vgosDB directory.",
                              icon="images/favicon.ico")
@@ -162,7 +167,7 @@ def run_gui():
                 # Update static variables
                 dir = new_dir
                 source = None
-                source_dict = find_station_matches(datapoint_df)
+                source_dict = datapoints.get_source_dict()
                 highlights = []
                 
                 # Reset/update GUI
@@ -196,7 +201,7 @@ def run_gui():
             main_window.refresh()
 
             try:
-                source_model = SourceModel2(new_dir)
+                source_model = SourceModelWrapper(new_dir)
             except:
                 sg.Popup("Something went wrong! Please select a valid fits file.",
                              icon="images/favicon.ico")
@@ -473,7 +478,7 @@ def run_gui():
             main_window.write_event_value("plot", True)
 
         if event == "fit_SEFD":
-            least_square_fit(source, source_model, station_information, datapoint_df, band, ignored_stations)
+            least_square_fit(source, source_model, station_information, datapoints, band, ignored_stations)
 
             # Update GUI
             new_table = update_station_table(
@@ -513,7 +518,7 @@ def run_gui():
 
             # Plot
             plot_source(
-                source, datapoint_df, station_information, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
+                source, datapoints.get_df(), station_information, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
 
             # Display plots in canvases
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
@@ -521,5 +526,3 @@ def run_gui():
             draw_fig(main_window["fig3"].TKCanvas, fig3, main_window["toolbar3"].TKCanvas)
 
 
-if __name__ == '__main__':
-    run_gui()

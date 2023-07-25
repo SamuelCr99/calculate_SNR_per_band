@@ -1,14 +1,17 @@
 from math import sqrt, log, e
 import numpy as np
+from data import DataWrapper
 
 def least_square_fit(source, model, stations, data, band, ignored_stations):
     
     # Find the datapoints with the specified source
-    data = data.loc[data.Source == source].copy(deep=True)
+    data = data.get(source=source,ignored_stations=ignored_stations)
+    df = data.get_df()
+    #data = data.loc[data.Source == source].copy(deep=True)
     
     # Find all rows that don't contain the stations in ignored_stations
-    for station in ignored_stations:
-        data = data.loc[(data.Station1 != station) & (data.Station2 != station)]
+    #for station in ignored_stations:
+    #    data = data.loc[(data.Station1 != station) & (data.Station2 != station)]
     
     band_letter = ["A","B","C","D","S","X"][band]
 
@@ -16,7 +19,9 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
     SNR_pred_list = []
     station_list = []
 
-    for _, point in data.iterrows():
+    for _, point in df.iterrows():
+        
+        # Make sure all stations are added to station_list
         if point.Station1 not in station_list: 
             station_list.append(point.Station1)
             
@@ -34,8 +39,10 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
         SNR_bit_pred = 0.617502*flux_pred*sqrt(1/(SEFD1*SEFD2))
         SNR_pred_list.append(SNR_bit_pred)
 
-    data["SNR_meas"] = SNR_meas_list
-    data["SNR_pred"] = SNR_pred_list
+    # Add 2 new columns to dataframe
+    df["SNR_meas"] = SNR_meas_list
+    df["SNR_pred"] = SNR_pred_list
+    data = df
 
     flux_scale = sum(list(map(lambda p,m: p/m, SNR_pred_list, SNR_meas_list)))/len(SNR_meas_list)
     SNR_pred_list = list(map(lambda snr: snr/flux_scale, SNR_pred_list))
@@ -49,14 +56,16 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
         N_i = []
         for j in range(num_stations):
             if i==j:
+                #N_ij = len(data.get_index(station=station_list[i]))
                 N_ij = len(data.loc[(data.Station1 == station_list[i]) | (data.Station2 == station_list[i])])
             else:
+                #N_ij = len(data.get_index(baseline=[station_list[i],station_list[j]]))
                 N_ij = len(data.loc[((data.Station1 == station_list[i]) & (data.Station2 == station_list[j])) | ((data.Station1 == station_list[j]) & (data.Station2 == station_list[i]))])
-
             N_i.append(N_ij)
         N.append(N_i)
 
         B_i = 0
+        #for _, point in data.get_df(station=station_list[i]).iterrows():
         for _, point in data.loc[(data.Station1 == station_list[i]) | (data.Station2 == station_list[i])].iterrows():
             B_i += log(point.SNR_pred/point.SNR_meas)
         B.append([B_i])

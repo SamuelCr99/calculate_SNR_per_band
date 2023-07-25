@@ -3,7 +3,7 @@ from QuasarModel.source_model import SourceModel as sm
 from astropy.io import fits
 from math import radians, pi, e, sin, cos, sqrt
 
-class SourceModel2:
+class SourceModelWrapper:
 
     def __init__(self, path, scale=pi):
         data = fits.open(path)[0]
