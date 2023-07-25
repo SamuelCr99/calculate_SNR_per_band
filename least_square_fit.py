@@ -61,7 +61,8 @@ def least_square_fit(source, model, stations, data, band):
     A = list(map(lambda p: e**(2*p[0]),P))
 
     for i in range(len(A)):
-        station_SEFD = stations.loc[stations.name == station_list[i],f"{band_letter}_SEFD"]
-        station_SEFD = float(station_SEFD)*A[i]
+        station_SEFD = float(stations.loc[stations.name == station_list[i],f"{band_letter}_SEFD"].iloc[0])
+        stations.loc[stations.name == station_list[i],f"{band_letter}_SEFD"] = station_SEFD*A[i]
 
+    
     return

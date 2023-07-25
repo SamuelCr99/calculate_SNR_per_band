@@ -488,20 +488,14 @@ def run_gui():
         if event == "plot":
             # Check that user has selected a folder
             if not dir:
-                sg.Popup("Please select a folder first!",
-                         icon="images/favicon.ico")
                 continue
 
            # Check that user has selected a source
             if not source:
-                sg.Popup("No source selected! Please select one from the list.",
-                         icon="images/favicon.ico")
                 continue
 
             # Check that user has selected a valid source
             if source not in source_dict:
-                sg.Popup("Source not found! Please select one from the list.",
-                         icon="images/favicon.ico")
                 continue
 
             # Find which band the user has selected, selected station will have
