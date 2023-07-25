@@ -23,7 +23,7 @@ def calculate_flux(index, general_data, station_data, bands=[0, 1, 2, 3]):
 
     # Constants to use
     int_time = general_data.int_time.iloc[index]
-    C = 1  # Currently assume C is always equal to 1
+    C = 0.617502
     stat1 = general_data.Station1.iloc[index]
     stat2 = general_data.Station2.iloc[index]
 

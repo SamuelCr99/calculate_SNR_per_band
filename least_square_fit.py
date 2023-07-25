@@ -1,9 +1,15 @@
 from math import sqrt, log, e
 import numpy as np
 
-def least_square_fit(source, model, stations, data, band):
+def least_square_fit(source, model, stations, data, band, ignored_stations):
     
+    # Find the datapoints with the specified source
     data = data.loc[data.Source == source].copy(deep=True)
+    
+    # Find all rows that don't contain the stations in ignored_stations
+    for station in ignored_stations:
+        data = data.loc[(data.Station1 != station) & (data.Station2 != station)]
+    
     band_letter = ["A","B","C","D","S","X"][band]
 
     SNR_meas_list = []
@@ -25,7 +31,7 @@ def least_square_fit(source, model, stations, data, band):
         SEFD2 = float(stations.loc[stations["name"] == point.Station2][f"{band_letter}_SEFD"].iloc[0])
 
         flux_pred = model.get_flux(point.u,point.v)
-        SNR_bit_pred = 1*flux_pred*sqrt(1/(SEFD1*SEFD2))
+        SNR_bit_pred = 0.617502*flux_pred*sqrt(1/(SEFD1*SEFD2))
         SNR_pred_list.append(SNR_bit_pred)
 
     data["SNR_meas"] = SNR_meas_list

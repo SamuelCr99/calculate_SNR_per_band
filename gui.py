@@ -473,7 +473,7 @@ def run_gui():
             main_window.write_event_value("plot", True)
 
         if event == "fit_SEFD":
-            least_square_fit(source, source_model, station_information, datapoint_df, band)
+            least_square_fit(source, source_model, station_information, datapoint_df, band, ignored_stations)
 
             # Update GUI
             new_table = update_station_table(
