@@ -1,7 +1,7 @@
 import PySimpleGUI as sg
 
 
-def create_layout(stations):
+def create_layout():
     """
     Creates the layout for the GUI
 
@@ -11,7 +11,6 @@ def create_layout(stations):
     Returns:
     The finished layout
     """
-    stations.sort()
     headings = ["Sel.", "Stations", "Obs.", "SEFD", "★"]
     col_widths = [4,10,4,10,4]
     table_col = sg.Table([], headings=headings, col_widths=col_widths, auto_size_columns=False, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_NONE,
@@ -21,7 +20,8 @@ def create_layout(stations):
     sources_col = sg.Table([], headings=source_headings, key="sources_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
                          expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
-    debug_col = [[sg.Input(default_text="3.14", key="scale", expand_x=True), sg.Button("Set", key="set_scale")]]
+    debug_col = [[sg.Input(default_text="3.14", key="scale", expand_x=True), sg.Button("Set", key="set_scale")],
+                 [sg.Button("Fit SEFD", key="fit_SEFD")]]
 
     # Currently the only column
     left_col = [[sg.Frame("Source", [[sources_col]], expand_x=True, expand_y=True)],

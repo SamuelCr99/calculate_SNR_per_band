@@ -9,6 +9,7 @@ from layout import create_layout
 from plot_source import plot_source
 from init import find_datapoints, find_stations
 from source_model2 import SourceModel2
+from least_square_fit import least_square_fit
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 def repack(widget, option):
@@ -101,8 +102,7 @@ def run_gui():
     saved_station_information = station_information.copy(deep=True)
     
     # Create the main GUI window
-    stations = list(set(station_information['name']))
-    layout = create_layout(stations)
+    layout = create_layout()
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True,
                             icon="images/favicon.ico", enable_close_attempted_event=True)
@@ -203,6 +203,9 @@ def run_gui():
 
             main_window["loading_text"].update(value="")
             main_window.refresh()
+
+            # Re-plot with new fits file
+            main_window.write_event_value("plot", True)
 
         # Save the stations info config
         if event == "Save configuration":
@@ -468,6 +471,17 @@ def run_gui():
         if event == "set_scale":
             source_model.scale = float(values["scale"][0])
             main_window.write_event_value("plot", True)
+
+        if event == "fit_SEFD":
+            least_square_fit(source, source_model, station_information, datapoint_df, band)
+
+            # Update GUI
+            new_table = update_station_table(
+                station_information, source_dict[source]["stations"],
+                highlights, band)
+            main_window["stations_table"].update(new_table)
+            main_window.write_event_value("plot", True)
+            main_window.refresh()
 
         ### Plot event ###
 
