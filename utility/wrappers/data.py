@@ -26,7 +26,7 @@ class DataWrapper:
         """
         
         # Find all rows that contain the selected source
-        df = self.get_df(source="", baseline="", station="", ignored_stations=[])
+        df = self.get_df(source=source, baseline=baseline, station=station, ignored_stations=ignored_stations)
 
         return df.index.tolist()
     
@@ -78,9 +78,9 @@ class DataWrapper:
     
         return df
     
-    def get(self, source="", baseline="", station="", ignored_stations=[]):
+    def get(self, source="", baseline="", station="", ignored_stations=[], copy=False):
 
-        return DataWrapper(self.get_df(source="", baseline="", station="", ignored_stations=[]))
+        return DataWrapper(self.get_df(source=source, baseline=baseline, station=station, ignored_stations=ignored_stations, copy=copy))
 
     def get_source_dict(self):
         """
