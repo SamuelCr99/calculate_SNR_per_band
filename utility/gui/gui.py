@@ -132,6 +132,7 @@ def run_gui():
     fig1 = plt.figure(0)
     fig2 = plt.figure(1)
     fig3 = plt.figure(2)
+    fig4 = plt.figure(3)
 
     # Event loop for the GUI
     while True:
@@ -186,9 +187,11 @@ def run_gui():
                 fig1.clf()
                 fig2.clf()
                 fig3.clf()
+                fig4.clf()
                 draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
                 draw_fig(main_window["fig2"].TKCanvas, fig2, main_window["toolbar2"].TKCanvas)
                 draw_fig(main_window["fig3"].TKCanvas, fig3, main_window["toolbar3"].TKCanvas)
+                draw_fig(main_window["fig4"].TKCanvas, fig4, main_window["toolbar4"].TKCanvas)
 
                 main_window.refresh()
 
@@ -488,6 +491,11 @@ def run_gui():
             main_window.write_event_value("plot", True)
             main_window.refresh()
 
+        if event == "gauss":
+            if source_model:
+                sm = source_model
+                sg.Popup(f"a = {sm.a}\nb = {sm.b}\nA = {sm.A}\nt = {sm.t}\nx0 = {sm.x0}\ny0 = {sm.y0}")
+
         ### Plot event ###
 
         if event == "plot":
@@ -524,5 +532,6 @@ def run_gui():
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
             draw_fig(main_window["fig2"].TKCanvas, fig2, main_window["toolbar2"].TKCanvas)
             draw_fig(main_window["fig3"].TKCanvas, fig3, main_window["toolbar3"].TKCanvas)
+            draw_fig(main_window["fig4"].TKCanvas, fig4, main_window["toolbar4"].TKCanvas)
 
 

@@ -5,7 +5,7 @@ from math import radians, pi, e, sin, cos, sqrt
 
 class SourceModelWrapper:
 
-    def __init__(self, path, scale=pi):
+    def __init__(self, path, scale=1):
         data = fits.open(path)[0]
         print(path)
         self.delta_u = radians(data.header["CDELT1"])
