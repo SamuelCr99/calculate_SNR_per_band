@@ -20,8 +20,8 @@ def create_layout():
     sources_col = sg.Table([], headings=source_headings, key="sources_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
                          expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
-    debug_col = [[sg.Input(default_text="3.14", key="scale", expand_x=True), sg.Button("Set", key="set_scale")],
-                 [sg.Button("Fit SEFD", key="fit_SEFD")]]
+    debug_col = [[sg.Input(default_text="1", key="scale", expand_x=True), sg.Button("Set", key="set_scale")],
+                 [sg.Button("Fit SEFD", key="fit_SEFD"), sg.Button("Get Gauss.", key="gauss")]]
 
     # Currently the only column
     left_col = [[sg.Frame("Source", [[sources_col]], expand_x=True, expand_y=True)],
@@ -44,10 +44,14 @@ def create_layout():
 
     figure3_tab = [[sg.Canvas(key="fig3", background_color="white", expand_x=True, expand_y=True)],
                    [sg.Canvas(key="toolbar3", background_color="white", expand_x=True)]]
+
+    figure4_tab = [[sg.Canvas(key="fig4", background_color="white", expand_x=True, expand_y=True)],
+                   [sg.Canvas(key="toolbar4", background_color="white", expand_x=True)]]
     
-    figure_tabgroup = [[sg.Tab("Flux density", figure1_tab, background_color="white")],
-                       [sg.Tab("Distance", figure2_tab, background_color="white")],
-                       [sg.Tab("Flux density ratio", figure3_tab, background_color="white")]]
+    figure_tabgroup = [[sg.Tab("Flux density (meas.)", figure1_tab, background_color="white")],
+                       [sg.Tab("Flux density (pred.)", figure2_tab, background_color="white")],
+                       [sg.Tab("Flux density ratio", figure3_tab, background_color="white")],
+                       [sg.Tab("Distance", figure4_tab, background_color="white")]]
     
     right_col = [[sg.TabGroup(figure_tabgroup, expand_x=True, expand_y=True)]]
 

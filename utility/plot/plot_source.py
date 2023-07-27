@@ -26,6 +26,8 @@ def plot_source(source, data, station_information, source_model = None, highligh
     No return values!
     """
 
+    CMAP = "jet"
+
     ### Generate data ###
 
     # Change bands to a list if it was only given as a integer
@@ -44,6 +46,9 @@ def plot_source(source, data, station_information, source_model = None, highligh
     highlighted_v = []
     highlighted_flux = []
     highlighted_matches = []
+
+    b = bands[0]
+    band_letter = ["a", "b", "c", "d"][b]
 
     for band in bands:
         for point in matches:
@@ -106,17 +111,22 @@ def plot_source(source, data, station_information, source_model = None, highligh
     coords_v = [v for v in coords_v if v == v]
 
     if return_coords:
+        with open(f"uv-flux{band_letter.capitalize()}.csv", "w") as file: 
+            file.write(f"u,v,{band_letter}_flux\n")
+            for u, v, f in zip(coords_u, coords_v, flux):
+                file.write(f"{u},{v},{f}")
+                file.write("\n")
         return coords_u, coords_v, flux
     
-    ### Scatter plot ###
+    ### Flux density (meas.) ###
 
     # Create figure and plot
     figure1 = plt.figure(0)
     figure1.clf()
-    uv_plot = plt.scatter(coords_u, coords_v, c=flux, marker=".", vmin=0, cmap='jet')
+    uv_plot = plt.scatter(coords_u, coords_v, c=flux, marker=".", vmin=0, cmap=CMAP)
 
     if len(highlighted_u):
-        plt.scatter(highlighted_u,highlighted_v, marker='*', c = highlighted_flux, vmin=0, vmax=max(flux), s=50, cmap='jet')
+        plt.scatter(highlighted_u,highlighted_v, marker='*', c = highlighted_flux, vmin=0, vmax=max(flux), s=50, cmap=CMAP)
     plt.colorbar(label="Flux density")
 
     # Adds arrows and annotations to all points
@@ -134,14 +144,78 @@ def plot_source(source, data, station_information, source_model = None, highligh
     plt.title(
         f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
 
-    ### Distance plot ###
+    ### Flux density (pred.) ###
+
+    if source_model:
+        figure2 = plt.figure(1)
+        figure2.clf()
+
+        num_points = 100
+        max_u = max(coords_u)
+        max_v = max(coords_v)
+
+        coords_u_im = list(map(lambda u: (u/((num_points-1)/2)-1)*max_u, range(num_points)))
+        coords_v_im = list(map(lambda v: (v/((num_points-1)/2)-1)*max_v, range(num_points)))
+
+        u_delta = (coords_u_im[1] - coords_u_im[0])/2
+        v_delta = (coords_v_im[1] - coords_v_im[0])/2
+
+        extent = [coords_u_im[0]-u_delta, coords_u_im[-1]+u_delta, coords_v_im[0]-v_delta, coords_v_im[-1]+v_delta]
+
+        flux_pred = []
+        for i in range(num_points):
+            row = []
+            for j in range(num_points):
+                row.append(source_model.get_flux(coords_u_im[i],coords_v_im[j]))
+            flux_pred.append(row)
+        
+        plt.imshow(flux_pred, extent=extent, vmin=0, cmap=CMAP)
+        plt.colorbar(label="Flux density")
+
+         # Add text
+        plt.xlabel("U [fringes/radian]")
+        plt.ylabel("V [fringes/radian]")
+
+    ### Flux density ratio ###
+
+    if source_model:
+        figure3 = plt.figure(2)
+        figure3.clf()
+
+        ratio = list(map(lambda u,v,f: source_model.get_flux(u,v)/f, coords_u, coords_v, flux))
+        #SF = sum(ratio)/len(ratio)
+        #ratio = list(map(lambda r: r/SF, ratio))
+        highlighted_ratio = list(map(lambda u,v,f: source_model.get_flux(u,v)/f, highlighted_u, highlighted_v, highlighted_flux))
+
+        uv_plot = plt.scatter(coords_u, coords_v, c=ratio, marker=".", vmin=0, vmax=2, cmap=CMAP)
+
+        if len(highlighted_u):
+            plt.scatter(highlighted_u,highlighted_v, marker='*', c = highlighted_ratio, vmin=0, vmax=max(ratio), s=50, cmap=CMAP)
+        plt.colorbar(label="Flux density ratio")
+
+        # Adds arrows and annotations to all points
+        uv_cursor = mplcursors.cursor(
+            uv_plot, hover=mplcursors.HoverMode.Transient)
+        uv_cursor.connect(
+            "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
+        
+        # Add text
+        plt.xlabel("U [fringes/radian]")
+        plt.ylabel("V [fringes/radian]")
+        bands_letters = list(map(lambda b: ["A","B","C","D","S","X"][b], bands))
+        plt.figtext(
+            0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
+        plt.title(
+            f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
+
+    ### Distance ###
 
     distance = list(map(lambda u, v: sqrt(u**2+v**2), coords_u, coords_v))
     highlighted_distance = list(map(lambda u, v: sqrt(u**2+v**2), highlighted_u, highlighted_v))
 
     # Create distance plot
-    figure2 = plt.figure(1)
-    figure2.clf()
+    figure4 = plt.figure(3)
+    figure4.clf()
 
     # Colors to use for the bands
     base_colors = ['blue', 'green', 'yellow', 'red', 'purple', 'orange']
@@ -178,39 +252,6 @@ def plot_source(source, data, station_information, source_model = None, highligh
         # Create empty scatter plots so the legend will be added correctly
         plt.legend(handles=list(map(lambda b: plt.scatter(
             [], [], c=base_colors[b], label=f'Band {["A","B","C","D","S","X"][b]}'), bands)))
-    
-    ### Ratio plot ###
-
-    if source_model:
-        figure3 = plt.figure(2)
-        figure3.clf()
-
-        ratio = list(map(lambda u,v,f: source_model.get_flux(u,v)/f, coords_u, coords_v, flux))
-        SF = sum(ratio)/len(ratio)
-        ratio = list(map(lambda r: r/SF, ratio))
-        highlighted_ratio = list(map(lambda u,v,f: source_model.get_flux(u,v)/f, highlighted_u, highlighted_v, highlighted_flux))
-
-        uv_plot = plt.scatter(coords_u, coords_v, c=ratio, marker=".", vmin=0, vmax=2, cmap='jet')
-
-        if len(highlighted_u):
-            plt.scatter(highlighted_u,highlighted_v, marker='*', c = highlighted_ratio, vmin=0, vmax=max(ratio), s=50, cmap='jet')
-        plt.colorbar(label="Flux density ratio")
-
-        # Adds arrows and annotations to all points
-        uv_cursor = mplcursors.cursor(
-            uv_plot, hover=mplcursors.HoverMode.Transient)
-        uv_cursor.connect(
-            "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
-        
-        # Add text
-        plt.xlabel("U [fringes/radian]")
-        plt.ylabel("V [fringes/radian]")
-        bands_letters = list(map(lambda b: ["A","B","C","D","S","X"][b], bands))
-        plt.figtext(
-            0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
-        plt.title(
-            f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
-
 
 if __name__ == '__main__':
     station_information = pd.read_csv('data/derived/stations.csv')
