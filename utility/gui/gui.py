@@ -390,12 +390,6 @@ def run_gui():
 
             # Edit SEFD values
             elif click_col == 3:
-                # Warn when changing S and X band SEFDs
-                if band in [4,5]:
-                    sg.Popup(f"You cannot change the SEFD value of the {['S','X'][band-4]} band!",
-                            icon="images/favicon.ico")
-                    continue
-
                 # Get stats of the selected cell
                 selected_station = main_window["stations_table"].get()[click_row][1]
                 selected_band = ["A","B","C","D","S","X"][band]

@@ -49,9 +49,6 @@ def plot_source(source, data, station_information, source_model = None, highligh
     highlighted_flux = []
     highlighted_matches = []
 
-    b = bands[0]
-    band_letter = ["a", "b", "c", "d"][b]
-
     for band in bands:
         for point in matches:
 
