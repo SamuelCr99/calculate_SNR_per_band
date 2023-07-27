@@ -34,10 +34,6 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
         SNR_bit_pred = 0.617502*flux_pred*sqrt(1/(SEFD1*SEFD2))
         SNR_pred_list.append(SNR_bit_pred)
 
-
-    flux_scale = sum(list(map(lambda p,m: p/m, SNR_pred_list, SNR_meas_list)))/len(SNR_meas_list)
-    SNR_pred_list = list(map(lambda snr: snr, SNR_pred_list))
-
     # Add 2 new columns to dataframe
     df = df.assign(SNR_meas=SNR_meas_list)
     df = df.assign(SNR_pred=SNR_pred_list)

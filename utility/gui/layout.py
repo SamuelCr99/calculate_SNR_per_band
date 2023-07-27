@@ -21,7 +21,7 @@ def create_layout():
                          expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
     debug_col = [[sg.Input(default_text="1", key="scale", expand_x=True), sg.Button("Set", key="set_scale")],
-                 [sg.Button("Fit SEFD", key="fit_SEFD"), sg.Button("Get Gauss.", key="gauss")]]
+                 [sg.Button("Fit SEFD", key="fit_SEFD"), sg.Button("Get Gauss.", key="gauss"), sg.Button("Set flux scale", key="flux_scale")]]
 
     # Currently the only column
     left_col = [[sg.Frame("Source", [[sources_col]], expand_x=True, expand_y=True)],

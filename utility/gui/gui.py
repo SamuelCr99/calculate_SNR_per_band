@@ -490,6 +490,18 @@ def run_gui():
                 sm = source_model.gauss_list[0]
                 sg.Popup(f"a = {sm.a}\nb = {sm.b}\nA = {sm.amp}\nt = {sm.theta}\nx0 = {sm.x0}\ny0 = {sm.y0}")
 
+        if event == "flux_scale":
+            if source_model:
+                source_model.set_flux_scale(source, station_information, datapoints, band, ignored_stations)
+
+                # Update GUI
+                new_table = update_station_table(
+                    station_information, source_dict[source]["stations"],
+                    highlights, band)
+                main_window["stations_table"].update(new_table)
+                main_window.write_event_value("plot", True)
+                main_window.refresh()
+
         ### Plot event ###
 
         if event == "plot":
