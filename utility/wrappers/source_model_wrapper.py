@@ -16,7 +16,7 @@ class SourceModelWrapper:
         _, _, _, self.gauss_list = sm().process(image)
 
     def get_flux(self,u,v):
-        u = self.delta_u*u/self.scale
+        u = -self.delta_u*u/self.scale
         v = self.delta_v*v/self.scale
 
         flux = 0

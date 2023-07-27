@@ -209,6 +209,7 @@ def run_gui():
                              icon="images/favicon.ico")
 
             main_window["loading_text"].update(value="")
+            main_window["scale"].update("1")
             main_window.refresh()
 
             # Re-plot with new fits file

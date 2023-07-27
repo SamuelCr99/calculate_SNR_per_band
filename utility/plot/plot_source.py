@@ -39,9 +39,11 @@ def plot_source(source, data, station_information, source_model = None, highligh
         source=source, df=data, baseline=baseline, ignored_stations=ignored_stations)
     
     baselines = []
+    baselines2 = []
     coords_u = []
     coords_v = []
     flux = []
+    ratio = []
     highlighted_u = []
     highlighted_v = []
     highlighted_flux = []
@@ -89,9 +91,17 @@ def plot_source(source, data, station_information, source_model = None, highligh
             curr_flux = calculate_flux(point, data, station_information, band)
             flux.extend(curr_flux*2)
 
+            if source_model:
+                curr_ratio = source_model.get_flux(u,v)/curr_flux
+                ratio.extend([curr_ratio]*2)
+
             # Find the baseline of that point
             baselines.extend(
                 [f'{data.Station1.iloc[point]}-{data.Station2.iloc[point]} {list(map(lambda x: round(x,3), curr_flux))}']*2)
+            
+            if source_model:
+                baselines2.extend(
+                    [f'{data.Station1.iloc[point]}-{data.Station2.iloc[point]} {list(map(lambda x: round(x,3), curr_ratio))}']*2)
 
 
             if len(highlighted_stations) == 1 and (data.Station1.iloc[point] in highlighted_stations or data.Station2.iloc[point] in highlighted_stations):
@@ -182,9 +192,6 @@ def plot_source(source, data, station_information, source_model = None, highligh
         figure3 = plt.figure(2)
         figure3.clf()
 
-        ratio = list(map(lambda u,v,f: source_model.get_flux(u,v)/f, coords_u, coords_v, flux))
-        #SF = sum(ratio)/len(ratio)
-        #ratio = list(map(lambda r: r/SF, ratio))
         highlighted_ratio = list(map(lambda u,v,f: source_model.get_flux(u,v)/f, highlighted_u, highlighted_v, highlighted_flux))
 
         uv_plot = plt.scatter(coords_u, coords_v, c=ratio, marker=".", vmin=0, vmax=2, cmap=CMAP)
@@ -197,7 +204,7 @@ def plot_source(source, data, station_information, source_model = None, highligh
         uv_cursor = mplcursors.cursor(
             uv_plot, hover=mplcursors.HoverMode.Transient)
         uv_cursor.connect(
-            "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
+            "add", lambda sel: sel.annotation.set_text(baselines2[sel.index]))
         
         # Add text
         plt.xlabel("U [fringes/radian]")
