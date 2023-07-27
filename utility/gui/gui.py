@@ -476,7 +476,7 @@ def run_gui():
         ### Debug event ###
 
         if event == "set_scale":
-            source_model.scale = float(values["scale"][0])
+            source_model.scale = float(values["scale"])
             main_window.write_event_value("plot", True)
 
         if event == "fit_SEFD":
@@ -492,8 +492,8 @@ def run_gui():
 
         if event == "gauss":
             if source_model:
-                sm = source_model
-                sg.Popup(f"a = {sm.a}\nb = {sm.b}\nA = {sm.A}\nt = {sm.t}\nx0 = {sm.x0}\ny0 = {sm.y0}")
+                sm = source_model.gauss_list[0]
+                sg.Popup(f"a = {sm.a}\nb = {sm.b}\nA = {sm.amp}\nt = {sm.theta}\nx0 = {sm.x0}\ny0 = {sm.y0}")
 
         ### Plot event ###
 
