@@ -39,9 +39,9 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
     SNR_pred_list = list(map(lambda snr: snr, SNR_pred_list))
 
     # Add 2 new columns to dataframe
-    df["SNR_meas"] = SNR_meas_list
-    df["SNR_pred"] = SNR_pred_list
-
+    df = df.assign(SNR_meas=SNR_meas_list)
+    df = df.assign(SNR_pred=SNR_pred_list)
+    data = DataWrapper(df)
 
     num_stations = len(station_list)
     

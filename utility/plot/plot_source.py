@@ -156,7 +156,7 @@ def plot_source(source, data, station_information, source_model = None, highligh
 
     ### Flux density (pred.) ###
 
-    if source_model:
+    if source_model and flux:
         figure2 = plt.figure(1)
         figure2.clf()
 
