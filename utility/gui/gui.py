@@ -1,5 +1,4 @@
-if __name__ == '__main__':
-    raise ValueError("Do not run this file, run main.py")
+assert __name__ != '__main__', "Don't run this file, run main.py"
 
 import os
 import PySimpleGUI as sg

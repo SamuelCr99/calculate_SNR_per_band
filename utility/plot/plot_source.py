@@ -47,6 +47,9 @@ def plot_source(source, data, station_information, source_model = None, highligh
     highlighted_flux = []
     highlighted_matches = []
 
+    b = bands[0]
+    band_letter = ["a", "b", "c", "d"][b]
+
     for band in bands:
         for point in matches:
 
@@ -108,6 +111,11 @@ def plot_source(source, data, station_information, source_model = None, highligh
     coords_v = [v for v in coords_v if v == v]
 
     if return_coords:
+        with open(f"uv-flux{band_letter.capitalize()}.csv", "w") as file: 
+            file.write(f"u,v,{band_letter}_flux\n")
+            for u, v, f in zip(coords_u, coords_v, flux):
+                file.write(f"{u},{v},{f}")
+                file.write("\n")
         return coords_u, coords_v, flux
     
     ### Flux density (meas.) ###
@@ -161,8 +169,12 @@ def plot_source(source, data, station_information, source_model = None, highligh
                 row.append(source_model.get_flux(coords_u_im[i],coords_v_im[j]))
             flux_pred.append(row)
         
-        plt.imshow(flux_pred, extent=extent, vmin=0, vmax=max(flux), cmap=CMAP)
+        plt.imshow(flux_pred, extent=extent, vmin=0, cmap=CMAP)
         plt.colorbar(label="Flux density")
+
+         # Add text
+        plt.xlabel("U [fringes/radian]")
+        plt.ylabel("V [fringes/radian]")
 
     ### Flux density ratio ###
 
