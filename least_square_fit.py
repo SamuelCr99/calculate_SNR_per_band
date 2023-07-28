@@ -66,6 +66,6 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
 
     for i in range(len(A)):
         station_SEFD = float(stations.loc[stations.name == station_list[i],f"{band_letter}_SEFD"].iloc[0])
-        stations.loc[stations.name == station_list[i],f"{band_letter}_SEFD"] = station_SEFD*A[i]
+        stations.loc[stations.name == station_list[i],f"{band_letter}_SEFD"] = max(round(station_SEFD*A[i]),1)
     
     return

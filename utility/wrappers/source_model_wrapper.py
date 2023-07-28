@@ -34,6 +34,8 @@ class SourceModelWrapper:
         return abs(flux)/self.flux_scale
     
     def set_flux_scale(self, source, stations, data, band, ignored_stations):
+        self.flux_scale = 1
+        
         # Find the datapoints with the specified source
         data = data.get(source=source,ignored_stations=ignored_stations)
         df = data.get_df()

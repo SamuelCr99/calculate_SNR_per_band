@@ -471,19 +471,21 @@ def run_gui():
         ### Debug event ###
 
         if event == "set_scale":
-            source_model.scale = float(values["scale"])
-            main_window.write_event_value("plot", True)
+            if source_model:
+                source_model.scale = float(values["scale"])
+                main_window.write_event_value("plot", True)
 
         if event == "fit_SEFD":
-            least_square_fit(source, source_model, station_information, datapoints, band, ignored_stations)
+            if source_model:
+                least_square_fit(source, source_model, station_information, datapoints, band, ignored_stations)
 
-            # Update GUI
-            new_table = update_station_table(
-                station_information, source_dict[source]["stations"],
-                highlights, band)
-            main_window["stations_table"].update(new_table)
-            main_window.write_event_value("plot", True)
-            main_window.refresh()
+                # Update GUI
+                new_table = update_station_table(
+                    station_information, source_dict[source]["stations"],
+                    highlights, band)
+                main_window["stations_table"].update(new_table)
+                main_window.write_event_value("plot", True)
+                main_window.refresh()
 
         if event == "gauss":
             if source_model:
