@@ -1,12 +1,11 @@
 from math import sqrt, log, e
 import numpy as np
-from data import DataWrapper
+from data_wrapper import DataWrapper
 
 def least_square_fit(source, model, stations, data, band, ignored_stations):
     
     # Find the datapoints with the specified source
     data = data.get(source=source,ignored_stations=ignored_stations)
-    df = data.get_df()
     
     band_letter = ["A","B","C","D","S","X"][band]
 
@@ -14,7 +13,7 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
     SNR_pred_list = []
     station_list = []
 
-    for _, point in df.iterrows():
+    for _, point in data.iterrows():
         
         # Make sure all stations are added to station_list
         if point.Station1 not in station_list: 
@@ -35,9 +34,7 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
         SNR_pred_list.append(SNR_bit_pred)
 
     # Add 2 new columns to dataframe
-    df = df.assign(SNR_meas=SNR_meas_list)
-    df = df.assign(SNR_pred=SNR_pred_list)
-    data = DataWrapper(df)
+    data = DataWrapper(data.get_df().assign(SNR_meas=SNR_meas_list).assign(SNR_pred=SNR_pred_list))
 
     num_stations = len(station_list)
     
@@ -55,7 +52,7 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
         N.append(N_i)
 
         B_i = 0
-        for _, point in data.get_df(station=station_list[i]).iterrows():
+        for _, point in data.get(station=station_list[i]).iterrows():
             B_i += log(point.SNR_pred/point.SNR_meas)
         B.append([B_i])
 

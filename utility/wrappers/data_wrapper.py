@@ -116,3 +116,6 @@ class DataWrapper:
             d[source]['observations'] += 1
 
         return d
+    
+    def iterrows(self):
+        return self.df.iterrows()

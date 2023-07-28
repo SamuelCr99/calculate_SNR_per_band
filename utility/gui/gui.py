@@ -6,14 +6,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 from tkinter.filedialog import askdirectory, askopenfilename
-from find_station_matches import find_station_matches
 from layout import create_layout
-from calculate_flux import calculate_flux
 from plot_source import plot_source
 from init import find_datapoints, find_stations
 from source_model_wrapper import SourceModelWrapper
 from least_square_fit import least_square_fit
-from data import DataWrapper
+from data_wrapper import DataWrapper
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 def repack(widget, option):
@@ -503,6 +501,10 @@ def run_gui():
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
+
+        if (event == "set_scale" or event == "fit_SEFD" or event == "gauss" or event == "flux_scale") and not source_model:
+            sg.Popup("No fits file selected.",
+                     icon="images/favicon.ico")
 
         ### Plot event ###
 
