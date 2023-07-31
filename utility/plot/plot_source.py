@@ -4,7 +4,7 @@ from math import sqrt
 from utility.plot.to_uv import convert_uv
 from utility.calc.calculate_flux import calculate_flux
 
-def plot_source(source, data, station_information, source_model = None, highlighted_stations = [], baseline="", ignored_stations=[], bands=[0, 1, 2, 3], return_coords = False):
+def plot_source(source, data, station_information, source_model = None, highlighted_stations = [], baseline="", ignored_stations=[], bands=[0, 1, 2, 3]):
     """
     Plots uv coordinates of a source
 
@@ -13,8 +13,10 @@ def plot_source(source, data, station_information, source_model = None, highligh
 
     Parameters:
     source(string): The source to plot
-    data(DataFrame): The DataFrame to search through
-    station_information(): A DataFrame containing information about the stations
+    data(DataWrapper): The DataWrapper to search through
+    station_information(DataFrame): A DataFrame containing information about the stations
+    source_model(SourceModelWrapper): The model of the source
+    highlighted_stations(list): Stations to highlight
     baseline(string): Baseline to observe the source at
     ignored_stations(list): A list of stations to ignore
     bands(list): The bands to consider (A=0, B=1...)
@@ -32,12 +34,10 @@ def plot_source(source, data, station_information, source_model = None, highligh
         bands = [bands]
 
     # Find all observations that match the given criteria
-    # matches = find_index(
-    #     source=source, df=data, baseline=baseline, ignored_stations=ignored_stations)
     matches = data.get(source=source, baseline=baseline, ignored_stations=ignored_stations)
     
-    baselines = []
-    baselines2 = []
+    baselines_flux = []
+    baselines_ratio = []
     coords_u = []
     coords_v = []
     flux = []
@@ -45,6 +45,7 @@ def plot_source(source, data, station_information, source_model = None, highligh
     highlighted_u = []
     highlighted_v = []
     highlighted_flux = []
+    highlighted_ratio = []
 
     for band in bands:
         for _, point in matches.iterrows():
@@ -85,40 +86,31 @@ def plot_source(source, data, station_information, source_model = None, highligh
             curr_flux = calculate_flux(point, station_information, band)
             flux.extend(curr_flux*2)
 
+            # Find the baseline of that point
+            baselines_flux.extend(
+                [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_flux))}']*2)
+
             if source_model:
+                # Calculate the ratio at that point
                 curr_ratio = source_model.get_flux(u,v)/curr_flux
                 ratio.extend([curr_ratio]*2)
 
-            # Find the baseline of that point
-            baselines.extend(
-                [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_flux))}']*2)
-            
-            if source_model:
-                baselines2.extend(
+                # Find the baseline of that point
+                baselines_ratio.extend(
                     [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_ratio))}']*2)
+            
 
-
-            if len(highlighted_stations) == 1 and (point.Station1 in highlighted_stations or point.Station2 in highlighted_stations):
+            if (len(highlighted_stations) == 1 and (point.Station1 in highlighted_stations or point.Station2 in highlighted_stations)) or (
+                point.Station1 in highlighted_stations and point.Station2 in highlighted_stations):
                 highlighted_u.extend([u,-u])
                 highlighted_v.extend([v,-v])
                 highlighted_flux.extend(curr_flux*2)
-
-            elif point.Station1 in highlighted_stations and point.Station2 in highlighted_stations:
-                highlighted_u.extend([u,-u])
-                highlighted_v.extend([v,-v])
-                highlighted_flux.extend(curr_flux*2)
+                if source_model:
+                    highlighted_ratio.extend([curr_ratio]*2)
 
     # Remove NaN values
     coords_u = [u for u in coords_u if u == u]
     coords_v = [v for v in coords_v if v == v]
-
-    if return_coords:
-        with open(f"uv-flux{band_letter.capitalize()}.csv", "w") as file: 
-            file.write(f"u,v,{band_letter}_flux\n")
-            for u, v, f in zip(coords_u, coords_v, flux):
-                file.write(f"{u},{v},{f}")
-                file.write("\n")
-        return coords_u, coords_v, flux
     
     ### Flux density (meas.) ###
 
@@ -135,7 +127,7 @@ def plot_source(source, data, station_information, source_model = None, highligh
     uv_cursor = mplcursors.cursor(
         uv_plot, hover=mplcursors.HoverMode.Transient)
     uv_cursor.connect(
-        "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
+        "add", lambda sel: sel.annotation.set_text(baselines_flux[sel.index]))
     
     # Add text
     plt.xlabel("U [fringes/radian]")
@@ -183,20 +175,18 @@ def plot_source(source, data, station_information, source_model = None, highligh
     if source_model:
         figure3 = plt.figure(2)
         figure3.clf()
-
-        highlighted_ratio = list(map(lambda u,v,f: source_model.get_flux(u,v)/f, highlighted_u, highlighted_v, highlighted_flux))
-
+        
         uv_plot = plt.scatter(coords_u, coords_v, c=ratio, marker=".", vmin=0, vmax=2, cmap=CMAP)
 
         if len(highlighted_u):
-            plt.scatter(highlighted_u,highlighted_v, marker='*', c = highlighted_ratio, vmin=0, vmax=max(ratio), s=50, cmap=CMAP)
+            plt.scatter(highlighted_u,highlighted_v, marker='*', c = highlighted_ratio, vmin=0, vmax=2, s=50, cmap=CMAP)
         plt.colorbar(label="Flux density ratio")
 
         # Adds arrows and annotations to all points
         uv_cursor = mplcursors.cursor(
             uv_plot, hover=mplcursors.HoverMode.Transient)
         uv_cursor.connect(
-            "add", lambda sel: sel.annotation.set_text(baselines2[sel.index]))
+            "add", lambda sel: sel.annotation.set_text(baselines_ratio[sel.index]))
         
         # Add text
         plt.xlabel("U [fringes/radian]")
@@ -237,7 +227,7 @@ def plot_source(source, data, station_information, source_model = None, highligh
     distance_cursor = mplcursors.cursor(
         distance_plot, hover=mplcursors.HoverMode.Transient)
     distance_cursor.connect(
-        "add", lambda sel: sel.annotation.set_text(baselines[sel.index]))
+        "add", lambda sel: sel.annotation.set_text(baselines_flux[sel.index]))
     
     # Add text
     plt.xlabel("sqrt(U^2+V^2) [fringes/radian]")

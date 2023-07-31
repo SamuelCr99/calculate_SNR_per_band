@@ -470,7 +470,7 @@ def run_gui():
                 main_window.write_event_value("plot", True)
 
         if event == "fit_SEFD":
-            if source_model:
+            if source and source_model:
                 least_square_fit(source, source_model, station_information, data, band, ignored_stations)
 
                 # Update GUI
@@ -482,12 +482,12 @@ def run_gui():
                 main_window.refresh()
 
         if event == "gauss":
-            if source_model:
+            if source and source_model:
                 sm = source_model.gauss_list[0]
                 sg.Popup(f"a = {sm.a}\nb = {sm.b}\nA = {sm.amp}\nt = {sm.theta}\nx0 = {sm.x0}\ny0 = {sm.y0}")
 
         if event == "flux_scale":
-            if source_model:
+            if source and source_model:
                 source_model.set_flux_scale(source, station_information, data, band, ignored_stations)
 
                 # Update GUI
@@ -497,6 +497,10 @@ def run_gui():
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
+
+        if (event == "set_scale" or event == "fit_SEFD" or event == "gauss" or event == "flux_scale") and not source:
+            sg.Popup("No source selected.",
+                     icon="images/favicon.ico")
 
         if (event == "set_scale" or event == "fit_SEFD" or event == "gauss" or event == "flux_scale") and not source_model:
             sg.Popup("No fits file selected.",
@@ -511,10 +515,6 @@ def run_gui():
 
            # Check that user has selected a source
             if not source:
-                continue
-
-            # Check that user has selected a valid source
-            if source not in source_dict:
                 continue
 
             # Find which band the user has selected, selected station will have

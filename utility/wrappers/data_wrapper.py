@@ -42,6 +42,9 @@ class DataWrapper:
             else:
                 self.df = find_datapoints_sx(df)
     
+    def __len__(self):
+        return len(self.df.index.to_list())
+    
     def get(self, source="", baseline="", station="", ignored_stations=[], copy=False):
         """
         Get a new DataWrapper from the old DataWrapper that match a given source,

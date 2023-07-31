@@ -45,9 +45,9 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
         N_i = []
         for j in range(num_stations):
             if i==j:
-                N_ij = len(data.get_index(station=station_list[i]))
+                N_ij = len(data.get(station=station_list[i]))
             else:
-                N_ij = len(data.get_index(baseline=[station_list[i],station_list[j]]))
+                N_ij = len(data.get(baseline=[station_list[i],station_list[j]]))
             N_i.append(N_ij)
         N.append(N_i)
 
