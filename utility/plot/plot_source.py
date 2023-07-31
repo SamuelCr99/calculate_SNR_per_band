@@ -2,7 +2,7 @@ import pandas as pd
 import mplcursors
 import matplotlib.pyplot as plt
 from math import sqrt
-from to_uv import convert_uv
+from utility.plot.to_uv import convert_uv
 from calculate_flux import calculate_flux
 from init import find_datapoints
 

@@ -6,12 +6,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 from tkinter.filedialog import askdirectory, askopenfilename
-from layout import create_layout
-from plot_source import plot_source
+from utility.gui.layout import create_layout
+from utility.plot.plot_source import plot_source
 from init import find_datapoints, find_stations
-from source_model_wrapper import SourceModelWrapper
+from utility.wrappers.source_model_wrapper import SourceModelWrapper
 from least_square_fit import least_square_fit
-from data_wrapper import DataWrapper
+from utility.wrappers.data_wrapper import DataWrapper
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 def repack(widget, option):

@@ -1,6 +1,6 @@
 from math import sqrt, log, e
 import numpy as np
-from data_wrapper import DataWrapper
+from utility.wrappers.data_wrapper import DataWrapper
 
 def least_square_fit(source, model, stations, data, band, ignored_stations):
     
