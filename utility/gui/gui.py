@@ -135,7 +135,9 @@ def run_gui():
     while True:
         event, values = main_window.Read(timeout=25)
 
+        #######################
         ### Menu bar events ###
+        #######################
 
         # Open the vgosDB
         if event == "Open session":
@@ -210,15 +212,30 @@ def run_gui():
             main_window.write_event_value("plot", True)
 
         # Save the stations info config
-        if event == "Save configuration":
+        if event == "Save":
             station_information.to_csv(
                 "data/derived/stations.csv", index=False)
             saved_station_information = station_information.copy(deep=True)
 
-        # Restore old stations info config
-        if event == "Restore":
+        # Restore to saved stations info config
+        if event == "Restore to saved":
             a = sg.popup_yes_no(
-                "Restoring will remove all configurations set. Do you wish to continue?",
+                "Restoring will remove all unsaved configurations. Do you wish to continue?",
+                icon="images/favicon.ico")
+            if a == "Yes":
+                station_information = pd.read_csv("data/derived/stations.csv")
+                saved_station_information = station_information.copy(deep=True)
+                new_table = update_station_table(
+                    station_information, source_dict[source]["stations"],
+                    highlights, band)
+                main_window["stations_table"].update(new_table)
+                main_window.write_event_value("plot", True)
+                main_window.refresh()
+        
+        # Delete configuration and re-generate config file
+        if event == "Delete":
+            a = sg.popup_yes_no(
+                "Deleting will remove all configurations set. Do you wish to continue?",
                 icon="images/favicon.ico")
             if a == "Yes":
                 find_stations()
@@ -248,7 +265,9 @@ def run_gui():
                     continue
             break
 
+        ###############################
         ### Source selection events ###
+        ###############################
 
         # Source selected
         if event[0] == "sources_table" and event[1] == "+CLICKED+":
@@ -292,8 +311,10 @@ def run_gui():
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
-                
+        
+        ############################
         ### Band selection event ###
+        ############################
         
         if re.search("[A-DSX]_band",str(event)):
             band = ["A","B","C","D","S","X"].index(event.split("_")[0])
@@ -307,7 +328,9 @@ def run_gui():
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
 
+        ################################
         ### Station selection events ###
+        ################################
 
         if event[0] == "stations_table" and event[1] == "+CLICKED+":
             click_row, click_col = event[2]
@@ -462,7 +485,9 @@ def run_gui():
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
 
-        ### Debug event ###
+        ####################
+        ### Debug events ###
+        ####################
 
         if event == "set_scale":
             if source_model:
@@ -506,7 +531,9 @@ def run_gui():
             sg.Popup("No fits file selected.",
                      icon="images/favicon.ico")
 
+        ##################
         ### Plot event ###
+        ##################
 
         if event == "plot":
             # Check that user has selected a folder

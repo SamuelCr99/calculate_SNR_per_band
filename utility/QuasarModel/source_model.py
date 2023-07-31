@@ -1,13 +1,9 @@
 import numpy as np
-from numpy.fft import fft2, fftshift
-import matplotlib.pyplot as plt
-from numpy import log, where, amax, exp, sqrt
+from numpy import log, where, amax, exp
 from skimage.feature import peak_local_max
 from utility.QuasarModel.gauss import Gaussian, GaussList
 import copy
-import logging
 import scipy
-from utility.QuasarModel.constants import stars, line
 
 
 class SourceModel:
@@ -19,7 +15,6 @@ class SourceModel:
         :param image: np.array of image data
         :return: org - original input image, mdl - modelled image, anl - analytical fourier transform of modelled image
         """
-        logger = logging.getLogger('QuasarModelLog')
 
         size = image.shape[0]
         org = copy.deepcopy(image)
@@ -43,13 +38,9 @@ class SourceModel:
             chi_sq_dof = self.find_chi_sq_dof(image, gauss_now)
             chi_sq_dof_old = chi_sq_dof
 
-            self.log_initial_guess(logger, num_peaks, chi_sq_dof, guess, gauss_now)
-
             gauss_now, chi_sq_dof, step_min = self.least_sq_gauss(gauss_now, image)
             delta_chi = chi_sq_dof_old - chi_sq_dof
             chi_sq_dof_old = chi_sq_dof
-
-            self.log_iteration(logger, chi_sq_dof, delta_chi, step_min, 1, gauss_now)
 
             for iteration in range(2, 12):
                 if self.stop:
@@ -64,40 +55,13 @@ class SourceModel:
                     gauss_now, chi_sq_dof, step_min = self.least_sq_gauss(gauss_now, image)
                     delta_chi = chi_sq_dof_old - chi_sq_dof
                     chi_sq_dof_old = chi_sq_dof
-                    self.log_iteration(logger, chi_sq_dof, delta_chi, step_min, iteration, gauss_now)
 
         mdl = gauss_fnd.build_image()
-
-        self.log_final_iteration(logger, gauss_fnd)
-
-        precision = self.precision(org, mdl)
-
-        logger.info(f"mean error: {precision['mean error']}")
-        logger.info(f"mean error as % of max val: {precision['mean error as % of max val']}")
-        logger.info(f"total error: {precision['total error']}")
-        logger.info(f"total error as % of max val: {precision['total error as % of max val']}")
-        logger.info(f"mean error for fft: {precision['mean error for fft']}")
 
         anl = abs(sum([np.fromfunction(lambda x, y: gauss.get_fourier_transform_value(x, y, size),
                                        (size, size), dtype=float) for gauss in gauss_fnd]))
 
         return org, mdl, anl, gauss_fnd
-
-    @staticmethod
-    def plot_all(org, mdl, anl, style='inferno'):
-        # cool plot styles: jet, hot, magma, plasma, inferno
-        to_plot = [org, mdl, abs(fftshift(fft2(org))), abs(fftshift(fft2(mdl))),
-                   org - mdl, abs(anl)]
-        titles = ['Original Image', 'Modelled Image', 'FFT of Original Image', 'FFT of Modelled Image', 'Residual',
-                  'Analytical Fourier Transform']
-        for i, plot, title in zip(range(1, 7), to_plot, titles):
-            plt.subplot(3, 2, i)
-            plt.imshow(plot, cmap=style)
-            plt.gca().invert_yaxis()
-            plt.title(title)
-            plt.colorbar()
-        plt.subplots_adjust(hspace=0.5, top=0.95)
-        plt.show()
 
     def least_sq_gauss(self, gauss_now, image):
 
@@ -211,28 +175,6 @@ class SourceModel:
             delta_gauss.append(d_gauss)
         return delta_gauss
 
-    @staticmethod
-    def precision(img_data, mdl_data):
-        """
-        Calculate the difference between the original and modelled image.
-        :param img_data: np.array of original image
-        :param mdl_data: np.array of modelled image
-        :return: precisions - the different measurements of error as a dictionary where the type of precision measure
-        is the key.
-        """
-        chi_sq = np.sum(np.sum(np.power(np.subtract(img_data, mdl_data), 2)))
-        num_points = img_data.shape[0] ** 2
-        fft_img_data = abs(fftshift(fft2(img_data)))
-        fft_mdl_data = abs(fftshift(fft2(mdl_data)))
-        chi_sq_fft = np.sum(np.sum(np.power(np.subtract(fft_img_data, fft_mdl_data), 2)))
-
-        precisions = {'mean error': sqrt(chi_sq) / num_points, 'mean error as % of max val':
-            (sqrt(chi_sq) / num_points) / amax(img_data) * 100, 'total error': sqrt(chi_sq),
-                      'total error as % of max val': sqrt(chi_sq) / amax(img_data) * 100,
-                      'mean error for fft': sqrt(chi_sq_fft) / num_points}
-
-        return precisions
-
     def make_norm_np(self, gauss_in, image, num_peak):
         norm_vec = np.zeros(6 * num_peak, dtype=float)
         norm_mat = np.zeros((6 * num_peak, 6 * num_peak))
@@ -259,51 +201,3 @@ class SourceModel:
                     norm_mat[index * 6 + i][index * 6 + j] = np.sum(partials[i] * partials[j])
 
         return norm_vec, norm_mat
-
-    def log_initial_guess(self, logger, chi_sq_dof, num_peak, guess, gauss_now):
-        logger.info(f'Initial Guess #{guess + 1} \n')
-        logger.info(f"Chi_sq_DOF: {round(chi_sq_dof, 10):<15} #Found peaks: {num_peak} \n")
-        logger.info(f"{'#':<15}{'Amplitude':<15}{'X0':<15}{'Y0':<15}{'Sigma_X':<15}{'Sigma_Y':<15}"
-                    f"{'Rotation':<15}\n")
-        for gauss, index in enumerate(gauss_now):
-            logger.info(f"{index:<15}{str(gauss)}")
-        logger.info(f'{line}\n')
-
-    def log_iteration(self, logger, chi_sq_dof, delta_chi, step_min, iteration, gauss_now):
-        logger.info(f'Iteration #{iteration} \n')
-        logger.info(f'Chi_sq_DOF: {round(chi_sq_dof, 10):<15} Delta_chi: {round(delta_chi, 10):<15}'
-                     f'Step: {round(step_min, 5):<15} #Found peaks: {len(gauss_now)} \n')
-        logger.info(f"{'#':<15}{'Amplitude':<15}{'X0':<15}{'Y0':<15}{'Sigma_X':<15}{'Sigma_Y':<15}"
-                     f"{'Rotation':<15}\n")
-        logger.info("Found components: \n")
-        for index, gauss in enumerate(gauss_now):
-            logger.info(f"{index+1:<15} {str(gauss)}")
-        logger.info(f'{line}\n')
-
-    def log_final_iteration(self, logger, gauss_fnd):
-        logger.info(f'{stars}FINAL{stars}\n')
-        logger.info("Found components: \n")
-
-        logger.info(f"{'#':<15}{'Amplitude':<15}{'X0':<15}{'Y0':<15}{'Sigma_X':<15}{'Sigma_Y':<15}"
-                     f"{'Rotation':<15}\n")
-
-        for index, gauss in enumerate(gauss_fnd):
-            logger.info(f"{index+1:<15} {str(gauss)}")
-
-
-class SourceModelAnalytical(SourceModel):
-    gauss_vec: GaussList()
-
-    def log_final_iteration(self, logger, gauss_fnd):
-        logger.info(f'{stars}FINAL{stars}\n')
-        logger.info(f"{'#':<15}{'Amplitude':<15}{'X0':<15}{'Y0':<15}{'Sigma_X':<15}{'Sigma_Y':<15}"
-                     f"{'Rotation':<15}\n")
-
-        logger.info("Original components: \n")
-        for index, gauss in enumerate(self.gauss_vec):
-            logger.info(f"{index+1:<15} {str(gauss)}")
-
-        logger.info("Found components: \n")
-
-        for index, gauss in enumerate(gauss_fnd):
-            logger.info(f"{index+1:<15} {str(gauss)}")

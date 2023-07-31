@@ -1,9 +1,10 @@
 import pandas as pd
 import netCDF4 as nc
 import numpy as np
-from statistics import mean
 import math
 import os
+from statistics import mean
+from utility.calc.to_uv import convert_uv
 
 BAND_A_B_LIM = 4500
 BAND_B_C_LIM = 6000
@@ -43,6 +44,7 @@ class DataWrapper:
                 self.df = find_datapoints_sx(df)
     
     def __len__(self):
+        # Get the amount of rows (data points) in the data object
         return len(self.df.index.to_list())
     
     def get(self, source="", baseline="", station="", ignored_stations=[], copy=False):
@@ -362,11 +364,17 @@ def find_datapoints_abcd(dir, save_to_csv=False):
 
     # Find u and v
     uv_data = np.ma.getdata(uv_ds['UVFperAsec']).tolist()
-    u = list(map(lambda u: u[0]*206264.81, uv_data))
-    v = list(map(lambda v: v[1]*206264.81, uv_data))
+    u_l = list(map(lambda u: u[0]*206264.81, uv_data))
+    v_l = list(map(lambda v: v[1]*206264.81, uv_data))
 
     # Find reference frequency
     ref_freq = np.ma.getdata(ref_freq_ds["RefFreq"]).tolist()*len(time)
+
+    # Find u and v for each band
+    A_u, A_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,A_freq))))
+    B_u, B_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,B_freq))))
+    C_u, C_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,C_freq))))
+    D_u, D_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,D_freq))))    
 
     # Collect everything into a dataframe
     df = pd.DataFrame({"YMDHM": time,
@@ -393,8 +401,16 @@ def find_datapoints_abcd(dir, save_to_csv=False):
                        "D_bw": D_bw,
                        "int_time": int_time,
                        "Q_code": qualcode,
-                       "u": u,
-                       "v": v,
+                    #    "u": u_l,
+                    #    "v": v_l,
+                       "A_u": A_u,
+                       "A_v": A_v,
+                       "B_u": B_u,
+                       "B_v": B_v,
+                       "C_u": C_u,
+                       "C_v": C_v,
+                       "D_u": D_u,
+                       "D_v": D_v,
                        "ref_freq": ref_freq})
 
     # Sort out rows with too low quality

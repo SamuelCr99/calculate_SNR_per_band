@@ -62,7 +62,10 @@ class SourceModelWrapper:
             SEFD1 = float(stations.loc[stations["name"] == point.Station1][f"{band_letter}_SEFD"].iloc[0])
             SEFD2 = float(stations.loc[stations["name"] == point.Station2][f"{band_letter}_SEFD"].iloc[0])
 
-            flux_pred = self.get_flux(point.u,point.v)
+            u = getattr(point,f"{band_letter}_u")
+            v = getattr(point,f"{band_letter}_v")
+
+            flux_pred = self.get_flux(u,v)
             SNR_bit_pred = 0.617502*flux_pred*sqrt(1/(SEFD1*SEFD2))
             SNR_pred_list.append(SNR_bit_pred)
         
