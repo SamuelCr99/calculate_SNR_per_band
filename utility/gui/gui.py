@@ -8,9 +8,9 @@ import re
 from tkinter.filedialog import askdirectory, askopenfilename
 from utility.gui.layout import create_layout
 from utility.plot.plot_source import plot_source
-from init import find_datapoints, find_stations
+from init import find_stations
 from utility.wrappers.source_model_wrapper import SourceModelWrapper
-from least_square_fit import least_square_fit
+from utility.calc.least_square_fit import least_square_fit
 from utility.wrappers.data_wrapper import DataWrapper
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
@@ -118,6 +118,7 @@ def run_gui():
 
     # Static variables for the event loop
     dir = ""
+    data = None
     source_dict = {}
     source = ""
     source_model = None
@@ -125,7 +126,6 @@ def run_gui():
     sort_stat_reverse = [True, False, True, True, True]
     sort_source_reverse = [False, True]
     highlights = []
-    is_abcd = True
     fig1 = plt.figure(0)
     fig2 = plt.figure(1)
     fig3 = plt.figure(2)
@@ -147,13 +147,9 @@ def run_gui():
                 main_window.set_title(f"Quasar Viewer - Loading...")
                 main_window.refresh()
 
-                # Check if it is a ABCD session or an SX session
-                is_abcd = ("Observables" in os.listdir(f"{new_dir}/")) and (
-                    "QualityCode_bS.nc" not in os.listdir(f"{new_dir}/Observables/"))
-
                 # Load data (takes time)
                 try:
-                    datapoints = DataWrapper(find_datapoints(new_dir, is_abcd=is_abcd))
+                    data = DataWrapper(new_dir)
                 except:
                     sg.Popup("Something went wrong! Please select a valid vgosDB directory.",
                              icon="images/favicon.ico")
@@ -165,7 +161,7 @@ def run_gui():
                 # Update static variables
                 dir = new_dir
                 source = None
-                source_dict = datapoints.get_source_dict()
+                source_dict = data.get_source_dict()
                 highlights = []
                 
                 # Reset/update GUI
@@ -174,12 +170,12 @@ def run_gui():
                 main_window.set_title(f"Quasar Viewer - {new_dir.split('/')[-1]}")
                 main_window["loading_text"].update(value="")
                 
-                main_window["A_band"].update(visible=is_abcd)
-                main_window["B_band"].update(visible=is_abcd)
-                main_window["C_band"].update(visible=is_abcd)
-                main_window["D_band"].update(visible=is_abcd)
-                main_window["S_band"].update(visible=not is_abcd)
-                main_window["X_band"].update(visible=not is_abcd)
+                main_window["A_band"].update(visible=data.is_abcd)
+                main_window["B_band"].update(visible=data.is_abcd)
+                main_window["C_band"].update(visible=data.is_abcd)
+                main_window["D_band"].update(visible=data.is_abcd)
+                main_window["S_band"].update(visible=data.is_sx)
+                main_window["X_band"].update(visible=data.is_sx)
 
                 fig1.clf()
                 fig2.clf()
@@ -241,7 +237,7 @@ def run_gui():
                      icon="images/favicon.ico")
 
         # Close the program and save config
-        if event == sg.WIN_CLOSE_ATTEMPTED_EVENT or event == "cancel" or event == "Exit":
+        if event == sg.WIN_CLOSE_ATTEMPTED_EVENT or event == "Exit":
             if not station_information.equals(saved_station_information):
                 a,_ = sg.Window("Unsaved changes", [[sg.Text("You have unsaved changes. Do you wish to save?")],
                                                     [sg.Button("Yes",k="Yes"),sg.Button("No",k="No"),sg.Button("Cancel",k="Cancel")]], finalize=True, icon="images/favicon.ico", modal=True).read(close=True)
@@ -475,7 +471,7 @@ def run_gui():
 
         if event == "fit_SEFD":
             if source_model:
-                least_square_fit(source, source_model, station_information, datapoints, band, ignored_stations)
+                least_square_fit(source, source_model, station_information, data, band, ignored_stations)
 
                 # Update GUI
                 new_table = update_station_table(
@@ -492,7 +488,7 @@ def run_gui():
 
         if event == "flux_scale":
             if source_model:
-                source_model.set_flux_scale(source, station_information, datapoints, band, ignored_stations)
+                source_model.set_flux_scale(source, station_information, data, band, ignored_stations)
 
                 # Update GUI
                 new_table = update_station_table(
@@ -528,7 +524,7 @@ def run_gui():
                     values['S_band'], values['X_band']].index(True)
 
             # Check that the selected band is in the currently visible list
-            if (is_abcd and band in [4,5]) or (not is_abcd and band in [0,1,2,3]):
+            if (data.is_abcd and band in [4,5]) or (data.is_sx and band in [0,1,2,3]):
                 continue
 
             # Ignore the stations that were unselected in the GUI
@@ -536,7 +532,7 @@ def run_gui():
 
             # Plot
             plot_source(
-                source, datapoints, station_information, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
+                source, data, station_information, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
 
             # Display plots in canvases
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)

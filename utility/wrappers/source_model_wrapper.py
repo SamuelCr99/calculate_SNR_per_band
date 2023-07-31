@@ -1,5 +1,5 @@
-from QuasarModel.tools import get_image_from_path as get_image
-from QuasarModel.source_model import SourceModel as sm
+from utility.QuasarModel.get_image import get_image_from_path as get_image
+from utility.QuasarModel.source_model import SourceModel as sm
 from astropy.io import fits
 from math import radians, pi, e, sin, cos, sqrt
 

@@ -2,7 +2,7 @@ import mplcursors
 import matplotlib.pyplot as plt
 from math import sqrt
 from utility.plot.to_uv import convert_uv
-from calculate_flux import calculate_flux
+from utility.calc.calculate_flux import calculate_flux
 
 def plot_source(source, data, station_information, source_model = None, highlighted_stations = [], baseline="", ignored_stations=[], bands=[0, 1, 2, 3], return_coords = False):
     """
