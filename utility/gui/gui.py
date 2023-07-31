@@ -536,7 +536,7 @@ def run_gui():
 
             # Plot
             plot_source(
-                source, datapoints.get_df(), station_information, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
+                source, datapoints, station_information, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
 
             # Display plots in canvases
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)

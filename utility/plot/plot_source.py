@@ -2,7 +2,6 @@ import pandas as pd
 import mplcursors
 import matplotlib.pyplot as plt
 from math import sqrt
-from find_index import find_index
 from to_uv import convert_uv
 from calculate_flux import calculate_flux
 from init import find_datapoints
@@ -35,8 +34,9 @@ def plot_source(source, data, station_information, source_model = None, highligh
         bands = [bands]
 
     # Find all observations that match the given criteria
-    matches = find_index(
-        source=source, df=data, baseline=baseline, ignored_stations=ignored_stations)
+    # matches = find_index(
+    #     source=source, df=data, baseline=baseline, ignored_stations=ignored_stations)
+    matches = data.get(source=source, baseline=baseline, ignored_stations=ignored_stations)
     
     baselines = []
     baselines2 = []
@@ -50,22 +50,22 @@ def plot_source(source, data, station_information, source_model = None, highligh
     highlighted_matches = []
 
     for band in bands:
-        for point in matches:
+        for _, point in matches.iterrows():
 
             # For the A, B, C and D bands
             if band in [0,1,2,3]:
-                u_orig, v_orig = data.u.iloc[point], data.v.iloc[point]
-                ref_freq = data.ref_freq.iloc[point]
+                u_orig, v_orig = point.u, point.v
+                ref_freq = point.ref_freq
 
                 # Get the frequency of the band
                 if band == 0:
-                    freq = data.A_freq.iloc[point]
+                    freq = point.A_freq
                 elif band == 1:
-                    freq = data.B_freq.iloc[point]
+                    freq = point.B_freq
                 elif band == 2:
-                    freq = data.C_freq.iloc[point]
+                    freq = point.C_freq
                 elif band == 3:
-                    freq = data.D_freq.iloc[point]
+                    freq = point.D_freq
                     
                 if freq == None: 
                     continue
@@ -79,13 +79,13 @@ def plot_source(source, data, station_information, source_model = None, highligh
             # For the S and X bands
             else:
                 band_letter = ["S","X"][band-4]
-                u, v = data[f"{band_letter}_u"].iloc[point], data[f"{band_letter}_v"].iloc[point]
+                u, v = point[f"{band_letter}_u"], point[f"{band_letter}_v"]
 
                 coords_u.extend([u, -u])
                 coords_v.extend([v, -v])
 
             # Calculate the flux at that point
-            curr_flux = calculate_flux(point, data, station_information, band)
+            curr_flux = calculate_flux(point, station_information, band)
             flux.extend(curr_flux*2)
 
             if source_model:
@@ -94,20 +94,20 @@ def plot_source(source, data, station_information, source_model = None, highligh
 
             # Find the baseline of that point
             baselines.extend(
-                [f'{data.Station1.iloc[point]}-{data.Station2.iloc[point]} {list(map(lambda x: round(x,3), curr_flux))}']*2)
+                [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_flux))}']*2)
             
             if source_model:
                 baselines2.extend(
-                    [f'{data.Station1.iloc[point]}-{data.Station2.iloc[point]} {list(map(lambda x: round(x,3), curr_ratio))}']*2)
+                    [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_ratio))}']*2)
 
 
-            if len(highlighted_stations) == 1 and (data.Station1.iloc[point] in highlighted_stations or data.Station2.iloc[point] in highlighted_stations):
+            if len(highlighted_stations) == 1 and (point.Station1 in highlighted_stations or point.Station2 in highlighted_stations):
                 if point not in highlighted_matches: highlighted_matches.append(point)
                 highlighted_u.extend([u,-u])
                 highlighted_v.extend([v,-v])
                 highlighted_flux.extend(curr_flux*2)
 
-            elif data.Station1.iloc[point] in highlighted_stations and data.Station2.iloc[point] in highlighted_stations: 
+            elif point.Station1 in highlighted_stations and point.Station2 in highlighted_stations: 
                 if point not in highlighted_matches: highlighted_matches.append(point)
                 highlighted_u.extend([u,-u])
                 highlighted_v.extend([v,-v])

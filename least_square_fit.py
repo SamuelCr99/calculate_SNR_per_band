@@ -21,13 +21,13 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
             
         if point.Station2 not in station_list: 
             station_list.append(point.Station2)
+        
+        SEFD1 = float(stations.loc[stations["name"] == point.Station1][f"{band_letter}_SEFD"].iloc[0])
+        SEFD2 = float(stations.loc[stations["name"] == point.Station2][f"{band_letter}_SEFD"].iloc[0])
             
         SNR_meas = point[f"{band_letter}_SNR"]
         SNR_bit_meas = SNR_meas / sqrt(2*point.int_time*point[f"{band_letter}_bw"])
         SNR_meas_list.append(SNR_bit_meas)
-
-        SEFD1 = float(stations.loc[stations["name"] == point.Station1][f"{band_letter}_SEFD"].iloc[0])
-        SEFD2 = float(stations.loc[stations["name"] == point.Station2][f"{band_letter}_SEFD"].iloc[0])
 
         flux_pred = model.get_flux(point.u,point.v)
         SNR_bit_pred = 0.617502*flux_pred*sqrt(1/(SEFD1*SEFD2))
