@@ -1,4 +1,4 @@
-from math import sin, cos, radians, asin, acos, pi
+from math import sin, cos, asin, acos, pi
 
 
 def ElAz_to_RAdec(el, az, lat, lon):
@@ -121,8 +121,3 @@ def convert_uv(u, v, orig_freq, new_freq):
     new_omega = 299792458/new_freq
 
     return u*orig_omega/new_omega, v*orig_omega/new_omega
-
-
-if __name__ == '__main__':
-    to_uv(radians(-76.83), radians(39.02),
-          radians(140.22), radians(36.21), 0.873, 6.202)

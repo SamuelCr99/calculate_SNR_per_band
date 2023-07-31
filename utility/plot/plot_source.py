@@ -1,10 +1,8 @@
-import pandas as pd
 import mplcursors
 import matplotlib.pyplot as plt
 from math import sqrt
 from utility.plot.to_uv import convert_uv
 from calculate_flux import calculate_flux
-from init import find_datapoints
 
 def plot_source(source, data, station_information, source_model = None, highlighted_stations = [], baseline="", ignored_stations=[], bands=[0, 1, 2, 3], return_coords = False):
     """
@@ -47,7 +45,6 @@ def plot_source(source, data, station_information, source_model = None, highligh
     highlighted_u = []
     highlighted_v = []
     highlighted_flux = []
-    highlighted_matches = []
 
     for band in bands:
         for _, point in matches.iterrows():
@@ -102,13 +99,11 @@ def plot_source(source, data, station_information, source_model = None, highligh
 
 
             if len(highlighted_stations) == 1 and (point.Station1 in highlighted_stations or point.Station2 in highlighted_stations):
-                if point not in highlighted_matches: highlighted_matches.append(point)
                 highlighted_u.extend([u,-u])
                 highlighted_v.extend([v,-v])
                 highlighted_flux.extend(curr_flux*2)
 
-            elif point.Station1 in highlighted_stations and point.Station2 in highlighted_stations: 
-                if point not in highlighted_matches: highlighted_matches.append(point)
+            elif point.Station1 in highlighted_stations and point.Station2 in highlighted_stations:
                 highlighted_u.extend([u,-u])
                 highlighted_v.extend([v,-v])
                 highlighted_flux.extend(curr_flux*2)
@@ -227,9 +222,9 @@ def plot_source(source, data, station_information, source_model = None, highligh
     # If there are multiple bands shown they should be color coded
     if len(bands) > 1:
         colors = sum(
-            list(map(lambda b: [base_colors[b]]*2*len(matches), bands)), [])
+            list(map(lambda b: [base_colors[b]]*int(len(flux)/len(bands)), bands)), [])
         highlighted_colors = sum(
-            list(map(lambda b: [base_colors[b]]*2*len(highlighted_matches), bands)), [])
+            list(map(lambda b: [base_colors[b]]*int(len(highlighted_flux)/len(bands)), bands)), [])
     else:
         colors = "black"
         highlighted_colors = "black"
@@ -256,12 +251,3 @@ def plot_source(source, data, station_information, source_model = None, highligh
         # Create empty scatter plots so the legend will be added correctly
         plt.legend(handles=list(map(lambda b: plt.scatter(
             [], [], c=base_colors[b], label=f'Band {["A","B","C","D","S","X"][b]}'), bands)))
-
-if __name__ == '__main__':
-    station_information = pd.read_csv('data/derived/stations.csv')
-    source = "0133+476"
-    session_path = 'data/sessions/session1/'
-    data = find_datapoints(session_path)
-
-    plot_source(source, data, station_information=station_information, bands=[0])
-    plt.show()

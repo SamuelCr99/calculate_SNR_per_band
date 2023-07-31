@@ -412,9 +412,3 @@ def find_stations():
         os.mkdir('data/derived')
 
     joined_df.to_csv("data/derived/stations.csv", index=False)
-
-
-if __name__ == '__main__':
-    find_stations()
-    # find_datapoints("data/sessions/session1/")
-    # find_datapoints("data/sessions/19JUL24XA/")
