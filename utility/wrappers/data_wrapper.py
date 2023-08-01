@@ -2,6 +2,7 @@ import pandas as pd
 import netCDF4 as nc
 import numpy as np
 import math
+import itertools
 import os
 from statistics import mean
 from utility.calc.to_uv import convert_uv
@@ -47,7 +48,7 @@ class DataWrapper:
         # Get the amount of rows (data points) in the data object
         return len(self.df.index.to_list())
     
-    def get(self, source="", baseline="", station="", ignored_stations=[], copy=False):
+    def get(self, source="", baseline="", station="", ignored_stations=[], bands=None, copy=False):
         """
         Get a new DataWrapper from the old DataWrapper that match a given source,
         baseline, station and/or ignored station.
@@ -62,9 +63,9 @@ class DataWrapper:
         Returns:
         A DataWrapper that match the given criteria
         """
-        return DataWrapper(self.get_df(source=source, baseline=baseline, station=station, ignored_stations=ignored_stations, copy=copy))
+        return DataWrapper(self.get_df(source=source, baseline=baseline, station=station, ignored_stations=ignored_stations, bands=bands, copy=copy))
     
-    def get_df(self, source="", baseline="", station="", ignored_stations=[], copy=False):
+    def get_df(self, source="", baseline="", station="", ignored_stations=[], bands=None, copy=False):
         """
         Get a new DataFrame from the DataWrapper that match a given source,
         baseline, station and/or ignored station.
@@ -97,8 +98,8 @@ class DataWrapper:
                 station1 = baseline[0]
                 station2 = baseline[1]
             
-            df = df.loc[((df['Station1'] == station1) & (df['Station2'] == station2)) |
-                        ((df['Station1'] == station2) & (df['Station2'] == station1))]
+            df = df.loc[((df.Station1 == station1) & (df.Station2 == station2)) |
+                        ((df.Station1 == station2) & (df.Station2 == station1))]
             
         # Find all rows that include the specified station
         if station:
@@ -108,6 +109,14 @@ class DataWrapper:
         for station in ignored_stations:
             df = df.loc[(df.Station1 != station) & (df.Station2 != station)]
     
+        if not bands == None:
+            if type(bands) != list:
+                bands = [bands]
+            band_letters = []
+            for band in bands:
+                band_letters.append(["A","B","C","D","S","X"][band])
+            df = df.loc[df.band.isin(band_letters)]
+
         return df
 
     def get_source_dict(self):
@@ -149,6 +158,17 @@ class DataWrapper:
             d[source]['stations'][station2] += 1
 
             d[source]['observations'] += 1
+        
+        if self.is_abcd:
+            num_bands = 4
+        else:
+            num_bands = 2
+
+        for source in d:
+            d[source]["observations"] = int(d[source]["observations"]/num_bands)
+
+            for station in d[source]["stations"]:
+                d[source]["stations"][station] = int(d[source]["stations"][station]/num_bands)
 
         return d
     
@@ -219,22 +239,24 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     # Find source
     source = []
     for elem in np.ma.getdata(source_ds["Source"]).tolist():
-        source.append(bytes_to_string(elem))
+        source.extend([bytes_to_string(elem)]*4)
+
+    num_observations = int(len(source)/4)
 
     # Find time
     time = []
     for elem in np.ma.getdata(timeutc_ds["YMDHM"]):
-        time.append(time_to_string(elem))
+        time.extend([time_to_string(elem)]*4)
     second = []
     for elem in np.ma.getdata(timeutc_ds["Second"]):
-        second.append(elem)
+        second.extend([elem]*4)
 
     # Find stations
     stat1 = []
     stat2 = []
     for elem in np.ma.getdata(baseline_ds["Baseline"]).tolist():
-        stat1.append(bytes_to_string(elem[0]).replace(" ", ""))
-        stat2.append(bytes_to_string(elem[1]).replace(" ", ""))
+        stat1.extend([bytes_to_string(elem[0]).replace(" ", "")]*4)
+        stat2.extend([bytes_to_string(elem[1]).replace(" ", "")]*4)
 
     # Find frequency for each channel
     A_channels = []
@@ -243,7 +265,7 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     D_channels = []
     if is_float(channel_info["ChannelFreq"][0]):
         frequency_matrix = [np.ma.getdata(
-            channel_info["ChannelFreq"]).tolist()]*len(time)
+            channel_info["ChannelFreq"]).tolist()]*num_observations
 
     else:
         frequency_matrix = np.ma.getdata(channel_info["ChannelFreq"]).tolist()
@@ -267,13 +289,13 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     D_freq = list(map(lambda l: mean(l) if l != [] else None, D_channels))
 
     # Find elevation and azimuth
-    stations = pd.read_csv('data/derived/stations.csv')
+    stations = list(set(stat1 + stat2))
     time_sec_list = list(map(lambda t, s: f"{t}:{s}", time, second))
     stat_time_df = pd.DataFrame(
         {"stat1": stat1, "stat2": stat2, "time": time_sec_list})
 
     AzEl_dict = {}
-    for station in stations.name:
+    for station in stations:
         if station not in os.listdir(dir):
             continue
 
@@ -310,7 +332,7 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     C_SNR = []
     D_SNR = []
 
-    for i in range(len(stat1)):
+    for i in range(num_observations):
 
         amp = chanamp[i, :, 0]
         phase = chanamp[i, :, 1]
@@ -356,11 +378,10 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     D_bw = list(map(lambda ch: bw_per_band*len(ch), D_channels))
 
     # Find integration time
-    int_time = np.ma.getdata(corrinfo["EffectiveDuration"]).tolist()
+    int_time = list(np.repeat(np.ma.getdata(corrinfo["EffectiveDuration"]).tolist(), 4))
 
     # Find quality code
-    qualcode = list(bytes_to_string(np.ma.getdata(
-        quality_code_ds["QualityCode"]).tolist()))
+    qualcode = list(np.repeat(np.ma.getdata(quality_code_ds["QualityCode"]).tolist(), 4))
 
     # Find u and v
     uv_data = np.ma.getdata(uv_ds['UVFperAsec']).tolist()
@@ -368,7 +389,7 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     v_l = list(map(lambda v: v[1]*206264.81, uv_data))
 
     # Find reference frequency
-    ref_freq = np.ma.getdata(ref_freq_ds["RefFreq"]).tolist()*len(time)
+    ref_freq = np.ma.getdata(ref_freq_ds["RefFreq"]).tolist()*num_observations*4
 
     # Find u and v for each band
     A_u, A_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,A_freq))))
@@ -376,42 +397,47 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     C_u, C_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,C_freq))))
     D_u, D_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,D_freq))))    
 
+    # Zip zip
+    freq = list(itertools.chain(*zip(A_freq, B_freq, C_freq, D_freq)))
+    SNR = list(itertools.chain(*zip(A_SNR, B_SNR, C_SNR, D_SNR)))
+    bw = list(itertools.chain(*zip(A_bw, B_bw, C_bw, D_bw)))
+    u = list(itertools.chain(*zip(A_u, B_u, C_u, D_u)))
+    v = list(itertools.chain(*zip(A_v, B_v, C_v, D_v)))
+
+    band = ["A", "B", "C", "D"] * num_observations
+
+    print(len(time))
+    print(len(second))
+    print(len(source))
+    print(len(stat1))
+    print(len(stat2))
+    print(len(band))
+    print(len(El1))
+    print(len(freq))
+    print(len(SNR))
+    print(len(bw))
+    print(len(int_time))
+    print(len(qualcode))
+    print(len(u))
+
     # Collect everything into a dataframe
     df = pd.DataFrame({"YMDHM": time,
                        "Second": second,
                        "Source": source,
                        "Station1": stat1,
                        "Station2": stat2,
+                       "band": band,
                        "El1": El1,
                        "Az1": Az1,
                        "El2": El2,
                        "Az2": Az2,
-                       "A_freq": A_freq,
-                       "B_freq": B_freq,
-                       "C_freq": C_freq,
-                       "D_freq": D_freq,
-                       "A_SNR": A_SNR,
-                       "B_SNR": B_SNR,
-                       "C_SNR": C_SNR,
-                       "D_SNR": D_SNR,
-                       "tot_SNR": snr,
-                       "A_bw": A_bw,
-                       "B_bw": B_bw,
-                       "C_bw": C_bw,
-                       "D_bw": D_bw,
+                       "freq": freq,
+                       "SNR": SNR,
+                       "bw": bw,
                        "int_time": int_time,
                        "Q_code": qualcode,
-                    #    "u": u_l,
-                    #    "v": v_l,
-                       "A_u": A_u,
-                       "A_v": A_v,
-                       "B_u": B_u,
-                       "B_v": B_v,
-                       "C_u": C_u,
-                       "C_v": C_v,
-                       "D_u": D_u,
-                       "D_v": D_v,
-                       "ref_freq": ref_freq})
+                       "u": u,
+                       "v": v})
 
     # Sort out rows with too low quality
     df = df.loc[(df.Q_code.astype(int) > 5)]

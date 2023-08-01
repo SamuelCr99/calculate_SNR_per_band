@@ -6,7 +6,7 @@ from utility.calc.calculate_flux import calculate_flux
 
 CMAP = "jet"
 
-def plot_source(source, data, config, source_model = None, highlighted_stations = [], baseline="", ignored_stations=[], bands=[0, 1, 2, 3]):
+def plot_source(source, data, config, source_model = None, highlighted_stations = []):
     """
     Plots uv coordinates of a source
 
@@ -29,13 +29,6 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     #####################
     ### Generate data ###
     #####################
-
-    # Change bands to a list if it was only given as a integer
-    if not isinstance(bands, list):
-        bands = [bands]
-
-    # Find all observations that match the given criteria
-    matches = data.get(source=source, baseline=baseline, ignored_stations=ignored_stations)
     
     baselines_flux = []
     baselines_ratio = []
@@ -47,46 +40,46 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     highlighted_v = []
     highlighted_flux = []
     highlighted_ratio = []
+    colors = []
+    highlighted_colors = []
 
-    for band in bands:
-        for _, point in matches.iterrows():
+    for _, point in data.iterrows():
 
-            # Convert the old coordinates to the ones for the given band
-            # u, v = convert_uv(u_orig, v_orig, ref_freq, freq)
-            band_letter = ["A","B","C","D","S","X"][band]
-            u, v = point[f"{band_letter}_u"], point[f"{band_letter}_v"]
+        # Convert the old coordinates to the ones for the given band
+        u, v = point.u, point.v
 
-            coords_u.extend([u, -u])
-            coords_v.extend([v, -v])
+        coords_u.extend([u, -u])
+        coords_v.extend([v, -v])
 
-            # Calculate the flux at that point
-            curr_flux = calculate_flux(point, config, band)
-            flux.extend(curr_flux*2)
+        # Calculate the flux at that point
+        curr_flux = calculate_flux(point, config)
+        flux.extend(curr_flux*2)
+
+        # Find the baseline of that point
+        baselines_flux.extend(
+            [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_flux))}']*2)
+
+        if source_model:
+            # Calculate the ratio at that point
+            curr_ratio = source_model.get_flux(u,v)/curr_flux
+            ratio.extend([curr_ratio]*2)
 
             # Find the baseline of that point
-            baselines_flux.extend(
-                [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_flux))}']*2)
-
+            baselines_ratio.extend(
+                [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_ratio))}']*2)
+        
+        if (len(highlighted_stations) == 1 and (point.Station1 in highlighted_stations or point.Station2 in highlighted_stations)) or (
+            point.Station1 in highlighted_stations and point.Station2 in highlighted_stations):
+            highlighted_u.extend([u,-u])
+            highlighted_v.extend([v,-v])
+            highlighted_flux.extend(curr_flux*2)
             if source_model:
-                # Calculate the ratio at that point
-                curr_ratio = source_model.get_flux(u,v)/curr_flux
-                ratio.extend([curr_ratio]*2)
-
-                # Find the baseline of that point
-                baselines_ratio.extend(
-                    [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_ratio))}']*2)
-            
-            if (len(highlighted_stations) == 1 and (point.Station1 in highlighted_stations or point.Station2 in highlighted_stations)) or (
-                point.Station1 in highlighted_stations and point.Station2 in highlighted_stations):
-                highlighted_u.extend([u,-u])
-                highlighted_v.extend([v,-v])
-                highlighted_flux.extend(curr_flux*2)
-                if source_model:
-                    highlighted_ratio.extend([curr_ratio]*2)
+                highlighted_ratio.extend([curr_ratio]*2)
     
     ############################
     ### Flux density (meas.) ###
     ############################
+    band_letters = list(set(data.band))
 
     # Create figure and plot
     figure1 = plt.figure(0)
@@ -106,11 +99,10 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     # Add text
     plt.xlabel("U [fringes/radian]")
     plt.ylabel("V [fringes/radian]")
-    bands_letters = list(map(lambda b: ["A","B","C","D","S","X"][b], bands))
     plt.figtext(
         0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
     plt.title(
-        f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
+        f"UV coordinates for source {source} for band{'s'*(len(band_letters)>1)} {', '.join(band_letters)}")
 
     ############################
     ### Flux density (pred.) ###
@@ -169,11 +161,10 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
         # Add text
         plt.xlabel("U [fringes/radian]")
         plt.ylabel("V [fringes/radian]")
-        bands_letters = list(map(lambda b: ["A","B","C","D","S","X"][b], bands))
         plt.figtext(
             0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
         plt.title(
-            f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
+            f"UV coordinates for source {source} for band{'s'*(len(band_letters)>1)} {', '.join(band_letters)}")
 
     ################
     ### Distance ###

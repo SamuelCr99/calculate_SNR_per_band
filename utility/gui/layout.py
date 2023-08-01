@@ -56,7 +56,7 @@ def create_layout():
     right_col = [[sg.TabGroup(figure_tabgroup, expand_x=True, expand_y=True)]]
 
     menu = [["&File", ["&Open session", "&Open fits", "&Exit"]],
-            ["&Configuration", ["&Save", "&Restore to saved" , "&Delete"]],
+            ["&Configuration", ["&Save", "&Restore" , "&Delete"]],
             ["&Help", "&About..."]]
 
     layout = [[sg.MenubarCustom(menu, text_color="black", bar_background_color="white", background_color="white", bar_text_color="black")],

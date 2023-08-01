@@ -197,7 +197,7 @@ def run_gui():
             config.save()
 
         # Restore to saved stations info config
-        if event == "Restore to saved":
+        if event == "Restore":
             a = sg.popup_yes_no(
                 "Restoring will remove all unsaved configurations. Do you wish to continue?",
                 icon="images/favicon.ico")
@@ -468,7 +468,7 @@ def run_gui():
 
         if event == "fit_SEFD":
             if source and source_model:
-                least_square_fit(data.get(source=source,ignored_stations=ignored_stations), source_model, config, band)
+                least_square_fit(data.get(source=source,ignored_stations=ignored_stations,bands=band), source_model, config)
 
                 # Update GUI
                 new_table = update_station_table(
@@ -485,7 +485,7 @@ def run_gui():
 
         if event == "flux_scale":
             if source and source_model:
-                source_model.set_flux_scale(source, config, data, band, ignored_stations)
+                source_model.set_flux_scale(source, config, data.get(ignored_stations=ignored_stations,bands=band))
 
                 # Update GUI
                 new_table = update_station_table(
@@ -531,7 +531,7 @@ def run_gui():
 
             # Plot
             plot_source(
-                source, data, config, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
+                source, data(source=source, ignored_stations=ignored_stations, bands=band), config, source_model=source_model, highlighted_stations=highlights)
 
             # Display plots in canvases
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)

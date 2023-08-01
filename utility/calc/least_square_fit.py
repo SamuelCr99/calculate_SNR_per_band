@@ -2,32 +2,46 @@ from math import sqrt, log, e
 import numpy as np
 from utility.wrappers.data_wrapper import DataWrapper
 
-def least_square_fit(data, model, config, band):
-    
-    band_letter = ["A","B","C","D","S","X"][band]
+def least_square_fit(data, model, config):
+    """
+    Fits the SEFD values of the selected band so they match with the model
 
+    Will modify the provided config. Can only accept one band. Can only fit the
+    SEFD values for one source.
+
+    Parameters:
+    data(DataWrapper): All data points to consider
+    model(SourceModelWrapper): The model of the source
+    config(StationsConfigWrapper): Contains the SEFD values of the stations
+
+    Returns:
+    No returns
+    """
     SNR_meas_list = []
     SNR_pred_list = []
     station_list = []
 
     for _, point in data.iterrows():
         
-        # Make sure all stations are added to station_list
+        # Add all stations to station_list
         if point.Station1 not in station_list: 
             station_list.append(point.Station1)
             
         if point.Station2 not in station_list: 
             station_list.append(point.Station2)
         
+        band = point.band
         SEFD1 = config.get_SEFD(point.Station1,band)
         SEFD2 = config.get_SEFD(point.Station2,band)
-            
-        SNR_meas = point[f"{band_letter}_SNR"]
-        SNR_bit_meas = SNR_meas / sqrt(2*point.int_time*point[f"{band_letter}_bw"])
+        
+        # Get all the measured SNRs
+        SNR_meas = point.SNR
+        SNR_bit_meas = SNR_meas / sqrt(2*point.int_time*point.bw)
         SNR_meas_list.append(SNR_bit_meas)
 
-        u = getattr(point,f"{band_letter}_u")
-        v = getattr(point,f"{band_letter}_v")
+        # Get all the predicted SNRs
+        u = point.u
+        v = point.v
 
         flux_pred = model.get_flux(u,v)
         SNR_bit_pred = 0.617502*flux_pred*sqrt(1/(SEFD1*SEFD2))
@@ -61,7 +75,9 @@ def least_square_fit(data, model, config, band):
     P = (np.linalg.inv(N)*B).tolist()
     A = list(map(lambda p: e**(2*p[0]),P))
 
+    # Update the SEFD values with the correction factor
     for i in range(len(A)):
+        band = data.iloc[0].band # ! This assums all data points from the same band
         station_SEFD = config.get_SEFD(station_list[i], band)
         config.set_SEFD(station_list[i], band, station_SEFD*A[i])
     

@@ -3,18 +3,15 @@ from math import sqrt
 
 def calculate_flux(point, config, bands=[0, 1, 2, 3]):
     """
-    Calculates the flux of a source at a given index in the data/datapoints.csv file.
+    Calculates the flux of an observation.
 
     Parameters:
-    index(int): The index of the source in general_data.
-    general_data(DataFrame): DataFrame containing all observations
+    point(Series): The row describing the data point
     config(StationsConfigWrapper): A config containing all stations
-    bands(list): The bands to use (A=0, B=1...)
+    bands(int/list): The band/s to use (A=0, B=1...)
 
     Returns:
-    list[float]: A list of the calculated fluxes for each band for the source at
-    the given index.
-
+    list[float]: A list of the calculated fluxes for each band
     """
 
     # Change bands to a list if it was only given as a integer
