@@ -1,14 +1,14 @@
 from math import sqrt
 
 
-def calculate_flux(point, station_data, bands=[0, 1, 2, 3]):
+def calculate_flux(point, config, bands=[0, 1, 2, 3]):
     """
     Calculates the flux of a source at a given index in the data/datapoints.csv file.
 
     Parameters:
     index(int): The index of the source in general_data.
     general_data(DataFrame): DataFrame containing all observations
-    station_data(DataFrame): DataFrame containing all stations
+    config(StationsConfigWrapper): A config containing all stations
     bands(list): The bands to use (A=0, B=1...)
 
     Returns:
@@ -35,10 +35,8 @@ def calculate_flux(point, station_data, bands=[0, 1, 2, 3]):
         # Band-specific constants to use
         SNR = point[f"{band_letter}_SNR"]
         band_width = point[f"{band_letter}_bw"]
-        SEFD1 = float(
-            station_data[f"{band_letter}_SEFD"].loc[station_data.name == stat1].iloc[0])
-        SEFD2 = float(
-            station_data[f"{band_letter}_SEFD"].loc[station_data.name == stat2].iloc[0])
+        SEFD1 = config.get_SEFD(stat1,band)
+        SEFD2 = config.get_SEFD(stat2,band)
 
         # Equation for flux density
         flux.append((SNR * sqrt(SEFD1 * SEFD2)) /

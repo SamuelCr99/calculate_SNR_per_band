@@ -33,7 +33,7 @@ class SourceModelWrapper:
 
         return abs(flux)/self.flux_scale
     
-    def set_flux_scale(self, source, stations, data, band, ignored_stations):
+    def set_flux_scale(self, source, config, data, band, ignored_stations):
         self.flux_scale = 1
         
         # Find the datapoints with the specified source
@@ -59,8 +59,8 @@ class SourceModelWrapper:
             SNR_bit_meas = SNR_meas / sqrt(2*point.int_time*point[f"{band_letter}_bw"])
             SNR_meas_list.append(SNR_bit_meas)
 
-            SEFD1 = float(stations.loc[stations["name"] == point.Station1][f"{band_letter}_SEFD"].iloc[0])
-            SEFD2 = float(stations.loc[stations["name"] == point.Station2][f"{band_letter}_SEFD"].iloc[0])
+            SEFD1 = config.get_SEFD(point.Station1,band)
+            SEFD2 = config.get_SEFD(point.Station2,band)
 
             u = getattr(point,f"{band_letter}_u")
             v = getattr(point,f"{band_letter}_v")

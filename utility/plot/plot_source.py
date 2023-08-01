@@ -6,7 +6,7 @@ from utility.calc.calculate_flux import calculate_flux
 
 CMAP = "jet"
 
-def plot_source(source, data, station_information, source_model = None, highlighted_stations = [], baseline="", ignored_stations=[], bands=[0, 1, 2, 3]):
+def plot_source(source, data, config, source_model = None, highlighted_stations = [], baseline="", ignored_stations=[], bands=[0, 1, 2, 3]):
     """
     Plots uv coordinates of a source
 
@@ -16,7 +16,7 @@ def plot_source(source, data, station_information, source_model = None, highligh
     Parameters:
     source(string): The source to plot
     data(DataWrapper): The DataWrapper to search through
-    station_information(DataFrame): A DataFrame containing information about the stations
+    config(StationsConfigWrapper): The config containing information about the stations
     source_model(SourceModelWrapper): The model of the source
     highlighted_stations(list): Stations to highlight
     baseline(string): Baseline to observe the source at
@@ -60,7 +60,7 @@ def plot_source(source, data, station_information, source_model = None, highligh
             coords_v.extend([v, -v])
 
             # Calculate the flux at that point
-            curr_flux = calculate_flux(point, station_information, band)
+            curr_flux = calculate_flux(point, config, band)
             flux.extend(curr_flux*2)
 
             # Find the baseline of that point

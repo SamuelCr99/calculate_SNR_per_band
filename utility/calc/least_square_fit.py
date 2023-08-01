@@ -2,7 +2,7 @@ from math import sqrt, log, e
 import numpy as np
 from utility.wrappers.data_wrapper import DataWrapper
 
-def least_square_fit(source, model, stations, data, band, ignored_stations):
+def least_square_fit(source, model, config, data, band, ignored_stations):
     
     # Find the datapoints with the specified source
     data = data.get(source=source,ignored_stations=ignored_stations)
@@ -22,8 +22,8 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
         if point.Station2 not in station_list: 
             station_list.append(point.Station2)
         
-        SEFD1 = float(stations.loc[stations["name"] == point.Station1][f"{band_letter}_SEFD"].iloc[0])
-        SEFD2 = float(stations.loc[stations["name"] == point.Station2][f"{band_letter}_SEFD"].iloc[0])
+        SEFD1 = config.get_SEFD(point.Station1,band)
+        SEFD2 = config.get_SEFD(point.Station2,band)
             
         SNR_meas = point[f"{band_letter}_SNR"]
         SNR_bit_meas = SNR_meas / sqrt(2*point.int_time*point[f"{band_letter}_bw"])
@@ -65,7 +65,7 @@ def least_square_fit(source, model, stations, data, band, ignored_stations):
     A = list(map(lambda p: e**(2*p[0]),P))
 
     for i in range(len(A)):
-        station_SEFD = float(stations.loc[stations.name == station_list[i],f"{band_letter}_SEFD"].iloc[0])
-        stations.loc[stations.name == station_list[i],f"{band_letter}_SEFD"] = max(round(station_SEFD*A[i]),1)
+        station_SEFD = config.get_SEFD(station_list[i], band)
+        config.set_SEFD(station_list[i], band, station_SEFD*A[i])
     
     return

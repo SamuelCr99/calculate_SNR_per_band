@@ -7,8 +7,11 @@ class StationsConfigWrapper:
 
     def __init__(self, *arg):
         if not arg:
-            create_config()
-            self.df = pd.read_csv(CONFIG_PATH)
+            try:
+                self.df = pd.read_csv(CONFIG_PATH)
+            except:
+                create_config()
+                self.df = pd.read_csv(CONFIG_PATH)
         else:
             if type(arg) == pd.DataFrame:
                 self.df = arg
@@ -29,7 +32,7 @@ class StationsConfigWrapper:
         self.df_copy = self.df.copy(deep=True)
 
     def has_changed(self):
-        return self.df.equals(self.df_copy)
+        return not self.df.equals(self.df_copy)
 
     def get_SEFD(self, station, band):
         if type(band) == int:
@@ -54,11 +57,14 @@ class StationsConfigWrapper:
 
     def toggle(self, station):
         if self.is_selected(station):
-            self.deselect()
+            self.deselect(station)
             return False
         else:
-            self.select()
+            self.select(station)
             return True
+    
+    def get_deselected_stations(self):
+        return self.df.loc[self.df["selected"] == 0]["name"].to_list()
 
 def create_config():
     """

@@ -12,6 +12,7 @@ from init import find_stations
 from utility.wrappers.source_model_wrapper import SourceModelWrapper
 from utility.calc.least_square_fit import least_square_fit
 from utility.wrappers.data_wrapper import DataWrapper
+from utility.wrappers.stations_config_wrapper import StationsConfigWrapper
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 def repack(widget, option):
@@ -36,12 +37,12 @@ class Toolbar(NavigationToolbar2Tk):
     def __init__(self, *args, **kwargs):
         super(Toolbar, self).__init__(*args, **kwargs)
 
-def update_station_table(station_information, stations, highlights, band):
+def update_station_table(config, stations, highlights, band):
     """
     Generates a table that can be used in the GUI
 
     Parameters:
-    station_information(DataFrame): Information regarding *all* stations
+    config(DataFrame): Information regarding *all* stations
     stations(dict): A dictionary with the wanted stations as keys
 
     Returns:
@@ -49,21 +50,8 @@ def update_station_table(station_information, stations, highlights, band):
     """
     new_table = []
     for station in stations:
-        activated = "X" if station_information[station_information['name']
-                                               == station]["selected"].values[0] else ""
-        a_sefd = station_information[station_information['name']
-                                     == station]['A_SEFD'].values[0]
-        b_sefd = station_information[station_information['name']
-                                     == station]['B_SEFD'].values[0]
-        c_sefd = station_information[station_information['name']
-                                     == station]['C_SEFD'].values[0]
-        d_sefd = station_information[station_information['name']
-                                     == station]['D_SEFD'].values[0]
-        s_sefd = station_information[station_information['name']
-                                     == station]['S_SEFD'].values[0]
-        x_sefd = station_information[station_information['name']
-                                     == station]['X_SEFD'].values[0]
-        sefd = [a_sefd,b_sefd,c_sefd,d_sefd,s_sefd,x_sefd][band]
+        activated = "X" if config.is_selected(station) else ""
+        sefd = config.get_SEFD(station, band)
         highlight = "X" if station in highlights else ""
         new_table.append([activated, station, stations[station], sefd, highlight])
     return new_table
@@ -95,13 +83,8 @@ def run_gui():
     sg.theme("DarkGrey5")
     sg.SetOptions(font=("Andalde Mono", 12))
 
-    # Retrieve config if it exists, else create one
-    try:
-        station_information = pd.read_csv('data/derived/stations.csv')
-    except:
-        find_stations()
-        station_information = pd.read_csv('data/derived/stations.csv')
-    saved_station_information = station_information.copy(deep=True)
+    # Retrieve config
+    config = StationsConfigWrapper()
     
     # Create the main GUI window
     layout = create_layout()
@@ -213,9 +196,7 @@ def run_gui():
 
         # Save the stations info config
         if event == "Save":
-            station_information.to_csv(
-                "data/derived/stations.csv", index=False)
-            saved_station_information = station_information.copy(deep=True)
+            config.save()
 
         # Restore to saved stations info config
         if event == "Restore to saved":
@@ -223,10 +204,10 @@ def run_gui():
                 "Restoring will remove all unsaved configurations. Do you wish to continue?",
                 icon="images/favicon.ico")
             if a == "Yes":
-                station_information = pd.read_csv("data/derived/stations.csv")
-                saved_station_information = station_information.copy(deep=True)
+                config.restore()
+
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"],
+                    config, source_dict[source]["stations"],
                     highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
@@ -238,11 +219,10 @@ def run_gui():
                 "Deleting will remove all configurations set. Do you wish to continue?",
                 icon="images/favicon.ico")
             if a == "Yes":
-                find_stations()
-                station_information = pd.read_csv("data/derived/stations.csv")
-                saved_station_information = station_information.copy(deep=True)
+                config.delete()
+
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"],
+                    config, source_dict[source]["stations"],
                     highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
@@ -255,12 +235,11 @@ def run_gui():
 
         # Close the program and save config
         if event == sg.WIN_CLOSE_ATTEMPTED_EVENT or event == "Exit":
-            if not station_information.equals(saved_station_information):
+            if config.has_changed():
                 a,_ = sg.Window("Unsaved changes", [[sg.Text("You have unsaved changes. Do you wish to save?")],
                                                     [sg.Button("Yes",k="Yes"),sg.Button("No",k="No"),sg.Button("Cancel",k="Cancel")]], finalize=True, icon="images/favicon.ico", modal=True).read(close=True)
                 if a == "Yes":
-                    station_information.to_csv(
-                        "data/derived/stations.csv", index=False)
+                    config.save()
                 if a == "Cancel":
                     continue
             break
@@ -306,7 +285,7 @@ def run_gui():
                 highlights = []
                 source = main_window["sources_table"].get()[click_row][0]
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"],
+                    config, source_dict[source]["stations"],
                     highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
@@ -322,7 +301,7 @@ def run_gui():
             # Update GUI (if table is set)
             if not all(not e for e in main_window["stations_table"].get()):
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"],
+                    config, source_dict[source]["stations"],
                     highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
@@ -351,7 +330,7 @@ def run_gui():
                 # Sort by selected
                 if click_col == 0:
                     source_dict[source]["stations"] = dict(sorted(source_dict[source]["stations"].items(
-                    ), key=lambda stat: station_information.loc[station_information["name"] == stat[0]]["selected"].iloc[0], reverse=reverse))
+                    ), key=lambda stat: config.is_selected(stat[0]), reverse=reverse))
 
                 # Sort by name
                 if click_col == 1:
@@ -365,10 +344,8 @@ def run_gui():
 
                 # Sort by SEFD
                 if click_col == 3:
-                    selected_band = chr(65+click_col-3)
-                    col_name = f'{selected_band}_SEFD'
-                    source_dict[source]["stations"] = dict(sorted(source_dict[source]["stations"].items(), key=lambda stat: float(
-                        station_information.loc[station_information["name"] == stat[0]][col_name].iloc[0]), reverse=reverse))
+                    source_dict[source]["stations"] = dict(sorted(source_dict[source]["stations"].items(
+                    ), key=lambda stat: config.get_SEFD(stat[0],band), reverse=reverse))
 
                 # Sort by highlight
                 if click_col == 4:
@@ -381,7 +358,7 @@ def run_gui():
 
                 # Update GUI
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"],
+                    config, source_dict[source]["stations"],
                      highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.refresh()
@@ -390,16 +367,11 @@ def run_gui():
             elif click_col == 0:
                 # Update selection
                 selected_station = main_window["stations_table"].get()[click_row][1]
-                selected = station_information.loc[station_information["name"] == selected_station, "selected"].iloc[0]
-
-                if selected:
-                    station_information.loc[station_information["name"] == selected_station, "selected"] = 0
-                else:
-                    station_information.loc[station_information["name"] == selected_station, "selected"] = 1
+                config.toggle(selected_station)
 
                 # Update GUI
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"],
+                    config, source_dict[source]["stations"],
                      highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
@@ -409,15 +381,13 @@ def run_gui():
             elif click_col == 3:
                 # Get stats of the selected cell
                 selected_station = main_window["stations_table"].get()[click_row][1]
-                selected_band = ["A","B","C","D","S","X"][band]
-                click_col_name = f'{selected_band}_SEFD'
-                orig_SEFD = station_information.loc[station_information["name"]
-                                                    == selected_station, click_col_name].iloc[0]
+                orig_SEFD = config.get_SEFD(selected_station,band)
+                band_letter = ["A","B","C","D","S","X"][band]
 
                 # Popup to ask user to fill in new value
                 edit_popup = sg.Window("Edit...", [[sg.Text("Station:", s=(8, 1)), sg.Text(selected_station)],
                                                    [sg.Text("Band:", s=(8, 1)), sg.Text(
-                                                       selected_band)],
+                                                       band_letter)],
                                                    [sg.Text("SEFD: ", s=(8, 1)), sg.Input(
                                                        default_text=orig_SEFD, key="new_SEFD_input"), sg.Button("Set", key="new_SEFD_set")],
                                                    [sg.Text("Invalid input!", key="invalid_input", visible=False, text_color="red")]], finalize=True, icon="images/favicon.ico", modal=True)
@@ -448,12 +418,11 @@ def run_gui():
                             continue
 
                         # Set new SEFD
-                        station_information.loc[station_information["name"]
-                                                == selected_station, click_col_name] = new_SEFD
+                        config.set_SEFD(selected_station,band,new_SEFD)
                         
                         # Update GUI
                         new_table = update_station_table(
-                            station_information, source_dict[source]["stations"],
+                            config, source_dict[source]["stations"],
                             highlights, band)
                         main_window["stations_table"].update(new_table)
                         main_window.write_event_value("plot", True)
@@ -479,7 +448,7 @@ def run_gui():
                     highlights.append(selected_station)
 
                 # Update GUI
-                new_table = update_station_table(station_information, source_dict[source]["stations"],
+                new_table = update_station_table(config, source_dict[source]["stations"],
                                                  highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
@@ -496,11 +465,11 @@ def run_gui():
 
         if event == "fit_SEFD":
             if source and source_model:
-                least_square_fit(source, source_model, station_information, data, band, ignored_stations)
+                least_square_fit(source, source_model, config, data, band, ignored_stations)
 
                 # Update GUI
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"],
+                    config, source_dict[source]["stations"],
                     highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
@@ -513,11 +482,11 @@ def run_gui():
 
         if event == "flux_scale":
             if source and source_model:
-                source_model.set_flux_scale(source, station_information, data, band, ignored_stations)
+                source_model.set_flux_scale(source, config, data, band, ignored_stations)
 
                 # Update GUI
                 new_table = update_station_table(
-                    station_information, source_dict[source]["stations"],
+                    config, source_dict[source]["stations"],
                     highlights, band)
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
@@ -555,11 +524,11 @@ def run_gui():
                 continue
 
             # Ignore the stations that were unselected in the GUI
-            ignored_stations = station_information.loc[station_information["selected"] == 0]["name"].to_list()
+            ignored_stations = config.get_deselected_stations()
 
             # Plot
             plot_source(
-                source, data, station_information, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
+                source, data, config, source_model=source_model, ignored_stations=ignored_stations, bands=band, highlighted_stations=highlights)
 
             # Display plots in canvases
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)
