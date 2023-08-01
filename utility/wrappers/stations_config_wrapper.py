@@ -13,10 +13,12 @@ class StationsConfigWrapper:
                 create_config()
                 self.df = pd.read_csv(CONFIG_PATH)
         else:
-            if type(arg) == pd.DataFrame:
-                self.df = arg
-            elif type(arg) == str:
-                self.df = pd.read_csv(arg)
+            if type(arg[0]) == pd.DataFrame:
+                self.df = arg[0]
+
+            elif type(arg[0]) == str:
+                self.df = pd.read_csv(arg[0])
+            
         self.df_copy = self.df.copy(deep=True)
     
     def save(self):
@@ -44,7 +46,7 @@ class StationsConfigWrapper:
         if type(band) == int:
             band = ["A","B","C","D","S","X"][band]
         sefd_col = f"{band}_SEFD"
-        self.df.loc[self.df.name == station,sefd_col] = max(round(sefd),1)
+        self.df.loc[self.df.name == station,sefd_col] = max(round(float(sefd)),1)
 
     def select(self, station):
         self.df.loc[self.df.name == station,"selected"] = 1

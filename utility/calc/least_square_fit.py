@@ -2,10 +2,7 @@ from math import sqrt, log, e
 import numpy as np
 from utility.wrappers.data_wrapper import DataWrapper
 
-def least_square_fit(source, model, config, data, band, ignored_stations):
-    
-    # Find the datapoints with the specified source
-    data = data.get(source=source,ignored_stations=ignored_stations)
+def least_square_fit(data, model, config, band):
     
     band_letter = ["A","B","C","D","S","X"][band]
 

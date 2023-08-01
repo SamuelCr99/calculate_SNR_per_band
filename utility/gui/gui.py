@@ -5,13 +5,13 @@ import PySimpleGUI as sg
 import matplotlib.pyplot as plt
 import re
 from tkinter.filedialog import askdirectory, askopenfilename
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from utility.calc.least_square_fit import least_square_fit
 from utility.gui.layout import create_layout
 from utility.plot.plot_source import plot_source
 from utility.wrappers.source_model_wrapper import SourceModelWrapper
-from utility.calc.least_square_fit import least_square_fit
 from utility.wrappers.data_wrapper import DataWrapper
 from utility.wrappers.stations_config_wrapper import StationsConfigWrapper
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 def repack(widget, option):
     pack_info = widget.pack_info()
@@ -468,7 +468,7 @@ def run_gui():
 
         if event == "fit_SEFD":
             if source and source_model:
-                least_square_fit(source, source_model, config, data, band, ignored_stations)
+                least_square_fit(data.get(source=source,ignored_stations=ignored_stations), source_model, config, band)
 
                 # Update GUI
                 new_table = update_station_table(
