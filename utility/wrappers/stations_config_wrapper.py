@@ -46,7 +46,7 @@ class StationsConfigWrapper:
         if type(band) == int:
             band = ["A","B","C","D","S","X"][band]
         sefd_col = f"{band}_SEFD"
-        self.df.loc[self.df.name == station,sefd_col] = max(round(float(sefd)),1)
+        self.df.loc[self.df.name == station,sefd_col] = max(round(float(sefd),1),1)
 
     def select(self, station):
         self.df.loc[self.df.name == station,"selected"] = 1
