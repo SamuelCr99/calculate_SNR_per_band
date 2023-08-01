@@ -2,13 +2,11 @@ assert __name__ != '__main__', "Don't run this file, run main.py"
 
 import os
 import PySimpleGUI as sg
-import pandas as pd
 import matplotlib.pyplot as plt
 import re
 from tkinter.filedialog import askdirectory, askopenfilename
 from utility.gui.layout import create_layout
 from utility.plot.plot_source import plot_source
-from init import find_stations
 from utility.wrappers.source_model_wrapper import SourceModelWrapper
 from utility.calc.least_square_fit import least_square_fit
 from utility.wrappers.data_wrapper import DataWrapper
@@ -230,7 +228,12 @@ def run_gui():
 
         # Display about info
         if event == "About...":
-            sg.Popup("About info",
+            with open("LICENSE.txt", "r") as f:
+                license = f.read()
+                license = license.replace("\n\n", "\t")
+                license = license.replace("\n", " ")
+                license = license.replace("\t", "\n\n")
+            sg.Popup("""GUI for finding optimal SEFD values based on VGOS DB sessions and source images. The program was developed at NVI Inc. by Filip Herbertsson and Samuel Collier Ryder during a summer internship in 2023.""" + "\n\n" + license,
                      icon="images/favicon.ico")
 
         # Close the program and save config
