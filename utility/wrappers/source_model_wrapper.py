@@ -33,20 +33,14 @@ class SourceModelWrapper:
 
         return abs(flux)/self.flux_scale
     
-    def set_flux_scale(self, source, config, data, band, ignored_stations):
+    def set_flux_scale(self, config, data):
         self.flux_scale = 1
-        
-        # Find the datapoints with the specified source
-        data = data.get(source=source,ignored_stations=ignored_stations)
-        df = data.get_df()
-        
-        band_letter = ["A","B","C","D","S","X"][band]
 
         SNR_meas_list = []
         SNR_pred_list = []
         station_list = []
 
-        for _, point in df.iterrows():
+        for _, point in data.iterrows():
             
             # Make sure all stations are added to station_list
             if point.Station1 not in station_list: 
@@ -55,15 +49,15 @@ class SourceModelWrapper:
             if point.Station2 not in station_list: 
                 station_list.append(point.Station2)
                 
-            SNR_meas = point[f"{band_letter}_SNR"]
-            SNR_bit_meas = SNR_meas / sqrt(2*point.int_time*point[f"{band_letter}_bw"])
+            SNR_meas = point.SNR
+            SNR_bit_meas = SNR_meas / sqrt(2*point.int_time*point.bw)
             SNR_meas_list.append(SNR_bit_meas)
 
-            SEFD1 = config.get_SEFD(point.Station1,band)
-            SEFD2 = config.get_SEFD(point.Station2,band)
+            SEFD1 = config.get_SEFD(point.Station1,point.band)
+            SEFD2 = config.get_SEFD(point.Station2,point.band)
 
-            u = getattr(point,f"{band_letter}_u")
-            v = getattr(point,f"{band_letter}_v")
+            u = point.u
+            v = point.v
 
             flux_pred = self.get_flux(u,v)
             SNR_bit_pred = 0.617502*flux_pred*sqrt(1/(SEFD1*SEFD2))

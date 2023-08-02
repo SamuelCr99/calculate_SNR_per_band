@@ -10,6 +10,7 @@ from utility.calc.to_uv import convert_uv
 BAND_A_B_LIM = 4500
 BAND_B_C_LIM = 6000
 BAND_C_D_LIM = 8000
+BAND_LETTERS = ["A","B","C","D","S","X"]
 
 class DataWrapper:
 
@@ -48,7 +49,7 @@ class DataWrapper:
         # Get the amount of rows (data points) in the data object
         return len(self.df.index.to_list())
     
-    def get(self, source="", baseline="", station="", ignored_stations=[], bands=None, copy=False):
+    def get(self, sources=[], ignored_sources=[], baselines=[], ignored_baselines=[], stations=[], ignored_stations=[], bands=[], ignored_bands=[], copy=False):
         """
         Get a new DataWrapper from the old DataWrapper that match a given source,
         baseline, station and/or ignored station.
@@ -63,9 +64,9 @@ class DataWrapper:
         Returns:
         A DataWrapper that match the given criteria
         """
-        return DataWrapper(self.get_df(source=source, baseline=baseline, station=station, ignored_stations=ignored_stations, bands=bands, copy=copy))
+        return DataWrapper(self.get_df(sources=sources, ignored_sources=ignored_sources, baselines=baselines, ignored_baselines=ignored_baselines, stations=stations, ignored_stations=ignored_stations, bands=bands, ignored_bands=ignored_bands, copy=copy))
     
-    def get_df(self, source="", baseline="", station="", ignored_stations=[], bands=None, copy=False):
+    def get_df(self, sources=[], ignored_sources=[], baselines=[], ignored_baselines=[], stations=[], ignored_stations=[], bands=[], ignored_bands=[], copy=False):
         """
         Get a new DataFrame from the DataWrapper that match a given source,
         baseline, station and/or ignored station.
@@ -84,38 +85,97 @@ class DataWrapper:
             df = self.df.copy(deep=True)
         else:
             df = self.df
+
+        if type(sources) != list:
+            sources = [sources]
+        if type(ignored_sources) != list:
+            ignored_sources = [ignored_sources]
+        if type(baselines) != list:
+            baselines = [baselines]
+        if type(ignored_baselines) != list:
+            ignored_baselines = [ignored_baselines]
+        if type(stations) != list:
+            stations = [stations]
+        if type(ignored_stations) != list:
+            ignored_stations = [ignored_stations]
+        if type(bands) != list:
+            bands = [bands]
+        if type(ignored_bands) != list:
+            ignored_bands = [ignored_bands]
         
-        # Find all rows that contain the selected source
-        if source:
-            df = df.loc[(df.Source == source)]
+        # Find all rows that contain the selected sources
+        if sources:
+            df = df.loc[df.Source.isin(sources)]
         
+        # Find all rows that don't contain the ignored sources
+        if ignored_sources:
+            df = df.loc[~df.Sources.isin(ignored_sources)]
+
         # Find all rows that contains the specified baseline
-        if baseline:
-            if type(baseline) == str:
-                station1 = baseline.split("/")[0]
-                station2 = baseline.split("/")[1]
-            if type(baseline) == list:
-                station1 = baseline[0]
-                station2 = baseline[1]
+        if baselines:
+            mod_baselines = []
+
+            for baseline in baselines:
+                if type(baseline) == str:
+                    station1 = baseline.split("/")[0]
+                    station2 = baseline.split("/")[1]
+                if type(baseline) == list:
+                    station1 = baseline[0]
+                    station2 = baseline[1]
+                mod_baselines.append([station1,station2])
+                mod_baselines.append([station2,station1])
             
-            df = df.loc[((df.Station1 == station1) & (df.Station2 == station2)) |
-                        ((df.Station1 == station2) & (df.Station2 == station1))]
+            df = df.loc[df.apply(lambda point: [point.Station1,point.Station2] in mod_baselines, axis=1)]
+        
+        # Find all rows that except the ones that correspond to one of the
+        # ignored baselines
+        if ignored_baselines:
+            mod_baselines = []
+
+            for baseline in ignored_baselines:
+                if type(baseline) == str:
+                    station1 = baseline.split("/")[0]
+                    station2 = baseline.split("/")[1]
+                if type(baseline) == list:
+                    station1 = baseline[0]
+                    station2 = baseline[1]
+                mod_baselines.append([station1,station2])
+                mod_baselines.append([station2,station1])
             
-        # Find all rows that include the specified station
-        if station:
-            df = df.loc[(df.Station1 == station) | (df.Station2 == station)] 
+            df = df.loc[df.apply(lambda point: [point.Station1,point.Station2] not in mod_baselines, axis=1)]
+            
+        # Find all rows that include the specified stations. If there's only one
+        # station, we take all observations that include that station. Otherwise,
+        # we take only the observations where both stations are included.
+        if stations:
+            if len(stations) == 1:
+                df = df.loc[(df.Station1.isin(stations)) | (df.Station2.isin(stations))]
+            else:
+                df = df.loc[(df.Station1.isin(stations)) & (df.Station2.isin(stations))]
         
         # Find all rows that don't contain the stations in ignored_stations
-        for station in ignored_stations:
-            df = df.loc[(df.Station1 != station) & (df.Station2 != station)]
+        if ignored_stations:
+            df = df.loc[(~df.Station1.isin(ignored_stations)) & (~df.Station2.isin(ignored_stations))]
     
-        if not bands == None:
-            if type(bands) != list:
-                bands = [bands]
+        # Find all rows that correspond to the selected bands
+        if bands:
             band_letters = []
             for band in bands:
-                band_letters.append(["A","B","C","D","S","X"][band])
+                if type(band) == str:
+                    band_letters.append(band)
+                else:
+                    band_letters.append(BAND_LETTERS[band])
             df = df.loc[df.band.isin(band_letters)]
+        
+        # Find all rows that are not of the ignored bands
+        if ignored_bands:
+            band_letters = []
+            for band in ignored_bands:
+                if type(band) == str:
+                    band_letters.append(band)
+                else:
+                    band_letters.append(BAND_LETTERS[band])
+            df = df.loc[~df.band.isin(band_letters)]
 
         return df
 
@@ -406,20 +466,6 @@ def find_datapoints_abcd(dir, save_to_csv=False):
 
     band = ["A", "B", "C", "D"] * num_observations
 
-    print(len(time))
-    print(len(second))
-    print(len(source))
-    print(len(stat1))
-    print(len(stat2))
-    print(len(band))
-    print(len(El1))
-    print(len(freq))
-    print(len(SNR))
-    print(len(bw))
-    print(len(int_time))
-    print(len(qualcode))
-    print(len(u))
-
     # Collect everything into a dataframe
     df = pd.DataFrame({"YMDHM": time,
                        "Second": second,
@@ -478,50 +524,54 @@ def find_datapoints_sx(dir, save_to_csv=False):
     channel_info_x = nc.Dataset(f'{dir}Observables/ChannelInfo_bX.nc')
     snr_info_s = nc.Dataset(f'{dir}Observables/SNR_bS.nc')
     snr_info_x = nc.Dataset(f'{dir}Observables/SNR_bX.nc')
-    corrinfo = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bS.nc') # Might need one for each
+    corrinfo_s = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bS.nc')
+    corrinfo_x = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bX.nc')
 
     # Find source
     source = []
     for elem in np.ma.getdata(source_ds["Source"]).tolist():
-        source.append(bytes_to_string(elem))
+        source.extend([bytes_to_string(elem)]*2)
+
+    num_observations = int(len(source)/2)
 
     # Find time
     time = []
     for elem in np.ma.getdata(timeutc_ds["YMDHM"]):
-        time.append(time_to_string(elem))
+        time.extend([time_to_string(elem)]*2)
     second = []
     for elem in np.ma.getdata(timeutc_ds["Second"]):
-        second.append(elem)
+        second.extend([elem]*2)
 
     # Find stations
     stat1 = []
     stat2 = []
     for elem in np.ma.getdata(baseline_ds["Baseline"]).tolist():
-        stat1.append(bytes_to_string(elem[0]).replace(" ", ""))
-        stat2.append(bytes_to_string(elem[1]).replace(" ", ""))
+        stat1.extend([bytes_to_string(elem[0]).replace(" ", "")]*2)
+        stat2.extend([bytes_to_string(elem[1]).replace(" ", "")]*2)
 
     # Find quality code
-    qualcode_s = list(bytes_to_string(np.ma.getdata(
+    S_qualcode = list(bytes_to_string(np.ma.getdata(
         quality_code_s_ds["QualityCode"]).tolist()))
-    qualcode_x = list(bytes_to_string(np.ma.getdata(
+    X_qualcode = list(bytes_to_string(np.ma.getdata(
         quality_code_x_ds["QualityCode"]).tolist()))
     
     # Find u and v
     uv_data_s = np.ma.getdata(uv_s_ds['UVFperAsec']).tolist()
     uv_data_x = np.ma.getdata(uv_x_ds['UVFperAsec']).tolist()
 
-    u_s = list(map(lambda u: u[0]*206264.81, uv_data_s))
-    v_s = list(map(lambda v: v[1]*206264.81, uv_data_s))
+    S_u = list(map(lambda u: u[0]*206264.81, uv_data_s))
+    S_v = list(map(lambda v: v[1]*206264.81, uv_data_s))
     
-    u_x = list(map(lambda u: u[0]*206264.81, uv_data_x))
-    v_x = list(map(lambda v: v[1]*206264.81, uv_data_x))
+    X_u = list(map(lambda u: u[0]*206264.81, uv_data_x))
+    X_v = list(map(lambda v: v[1]*206264.81, uv_data_x))
 
     # Find SNR
     S_SNR = np.ma.getdata(snr_info_s["SNR"]).tolist()
     X_SNR = np.ma.getdata(snr_info_x["SNR"]).tolist()
     
     # Find integration time
-    int_time = np.ma.getdata(corrinfo["EffectiveDuration"]).tolist()
+    S_int_time = np.ma.getdata(corrinfo_s["EffectiveDuration"]).tolist()
+    X_int_time = np.ma.getdata(corrinfo_x["EffectiveDuration"]).tolist()
 
     # Find bandwidth
     N_S = len(np.ma.getdata(channel_info_s["ChannelFreq"]))
@@ -530,8 +580,18 @@ def find_datapoints_sx(dir, save_to_csv=False):
     bw_per_band_s = np.ma.getdata(channel_info_s["SampleRate"]).tolist()[0]/2
     bw_per_band_x = np.ma.getdata(channel_info_x["SampleRate"]).tolist()[0]/2
 
-    S_bw = [N_S*bw_per_band_s]*len(time)
-    X_bw = [N_X*bw_per_band_x]*len(time)
+    S_bw = [N_S*bw_per_band_s]*num_observations
+    X_bw = [N_X*bw_per_band_x]*num_observations
+
+    # Zip zip
+    SNR = list(itertools.chain(*zip(S_SNR, X_SNR)))
+    bw = list(itertools.chain(*zip(S_bw, X_bw)))
+    u = list(itertools.chain(*zip(S_u, X_u)))
+    v = list(itertools.chain(*zip(S_v, X_v)))
+    qualcode = list(itertools.chain(*zip(S_qualcode, X_qualcode)))
+    int_time = list(itertools.chain(*zip(S_int_time, X_int_time)))
+
+    band = ["S", "X"] * num_observations
 
     # Collect everything into a dataframe
     df = pd.DataFrame({"YMDHM": time,
@@ -539,21 +599,16 @@ def find_datapoints_sx(dir, save_to_csv=False):
                        "Source": source,
                        "Station1": stat1,
                        "Station2": stat2,
-                       "Q_code_S": qualcode_s,
-                       "Q_code_X": qualcode_x,
-                       "S_u": u_s,
-                       "S_v": v_s,
-                       "X_u": u_x,
-                       "X_v": v_x,
-                       "S_SNR": S_SNR,
-                       "X_SNR": X_SNR,
-                       "S_bw": S_bw,
-                       "X_bw": X_bw,
-                       "int_time": int_time})
-
+                       "band": band,
+                       "SNR": SNR,
+                       "bw": bw,
+                       "int_time": int_time,
+                       "Q_code": qualcode,
+                       "u": u,
+                       "v": v})
+    
     # Sort out rows with too low quality
-    df = df.loc[(df.Q_code_S.astype(int) > 5)]
-    df = df.loc[(df.Q_code_X.astype(int) > 5)]
+    df = df.loc[(df.Q_code.astype(int) > 5)]
 
     df.reset_index(inplace=True)
 

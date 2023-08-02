@@ -468,7 +468,7 @@ def run_gui():
 
         if event == "fit_SEFD":
             if source and source_model:
-                least_square_fit(data.get(source=source,ignored_stations=ignored_stations,bands=band), source_model, config)
+                least_square_fit(data.get(sources=source,ignored_stations=ignored_stations,bands=band), source_model, config)
 
                 # Update GUI
                 new_table = update_station_table(
@@ -485,7 +485,7 @@ def run_gui():
 
         if event == "flux_scale":
             if source and source_model:
-                source_model.set_flux_scale(source, config, data.get(ignored_stations=ignored_stations,bands=band))
+                source_model.set_flux_scale(config, data.get(sources=source,ignored_stations=ignored_stations,bands=band))
 
                 # Update GUI
                 new_table = update_station_table(
@@ -531,7 +531,7 @@ def run_gui():
 
             # Plot
             plot_source(
-                source, data(source=source, ignored_stations=ignored_stations, bands=band), config, source_model=source_model, highlighted_stations=highlights)
+                source, data.get(sources=source, ignored_stations=ignored_stations, bands=band), config, source_model=source_model, highlighted_stations=highlights)
 
             # Display plots in canvases
             draw_fig(main_window["fig1"].TKCanvas, fig1, main_window["toolbar1"].TKCanvas)

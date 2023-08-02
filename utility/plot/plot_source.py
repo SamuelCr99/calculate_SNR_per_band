@@ -1,3 +1,4 @@
+import argparse
 import mplcursors
 import matplotlib.pyplot as plt
 from math import sqrt
@@ -29,7 +30,11 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     #####################
     ### Generate data ###
     #####################
+
+    # Colors to use for the bands
+    base_colors = ['blue', 'green', 'yellow', 'red', 'purple', 'orange']
     
+    # Lists
     baselines_flux = []
     baselines_ratio = []
     coords_u = []
@@ -42,6 +47,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     highlighted_ratio = []
     colors = []
     highlighted_colors = []
+    bands = []
 
     for _, point in data.iterrows():
 
@@ -53,11 +59,18 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
 
         # Calculate the flux at that point
         curr_flux = calculate_flux(point, config)
-        flux.extend(curr_flux*2)
+        flux.extend([curr_flux]*2)
+
+        # Get the bands in the plot
+        bands.append(point.band)
+
+        # Get the color of that point
+        color = base_colors[["A","B","C","D","S","X"].index(point.band)]
+        colors.extend([color]*2)
 
         # Find the baseline of that point
         baselines_flux.extend(
-            [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_flux))}']*2)
+            [f'{point.Station1}-{point.Station2} {round(curr_flux,3)}']*2)
 
         if source_model:
             # Calculate the ratio at that point
@@ -66,20 +79,22 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
 
             # Find the baseline of that point
             baselines_ratio.extend(
-                [f'{point.Station1}-{point.Station2} {list(map(lambda x: round(x,3), curr_ratio))}']*2)
+                [f'{point.Station1}-{point.Station2} {round(curr_ratio,3)}']*2)
         
         if (len(highlighted_stations) == 1 and (point.Station1 in highlighted_stations or point.Station2 in highlighted_stations)) or (
             point.Station1 in highlighted_stations and point.Station2 in highlighted_stations):
             highlighted_u.extend([u,-u])
             highlighted_v.extend([v,-v])
-            highlighted_flux.extend(curr_flux*2)
+            highlighted_flux.extend([curr_flux]*2)
+            highlighted_colors.extend([color]*2)
             if source_model:
                 highlighted_ratio.extend([curr_ratio]*2)
     
+    bands = list(set(bands))
+
     ############################
     ### Flux density (meas.) ###
     ############################
-    band_letters = list(set(data.band))
 
     # Create figure and plot
     figure1 = plt.figure(0)
@@ -102,7 +117,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     plt.figtext(
         0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
     plt.title(
-        f"UV coordinates for source {source} for band{'s'*(len(band_letters)>1)} {', '.join(band_letters)}")
+        f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands)}")
 
     ############################
     ### Flux density (pred.) ###
@@ -164,7 +179,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
         plt.figtext(
             0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
         plt.title(
-            f"UV coordinates for source {source} for band{'s'*(len(band_letters)>1)} {', '.join(band_letters)}")
+            f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands)}")
 
     ################
     ### Distance ###
@@ -177,18 +192,11 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     figure4 = plt.figure(3)
     figure4.clf()
 
-    # Colors to use for the bands
-    base_colors = ['blue', 'green', 'yellow', 'red', 'purple', 'orange']
-
     # If there are multiple bands shown they should be color coded
-    if len(bands) > 1:
-        colors = sum(
-            list(map(lambda b: [base_colors[b]]*int(len(flux)/len(bands)), bands)), [])
-        highlighted_colors = sum(
-            list(map(lambda b: [base_colors[b]]*int(len(highlighted_flux)/len(bands)), bands)), [])
-    else:
+    if len(bands) <= 1:
         colors = "black"
         highlighted_colors = "black"
+    
     # Plot
     distance_plot = plt.scatter(distance, flux, marker=".", c=colors)
     if len(highlighted_u):
@@ -204,7 +212,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     plt.xlabel("sqrt(U^2+V^2) [fringes/radian]")
     plt.ylabel("Flux density")
     plt.title(
-        f"Flux density vs. sqrt(U^2+V^2) for band{'s'*(len(bands)>1)} {', '.join(bands_letters)}")
+        f"Flux density vs. sqrt(U^2+V^2) for band{'s'*(len(bands)>1)} {', '.join(bands)}")
     
     # If multiple bands are plotted there need the be a legend to explain different
     # colors
