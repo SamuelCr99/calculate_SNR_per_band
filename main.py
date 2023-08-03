@@ -38,7 +38,7 @@ if __name__ == "__main__":
             plot_source(args.source, data.get(sources=args.source, bands=args.band, ignored_stations=ignored_stations), config, highlighted_stations=highlighted_stations)
             plt.show()
 
-        elif args.mode == "least_square_fit":
+        elif args.mode == "lsf":
             if args.fits_folder == None: raise ValueError("No source model folder given, this is needed for least square fit")
 
             if type(args.ignored_stations) == str:
@@ -50,4 +50,4 @@ if __name__ == "__main__":
             least_square_fit(data.get(source=args.source, bands=args.band, ignored_stations=ignored_stations), source_model, config)
 
         else:
-            raise ValueError("Unknown mode, please select plot or least_square fit")
+            raise ValueError("Unknown mode, please select plot or lsf")
