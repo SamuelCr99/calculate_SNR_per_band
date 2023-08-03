@@ -91,6 +91,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
                 highlighted_ratio.extend([curr_ratio]*2)
     
     bands = list(set(bands))
+    bands.sort()
 
     ############################
     ### Flux density (meas.) ###
@@ -219,4 +220,4 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     if len(bands) > 1:
         # Create empty scatter plots so the legend will be added correctly
         plt.legend(handles=list(map(lambda b: plt.scatter(
-            [], [], c=base_colors[b], label=f'Band {["A","B","C","D","S","X"][b]}'), bands)))
+            [], [], c=base_colors[["A","B","C","D","S","X"].index(b)], label=f'Band {b}'), bands)))

@@ -14,7 +14,7 @@ BAND_LETTERS = ["A","B","C","D","S","X"]
 
 class DataWrapper:
 
-    def __init__(self,df):
+    def __init__(self,arg):
         """
         Initializes the DataWrapper
 
@@ -22,28 +22,35 @@ class DataWrapper:
         provide a string path to the session directory.
 
         Parameters:
-        df(string/DataFrame): Path of session or a pandas DataFrame
+        arg(string/DataFrame): Path of session or a pandas DataFrame
 
         Returns:
         The newly created data object
         """
 
         # If provided a DataFrame, use that one
-        if type(df) == pd.DataFrame:
-            self.df = df
+        if type(arg) == pd.DataFrame:
+            self.df = arg
+            bands = list(set(self.df.band.tolist()))
+            if len(bands) > 0:
+                if bands[0] in ["A","B","C","D"]:
+                    self.is_abcd = True
+                else:
+                    self.is_abcd = False
+                self.is_sx = not self.is_abcd
 
         # If provided a string, use it as the directory of a session
-        elif type(df) == str:
+        elif type(arg) == str:
 
             # Check if it is a ABCD session or an SX session
-            self.is_abcd = ("Observables" in os.listdir(f"{df}/")) and (
-                "QualityCode_bS.nc" not in os.listdir(f"{df}/Observables/"))
+            self.is_abcd = ("Observables" in os.listdir(f"{arg}/")) and (
+                "QualityCode_bS.nc" not in os.listdir(f"{arg}/Observables/"))
             self.is_sx = not self.is_abcd
             
             if self.is_abcd:
-                self.df = find_datapoints_abcd(df)
+                self.df = find_datapoints_abcd(arg)
             else:
-                self.df = find_datapoints_sx(df)
+                self.df = find_datapoints_sx(arg)
     
     def __len__(self):
         # Get the amount of rows (data points) in the data object
@@ -86,21 +93,21 @@ class DataWrapper:
         else:
             df = self.df
 
-        if type(sources) != list:
+        if sources and type(sources) != list:
             sources = [sources]
-        if type(ignored_sources) != list:
+        if ignored_sources and type(ignored_sources) != list:
             ignored_sources = [ignored_sources]
-        if type(baselines) != list:
+        if baselines and type(baselines) != list:
             baselines = [baselines]
-        if type(ignored_baselines) != list:
+        if ignored_baselines and type(ignored_baselines) != list:
             ignored_baselines = [ignored_baselines]
-        if type(stations) != list:
+        if stations and type(stations) != list:
             stations = [stations]
-        if type(ignored_stations) != list:
+        if ignored_stations and type(ignored_stations) != list:
             ignored_stations = [ignored_stations]
-        if type(bands) != list:
+        if (bands or bands==0) and type(bands) != list:
             bands = [bands]
-        if type(ignored_bands) != list:
+        if (ignored_bands or ignored_bands==0) and type(ignored_bands) != list:
             ignored_bands = [ignored_bands]
         
         # Find all rows that contain the selected sources
