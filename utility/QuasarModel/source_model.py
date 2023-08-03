@@ -1,46 +1,49 @@
 import numpy as np
-from numpy import log, where, amax, exp
-from skimage.feature import peak_local_max
+from numpy import log, where, exp
 from utility.QuasarModel.gauss import Gaussian, GaussList
-import copy
 import scipy
 
 
 class SourceModel:
     stop: bool = False
 
-    def process(self, image):
+    def process(self, x_l, y_l, intensity_l):
         """
         Model a quasar image with gaussian functions.
         :param image: np.array of image data
         :return: org - original input image, mdl - modelled image, anl - analytical fourier transform of modelled image
         """
 
-        size = image.shape[0]
-        org = copy.deepcopy(image)
+        gauss_fnd = GaussList()
 
-        gauss_fnd = GaussList(size=size)
-
-        for guess in range(10):
+        for index in range(10):
             if self.stop:
                 break
 
-            peaks_position = peak_local_max(image, min_distance=3, threshold_abs=amax(org)*0.1,
-                                            exclude_border=True, num_peaks=10)
-            num_peaks = len(peaks_position)
+            peaks = peak_local_max(x_l, y_l, intensity_l, threshold_abs=max(intensity_l)*0.1, num_peaks=10)
+            num_peaks = len(peaks)
             if num_peaks == 0:
                 break
 
-            gauss_now = GaussList(size=size)
+            gauss_now = GaussList()
 
             for i in range(num_peaks):
-                gauss_now.append(self.initial_guess(peaks_position[i][0], peaks_position[i][1], image))
-            chi_sq_dof = self.find_chi_sq_dof(image, gauss_now)
+                gauss_now.append(self.initial_guess(peaks[i]))
+            chi_sq_dof = self.find_chi_sq_dof(x_l, y_l, intensity_l, gauss_now)
             chi_sq_dof_old = chi_sq_dof
 
-            gauss_now, chi_sq_dof, step_min = self.least_sq_gauss(gauss_now, image)
+            gauss_now, chi_sq_dof, step_min = self.least_sq_gauss(gauss_now, x_l, y_l, intensity_l)
             delta_chi = chi_sq_dof_old - chi_sq_dof
             chi_sq_dof_old = chi_sq_dof
+
+            print("-------------------")
+            print("Iteration:",index)
+            print("a:", gauss_now[0].a)
+            print("b:", gauss_now[0].b)
+            print("x0:", gauss_now[0].x0)
+            print("y0:", gauss_now[0].y0)
+            print("amp:", gauss_now[0].amp)
+            print("theta:", gauss_now[0].theta)
 
             for iteration in range(2, 12):
                 if self.stop:
@@ -48,29 +51,35 @@ class SourceModel:
 
                 if step_min == 0 or abs(delta_chi) < 10 ** (-8) or iteration == 11:
                     gauss_fnd.append(gauss_now)
-                    image_comp = gauss_fnd.build_image()
-                    image = image - image_comp
+
+                    intensity_comp = list(map(lambda x,y: gauss_fnd.get_gauss(x,y), x_l, y_l))
+                    intensity_l = list(map(lambda i,ic: i-ic, intensity_l, intensity_comp))
                     break
                 else:
-                    gauss_now, chi_sq_dof, step_min = self.least_sq_gauss(gauss_now, image)
+                    gauss_now, chi_sq_dof, step_min = self.least_sq_gauss(gauss_now, x_l, y_l, intensity_l)
                     delta_chi = chi_sq_dof_old - chi_sq_dof
                     chi_sq_dof_old = chi_sq_dof
+            
+                print("-------------------")
+                print("Iteration:",index)
+                print("a:", gauss_now[0].a)
+                print("b:", gauss_now[0].b)
+                print("x0:", gauss_now[0].x0)
+                print("y0:", gauss_now[0].y0)
+                print("amp:", gauss_now[0].amp)
+                print("theta:", gauss_now[0].theta)
 
-        mdl = gauss_fnd.build_image()
 
-        anl = abs(sum([np.fromfunction(lambda x, y: gauss.get_fourier_transform_value(x, y, size),
-                                       (size, size), dtype=float) for gauss in gauss_fnd]))
+        return gauss_fnd
 
-        return org, mdl, anl, gauss_fnd
+    def least_sq_gauss(self, gauss_now, x_l, y_l, intensity_l):
 
-    def least_sq_gauss(self, gauss_now, image):
-
-        delta_gauss = self.compute_adjustment(gauss_now, image)
+        delta_gauss = self.compute_adjustment(gauss_now, x_l, y_l, intensity_l)
         chi_from_step = []
         steps = [0, 0.6, 1.2]  # Three points which a parabola is fitted through
 
         for step in steps:
-            chi_from_step.append(self.find_chi_sq_dof(image, gauss_now.add(delta_gauss, step)))
+            chi_from_step.append(self.find_chi_sq_dof(x_l, y_l, intensity_l, gauss_now.add(delta_gauss, step)))
 
         chi_sq_dof_one, chi_sq_dof_two, chi_sq_dof_three = chi_from_step
         step_one, step_two, step_three = steps
@@ -95,7 +104,7 @@ class SourceModel:
             step_min = -1
 
         gauss_min_chi = gauss_now.add(delta_gauss, step_min)
-        chi = self.find_chi_sq_dof(image, gauss_min_chi)
+        chi = self.find_chi_sq_dof(x_l, y_l, intensity_l, gauss_min_chi)
 
         # a and b should not be negative since that gives a non elliptical gaussian distribution function
         for gauss, gauss_n in zip(gauss_min_chi, gauss_now):
@@ -109,14 +118,14 @@ class SourceModel:
 
         return gauss_now, chi_sq_dof, step_min
 
-    def initial_guess(self, x0, y0, image):
+    def initial_guess(self, peak):
         gauss_now = Gaussian()
         gauss_now.theta = 0
-        gauss_now.amp = image[x0][y0]
-        gauss_now.x0 = where(image == gauss_now.amp)[0][0]
-        gauss_now.y0 = where(image == gauss_now.amp)[1][0]
-        a_nominator = image[gauss_now.x0 + 1][gauss_now.y0] + image[gauss_now.x0 - 1][gauss_now.y0]
-        b_nominator = image[gauss_now.x0][gauss_now.y0 + 1] + image[gauss_now.x0][gauss_now.y0 - 1]
+        gauss_now.x0 = peak[0]
+        gauss_now.y0 = peak[1]
+        gauss_now.amp = peak[2]
+        a_nominator = peak[2]
+        b_nominator = peak[2]
 
         """
         In certain cases some of the values next to the max point (x0, y0), can be zero. The algebraic estimate of a and
@@ -128,26 +137,24 @@ class SourceModel:
 
         return gauss_now
 
-    def find_chi_sq_dof(self, image_data, gauss_now):
+    def find_chi_sq_dof(self, x_l, y_l, intensity_l, gauss_now):
         """
         Finds and returns the mean squared error of the current gaussian model evaluated in every point in the image.
         """
-        full_size = image_data.shape[0]
-        num_points = full_size * full_size
-        mdl_data = gauss_now.build_image()
-        chi_sq = np.sum(np.sum(np.power((np.subtract(image_data, mdl_data)), 2)))
+        num_points = len(intensity_l)
+        chi_sq = sum(list(map(lambda x,y,i: (i-gauss_now.get_gauss(x,y))**2, x_l, y_l, intensity_l)))
 
         return chi_sq / num_points
 
-    def compute_adjustment(self, gauss_in, image):
+    def compute_adjustment(self, gauss_in, x_l, y_l, intensity_l):
         """
         Calculates and sets delta_gauss which contains the adjustment for gauss_now based on its partial derivatives.
         """
-        size = image.shape[0]
         num_peaks = len(gauss_in)
-        delta_gauss = GaussList(size=size)
-        norm_vec, norm_mat = self.make_norm_np(gauss_in, image, num_peaks)
-
+        delta_gauss = GaussList()
+        norm_vec, norm_mat = self.make_norm_np(gauss_in, x_l, y_l, intensity_l, num_peaks)
+        print(norm_mat)
+        print("-------------------")
         if scipy.linalg.det(norm_mat) == 0:
             for i in range(len(norm_mat)):
                 if norm_mat[i][i] < 10e-8:
@@ -167,37 +174,50 @@ class SourceModel:
             d_gauss.x0 = adjust[3 + 6 * i]
             d_gauss.y0 = adjust[4 + 6 * i]
             # Keep from making large adjustments in offset
-            if abs(d_gauss.x0 / image.shape[0]) > 0.2:
+            if abs(d_gauss.x0 / max(x_l)) > 0.2:
                 d_gauss.x0 = 0.2 * gauss_in[i].x0 if d_gauss.x0 > 0 else -0.2 * gauss_in[i].x0
-            if abs(d_gauss.y0 / image.shape[0]) > 0.2:
+            if abs(d_gauss.y0 / max(y_l)) > 0.2:
                 d_gauss.y0 = 0.2 * gauss_in[i].y0 if d_gauss.y0 > 0 else -0.2 * gauss_in[i].y0
             d_gauss.theta = adjust[5 + 6 * i]
             delta_gauss.append(d_gauss)
         return delta_gauss
 
-    def make_norm_np(self, gauss_in, image, num_peak):
+    def make_norm_np(self, gauss_in, x_l, y_l, intensity_l, num_peak):
         norm_vec = np.zeros(6 * num_peak, dtype=float)
         norm_mat = np.zeros((6 * num_peak, 6 * num_peak))
         for index, gauss in enumerate(gauss_in, 0):
-            terms = np.fromfunction(gauss.get_terms, (image.shape[0], image.shape[0]), dtype=float)
-            term_a, term_b = terms[::][0], terms[::][1]
-            g = abs(gauss.a * term_a + gauss.b * term_b)
-            g[g > 50.] = 50.
-            exp_minus_g = exp(-g)
+            terms = list(map(lambda x,y: gauss.get_terms(x,y), x_l, y_l))
+            term_a, term_b = list(list(zip(*terms))[0]), list(list(zip(*terms))[1])
+            term_2, term_3 = list(list(zip(*terms))[2]), list(list(zip(*terms))[3])
+            term_4, term_5 = list(list(zip(*terms))[4]), list(list(zip(*terms))[5])
+            term_6 = list(list(zip(*terms))[6])
 
-            apriori = exp_minus_g * gauss.amp
-            residuals = image - apriori
-            partials = [exp_minus_g,
-                        -apriori * term_a,
-                        -apriori * term_b,
-                        apriori * (gauss.a * terms[::][2] + gauss.b * terms[::][3]),
-                        apriori * (gauss.a * terms[::][4] + gauss.b * terms[::][5]),
-                        -apriori * (gauss.b - gauss.a) * terms[::][6]
-                        ]
+            g = list(map(lambda a,b: abs(gauss.a*a + gauss.b*b), term_a, term_b))
+            g = list(map(lambda g_i: g_i if g_i<50 else 50, g))
+            exp_minus_g = list(map(lambda g_i: exp(-g_i), g))
+
+            apriori = list(map(lambda g_i: g_i*gauss.amp, exp_minus_g))
+            residuals = list(map(lambda i,a: i-a, intensity_l, apriori))
+
+            a_ta = list(map(lambda a,ta: -a*ta, apriori, term_a))
+            a_tb = list(map(lambda a,tb: -a*tb, apriori, term_b))
+            a_t23 = list(map(lambda a,t2,t3: a*(gauss.a*t2 + gauss.b*t3), apriori, term_2, term_3))
+            a_t45 = list(map(lambda a,t4,t5: a*(gauss.a*t4 + gauss.b*t5), apriori, term_4, term_5))
+            a_t6 = list(map(lambda a,t6: -a*(gauss.b - gauss.a)*t6, apriori, term_6))
+
+            partials = [exp_minus_g, a_ta, a_tb, a_t23, a_t45, a_t6]
 
             for i in range(6):
-                norm_vec[index * 6 + i] = np.sum(residuals * partials[i])
+                r_pi = list(map(lambda r,pi: r*pi, residuals, partials[i]))
+                norm_vec[index * 6 + i] = sum(r_pi)
+
                 for j in range(6):
-                    norm_mat[index * 6 + i][index * 6 + j] = np.sum(partials[i] * partials[j])
+                    pi_pj = list(map(lambda pi,pj: pi*pj, partials[i], partials[j]))
+                    norm_mat[index * 6 + i][index * 6 + j] = sum(pi_pj)
 
         return norm_vec, norm_mat
+
+def peak_local_max(x, y, intensity, threshold_abs=0.01, num_peaks=1):
+    i = intensity.index(max(intensity))
+
+    return [[x[i],y[i],intensity[i]]]

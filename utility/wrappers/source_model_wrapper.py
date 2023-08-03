@@ -1,4 +1,4 @@
-from utility.QuasarModel.get_image import get_image_from_path as get_image
+from utility.QuasarModel.get_data import get_data
 from utility.QuasarModel.source_model import SourceModel as sm
 from astropy.io import fits
 from math import radians, pi, e, sin, cos, sqrt
@@ -8,13 +8,15 @@ class SourceModelWrapper:
     def __init__(self, path, scale=1, flux_scale=1):
         data = fits.open(path)[0]
         print(path)
-        self.delta_u = radians(data.header["CDELT1"])
-        self.delta_v = radians(data.header["CDELT2"])
+        # self.delta_u = radians(data.header["CDELT1"])
+        # self.delta_v = radians(data.header["CDELT2"])
+        self.delta_u = 1
+        self.delta_v = 1
         self.scale = scale
         self.flux_scale = flux_scale
 
-        image = get_image(path)
-        _, _, _, self.gauss_list = sm().process(image)
+        x,y,intensity = get_data(path)
+        self.gauss_list = sm().process(x,y,intensity)
 
     def get_flux(self,u,v):
         u = -self.delta_u*u/self.scale

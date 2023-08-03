@@ -47,7 +47,7 @@ class Gaussian:
         a_term = (x2 * (1.0 + cos_2_theta) / 2 + y2 * (1.0 - cos_2_theta) / 2 + xy * sin_2_theta)
         b_term = (x2 * (1.0 - cos_2_theta) / 2 + y2 * (1.0 + cos_2_theta) / 2 - xy * sin_2_theta)
         g = abs(self.a * a_term + self.b * b_term)
-        g[g>50] = 50
+        if g>50: g=50
 
         return exp(-g) * self.amp
 
@@ -86,8 +86,7 @@ class GaussList:
     of the gaussians that the build_image function returns.
     """
 
-    def __init__(self, gaussians=None, size=256):
-        self.size = size
+    def __init__(self, gaussians=None):
         self.gaussians = list(gaussians) if gaussians else []
 
     def __getitem__(self, num):
@@ -111,7 +110,10 @@ class GaussList:
         return sum([np.fromfunction(gauss.get_gauss, (self.size, self.size), dtype=float) for gauss in self.gaussians])
 
     def add(self, delta, step):
-        return GaussList([gauss + d_gauss * step for gauss, d_gauss in zip(self.gaussians, delta)], size=self.size)
+        return GaussList([gauss + d_gauss * step for gauss, d_gauss in zip(self.gaussians, delta)])
+
+    def get_gauss(self, x, y):
+        return sum(list(map(lambda gaussian: gaussian.get_gauss(x,y), self.gaussians)))
 
     def sort(self):
         """
