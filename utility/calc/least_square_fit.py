@@ -1,6 +1,10 @@
 from math import sqrt, log, e
+import requests
+import re
 import numpy as np
 from utility.wrappers.data_wrapper import DataWrapper
+from utility.wrappers.source_model_wrapper import SourceModelWrapper
+import os
 
 def least_square_fit(data, model, config):
     """
@@ -12,12 +16,15 @@ def least_square_fit(data, model, config):
 
     Parameters:
     data(DataWrapper): All data points to consider
-    model(SourceModelWrapper): The model of the source
+    model(dict/SourceModelWrapper): The model of the source
     config(StationsConfigWrapper): Contains the SEFD values of the stations
 
     Returns:
     No returns
     """
+    if type(model) != dict:
+        model = {data.get_df().Source.iloc[0]:model}
+
     SNR_meas_list = []
     SNR_pred_list = []
     station_list = []
@@ -25,7 +32,9 @@ def least_square_fit(data, model, config):
 
     for band in bands:
         for _, point in data.iterrows():
-            
+            if point.Source not in model:
+                continue
+
             # Add all stations to station_list
             if point.Station1 not in station_list: 
                 station_list.append(point.Station1)
@@ -44,8 +53,8 @@ def least_square_fit(data, model, config):
             # Get all the predicted SNRs
             u = point.u
             v = point.v
-
-            flux_pred = model.get_flux(u,v)
+            
+            flux_pred = model[point.Source].get_flux(u,v)
             SNR_bit_pred = 0.617502*flux_pred*sqrt(1/(SEFD1*SEFD2))
             SNR_pred_list.append(SNR_bit_pred)
 
@@ -83,3 +92,28 @@ def least_square_fit(data, model, config):
             config.set_SEFD(station_list[i], band, station_SEFD*A[i])
     
     return
+
+def model_source_map(data, dir):
+
+    sources = list(map(lambda b1950_name: get_j2000_name(b1950_name), list(set(data.get_df().Sources.tolist()))))
+    source_fits_dict = {}
+    files = os.listdir(dir)
+    
+    for source in sources:
+        for file in files:
+            if source in file: 
+                source_fits_dict[source] = SourceModelWrapper(f"{dir}/{file}")
+                break
+    return source_fits_dict
+
+def get_j2000_name(b1950_name):
+    base_url = f"http://astrogeo.org/cgi-bin/imdb_get_source.csh"
+    params = {
+        "source_name": b1950_name
+    }
+
+    response = requests.get(base_url,params=params)
+    page = response.text
+
+    j2000_name = re.findall(r'J\d\d\d\d[+-]\d\d\d\d',page)[0]
+    return j2000_name

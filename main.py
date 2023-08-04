@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from utility.gui.gui import run_gui
 from utility.wrappers.data_wrapper import DataWrapper
 from utility.plot.plot_source import plot_source
-from utility.calc.least_square_fit import least_square_fit
+from utility.calc.least_square_fit import least_square_fit, model_source_map
 from utility.wrappers.stations_config_wrapper import StationsConfigWrapper
 from utility.wrappers.source_model_wrapper import SourceModelWrapper
 
@@ -41,7 +41,8 @@ if __name__ == "__main__":
         plot_parser.add_argument('--save_dir', type=str, help="Relative or absolute path to save plots to")
 
         lsf_parser.add_argument('session_folder', type=str, help="Relative or absolute path to the session folder")
-        lsf_parser.add_argument('fits_file', type=str, help="Relative or absolute path to the fits file")
+        lsf_parser.add_argument('--fits_file', type=str, help="Relative or absolute path to the fits file. Mandatory to have one of fits_file or fits_folder")
+        lsf_parser.add_argument('--fits_folder', type=str, help="Relative or absolute path to the directory with fits files. Mandatory to have one of fits_file or fits_folder")
         lsf_parser.add_argument('--sources', type=str, help="Source name or comma separated list of sources", default=[])
         lsf_parser.add_argument('--ignored_sources', type=str, help="Source name or comma separated list of sources to ignore", default=[])
         lsf_parser.add_argument('--bands', type=str, help="Band name or comma separated list of bands", default=[])
@@ -82,7 +83,12 @@ if __name__ == "__main__":
                 plt.show()
 
         elif args.mode == "lsf":
-            if args.fits_file == None: raise ValueError("No source model folder given, this is needed for least square fit")
+            if args.fits_file == None and args.fits_folder == None:
+                raise ValueError("Either fits_file or fits_folder must be specified")
+            
+            if args.fits_file != None and args.fits_folder != None:
+                raise ValueError("Both fits_file and fits_folder cannot be specified")
+
             split_attribute("sources")
             split_attribute("ignored_sources")
 
@@ -91,8 +97,14 @@ if __name__ == "__main__":
 
             data = DataWrapper(args.session_folder)
             config = StationsConfigWrapper()
-            source_model = SourceModelWrapper(args.fits_file)
-            least_square_fit(data.get(source=args.sources, bands=args.bands, ignored_stations=ignored_stations), source_model, config)
+
+            if args.fits_file:
+                source_model = SourceModelWrapper(args.fits_file)
+
+            elif args.fits_folder:
+                source_model = model_source_map(data.get(sources=args.sources, bands=args.bands, ignored_stations=args.ignored_stations), args.fits_folder)
+            
+            least_square_fit(data.get(sources=args.sources, bands=args.bands, ignored_stations=args.ignored_stations), source_model, config)
             config.save(args.save_dir)
 
         else:
