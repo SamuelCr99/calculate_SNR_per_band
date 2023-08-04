@@ -21,8 +21,9 @@ class StationsConfigWrapper:
             
         self.df_copy = self.df.copy(deep=True)
     
-    def save(self):
-        self.df.to_csv(CONFIG_PATH, index=False)
+    def save(self, path=""):
+        save_path = CONFIG_PATH if path == "" else path
+        self.df.to_csv(save_path, index=False)
         self.df_copy = self.df.copy(deep=True)
 
     def restore(self):
