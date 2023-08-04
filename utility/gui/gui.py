@@ -179,9 +179,8 @@ def run_gui():
             main_window["loading_text"].update(value="Loading...")
             main_window.refresh()
 
-            source_model = SourceModelWrapper(new_dir)
             try:
-                pass
+                source_model = SourceModelWrapper(new_dir)
             except:
                 sg.Popup("Something went wrong! Please select a valid fits file.",
                              icon="images/favicon.ico")

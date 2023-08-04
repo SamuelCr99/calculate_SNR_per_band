@@ -36,14 +36,14 @@ class SourceModel:
             delta_chi = chi_sq_dof_old - chi_sq_dof
             chi_sq_dof_old = chi_sq_dof
 
-            print("-------------------")
-            print("Iteration:",index)
-            print("a:", gauss_now[0].a)
-            print("b:", gauss_now[0].b)
-            print("x0:", gauss_now[0].x0)
-            print("y0:", gauss_now[0].y0)
-            print("amp:", gauss_now[0].amp)
-            print("theta:", gauss_now[0].theta)
+            # print("-------------------")
+            # print("Iteration:",index)
+            # print("a:", gauss_now[0].a)
+            # print("b:", gauss_now[0].b)
+            # print("x0:", gauss_now[0].x0)
+            # print("y0:", gauss_now[0].y0)
+            # print("amp:", gauss_now[0].amp)
+            # print("theta:", gauss_now[0].theta)
 
             for iteration in range(2, 12):
                 if self.stop:
@@ -60,14 +60,15 @@ class SourceModel:
                     delta_chi = chi_sq_dof_old - chi_sq_dof
                     chi_sq_dof_old = chi_sq_dof
             
-                print("-------------------")
-                print("Iteration:",index)
-                print("a:", gauss_now[0].a)
-                print("b:", gauss_now[0].b)
-                print("x0:", gauss_now[0].x0)
-                print("y0:", gauss_now[0].y0)
-                print("amp:", gauss_now[0].amp)
-                print("theta:", gauss_now[0].theta)
+                # print("-------------------")
+                # print("Iteration:",index)
+                # print("a:", gauss_now[0].a)
+                # print("b:", gauss_now[0].b)
+                # print("x0:", gauss_now[0].x0)
+                # print("y0:", gauss_now[0].y0)
+                # print("amp:", gauss_now[0].amp)
+                # print("theta:", gauss_now[0].theta)
+                # print("chi-sq:", delta_chi)
 
 
         return gauss_fnd
@@ -153,8 +154,8 @@ class SourceModel:
         num_peaks = len(gauss_in)
         delta_gauss = GaussList()
         norm_vec, norm_mat = self.make_norm_np(gauss_in, x_l, y_l, intensity_l, num_peaks)
-        print(norm_mat)
-        print("-------------------")
+        # print("-------------------")
+        # print(norm_mat)
         if scipy.linalg.det(norm_mat) == 0:
             for i in range(len(norm_mat)):
                 if norm_mat[i][i] < 10e-8:
@@ -218,6 +219,13 @@ class SourceModel:
         return norm_vec, norm_mat
 
 def peak_local_max(x, y, intensity, threshold_abs=0.01, num_peaks=1):
-    i = intensity.index(max(intensity))
+    intensity = intensity.copy()
+    peaks = []
+    for _ in range(num_peaks):
+        i = intensity.index(max(intensity))
+        if intensity[i] < threshold_abs:
+            break
+        peaks.append([x[i],y[i],intensity[i]])
+        intensity[i] = 0
 
-    return [[x[i],y[i],intensity[i]]]
+    return peaks
