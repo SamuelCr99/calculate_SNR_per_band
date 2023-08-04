@@ -131,8 +131,10 @@ def run_gui():
                 main_window.refresh()
 
                 # Load data (takes time)
+                data = DataWrapper(new_dir)
                 try:
-                    data = DataWrapper(new_dir)
+                    pass
+                    # data = DataWrapper(new_dir)
                 except:
                     sg.Popup("Something went wrong! Please select a valid vgosDB directory.",
                              icon="images/favicon.ico")

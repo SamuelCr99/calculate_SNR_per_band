@@ -29,8 +29,7 @@ if __name__ == "__main__":
         lsf_parser = subparsers.add_parser('lsf', help="Find the SEFD values of the stations using least square fit")
 
         plot_parser.add_argument('session_folder', type=str, help="Relative or absolute path to the session folder")
-        plot_parser.add_argument('sources', type=str, help="Source name or comma separated list of sources")
-        plot_parser.add_argument('--ignored_sources', type=str, help="Source name or comma separated list of sources to ignore", default=[])
+        plot_parser.add_argument('source', type=str, help="Source name or comma separated list of sources")
         plot_parser.add_argument('--bands', type=str, help="Band name or comma separated list of bands", default=[])
         plot_parser.add_argument('--ignored_bands', type=str, help="Band name or comma separated list of bands to ignore", default=[])
         plot_parser.add_argument('--highlighted_stations', type=str, help="Comma separated list of stations to highlight", default=[])
@@ -55,8 +54,6 @@ if __name__ == "__main__":
 
         args = parser.parse_args()
 
-        split_attribute("sources")
-        split_attribute("ignored_sources")
         split_attribute("stations")
         split_attribute("ignored_stations")
         split_attribute("baselines")
@@ -70,7 +67,7 @@ if __name__ == "__main__":
 
             data = DataWrapper(args.session_folder)
             config = StationsConfigWrapper()
-            plot_source(args.sources, data.get(sources=args.sources, ignored_sources=args.ignored_sources, 
+            plot_source(args.sources, data.get(sources=args.source, 
                                                bands=args.bands, ignored_bands=args.ignored_bands, 
                                                stations=args.stations, ignored_stations=args.ignored_stations, 
                                                baselines=args.baselines, ignored_baselines=args.ignored_baselines), 
@@ -86,6 +83,8 @@ if __name__ == "__main__":
 
         elif args.mode == "lsf":
             if args.fits_file == None: raise ValueError("No source model folder given, this is needed for least square fit")
+            split_attribute("sources")
+            split_attribute("ignored_sources")
 
             if type(args.ignored_stations) == str:
                 ignored_stations = args.ignored_stations.split(",")

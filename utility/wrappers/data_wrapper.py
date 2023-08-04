@@ -292,10 +292,9 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     if dir[-1] != '/':
         dir += '/'
 
+    start = start_df(dir, 4)
+
     # Import datasets
-    baseline_ds = nc.Dataset(f'{dir}Observables/Baseline.nc')
-    timeutc_ds = nc.Dataset(f'{dir}Observables/TimeUTC.nc')
-    source_ds = nc.Dataset(f'{dir}Observables/Source.nc')
     channel_info = nc.Dataset(f'{dir}Observables/ChannelInfo_bX.nc')
     snr_info = nc.Dataset(f'{dir}Observables/SNR_bX.nc')
     corrinfo = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bX.nc')
@@ -303,27 +302,7 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     ref_freq_ds = nc.Dataset(f'{dir}Observables/RefFreq_bX.nc')
     uv_ds = nc.Dataset(f'{dir}ObsDerived/UVFperAsec_bX.nc')
 
-    # Find source
-    source = []
-    for elem in np.ma.getdata(source_ds["Source"]).tolist():
-        source.extend([bytes_to_string(elem)]*4)
-
-    num_observations = int(len(source)/4)
-
-    # Find time
-    time = []
-    for elem in np.ma.getdata(timeutc_ds["YMDHM"]):
-        time.extend([time_to_string(elem)]*4)
-    second = []
-    for elem in np.ma.getdata(timeutc_ds["Second"]):
-        second.extend([elem]*4)
-
-    # Find stations
-    stat1 = []
-    stat2 = []
-    for elem in np.ma.getdata(baseline_ds["Baseline"]).tolist():
-        stat1.extend([bytes_to_string(elem[0]).replace(" ", "")]*4)
-        stat2.extend([bytes_to_string(elem[1]).replace(" ", "")]*4)
+    num_observations = int(len(start["Source"])/4)
 
     # Find frequency for each channel
     A_channels = []
@@ -333,7 +312,6 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     if is_float(channel_info["ChannelFreq"][0]):
         frequency_matrix = [np.ma.getdata(
             channel_info["ChannelFreq"]).tolist()]*num_observations
-
     else:
         frequency_matrix = np.ma.getdata(channel_info["ChannelFreq"]).tolist()
 
@@ -348,47 +326,6 @@ def find_datapoints_abcd(dir, save_to_csv=False):
             list(filter(lambda f: f > BAND_B_C_LIM and f < BAND_C_D_LIM, frequencies)))
         D_channels.append(
             list(filter(lambda f: f > BAND_C_D_LIM, frequencies)))
-
-    # Find frequency for each band
-    A_freq = list(map(lambda l: mean(l) if l != [] else None, A_channels))
-    B_freq = list(map(lambda l: mean(l) if l != [] else None, B_channels))
-    C_freq = list(map(lambda l: mean(l) if l != [] else None, C_channels))
-    D_freq = list(map(lambda l: mean(l) if l != [] else None, D_channels))
-
-    # Find elevation and azimuth
-    stations = list(set(stat1 + stat2))
-    time_sec_list = list(map(lambda t, s: f"{t}:{s}", time, second))
-    stat_time_df = pd.DataFrame(
-        {"stat1": stat1, "stat2": stat2, "time": time_sec_list})
-
-    AzEl_dict = {}
-    for station in stations:
-        if station not in os.listdir(dir):
-            continue
-
-        AzEl_ds = nc.Dataset(f'{dir}{station}/AzEl.nc')
-
-        current_df = stat_time_df[(stat_time_df.stat1 == station) | (
-            stat_time_df.stat2 == station)]
-        current_df = current_df.drop_duplicates(subset=["time"])
-
-        El = list(map(lambda row: row[0], AzEl_ds["ElTheo"]))
-        Az = list(map(lambda row: row[0], AzEl_ds["AzTheo"]))
-        station_dict = {}
-
-        for _, row in current_df.iterrows():
-            station_dict[row.time] = {"El": El.pop(0), "Az": Az.pop(0)}
-
-        AzEl_dict[station] = station_dict
-
-    El1 = list(
-        map(lambda stat, t, s: AzEl_dict[stat][f"{t}:{s}"]["El"], stat1, time, second))
-    Az1 = list(
-        map(lambda stat, t, s: AzEl_dict[stat][f"{t}:{s}"]["Az"], stat1, time, second))
-    El2 = list(
-        map(lambda stat, t, s: AzEl_dict[stat][f"{t}:{s}"]["El"], stat2, time, second))
-    Az2 = list(
-        map(lambda stat, t, s: AzEl_dict[stat][f"{t}:{s}"]["Az"], stat2, time, second))
 
     # Find SNR
     chanamp = np.ma.getdata(channel_info['ChanAmpPhase'])
@@ -459,13 +396,17 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     ref_freq = np.ma.getdata(ref_freq_ds["RefFreq"]).tolist()*num_observations*4
 
     # Find u and v for each band
+    A_freq = list(map(lambda l: mean(l) if l != [] else None, A_channels))
+    B_freq = list(map(lambda l: mean(l) if l != [] else None, B_channels))
+    C_freq = list(map(lambda l: mean(l) if l != [] else None, C_channels))
+    D_freq = list(map(lambda l: mean(l) if l != [] else None, D_channels))
+
     A_u, A_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,A_freq))))
     B_u, B_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,B_freq))))
     C_u, C_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,C_freq))))
     D_u, D_v = list(zip(*list(map(lambda u,v,o_f,n_f: convert_uv(u,v,o_f,n_f),u_l,v_l,ref_freq,D_freq))))    
 
     # Zip zip
-    freq = list(itertools.chain(*zip(A_freq, B_freq, C_freq, D_freq)))
     SNR = list(itertools.chain(*zip(A_SNR, B_SNR, C_SNR, D_SNR)))
     bw = list(itertools.chain(*zip(A_bw, B_bw, C_bw, D_bw)))
     u = list(itertools.chain(*zip(A_u, B_u, C_u, D_u)))
@@ -474,36 +415,7 @@ def find_datapoints_abcd(dir, save_to_csv=False):
     band = ["A", "B", "C", "D"] * num_observations
 
     # Collect everything into a dataframe
-    df = pd.DataFrame({"YMDHM": time,
-                       "Second": second,
-                       "Source": source,
-                       "Station1": stat1,
-                       "Station2": stat2,
-                       "band": band,
-                       "El1": El1,
-                       "Az1": Az1,
-                       "El2": El2,
-                       "Az2": Az2,
-                       "freq": freq,
-                       "SNR": SNR,
-                       "bw": bw,
-                       "int_time": int_time,
-                       "Q_code": qualcode,
-                       "u": u,
-                       "v": v})
-
-    # Sort out rows with too low quality
-    df = df.loc[(df.Q_code.astype(int) > 5)]
-
-    df.reset_index(inplace=True)
-
-    if save_to_csv:
-        datapoints_csv = f"Generated from vgosDB: {dir.split('/')[-2]}\n" + df.to_csv(
-            index=False)
-        with open("data/derived/datapoints.csv", "w") as file:
-            file.write(datapoints_csv)
-
-    return df
+    return get_df(start, band, bw, int_time, SNR, u, v, qualcode, save_to_csv=save_to_csv)
 
 def find_datapoints_sx(dir, save_to_csv=False):
     """
@@ -519,10 +431,9 @@ def find_datapoints_sx(dir, save_to_csv=False):
     if dir[-1] != '/':
         dir += '/'
 
+    start = start_df(dir, 2)
+
     # Import datasets
-    baseline_ds = nc.Dataset(f'{dir}Observables/Baseline.nc')
-    timeutc_ds = nc.Dataset(f'{dir}Observables/TimeUTC.nc')
-    source_ds = nc.Dataset(f'{dir}Observables/Source.nc')
     quality_code_s_ds = nc.Dataset(f'{dir}Observables/QualityCode_bS.nc')
     quality_code_x_ds = nc.Dataset(f'{dir}Observables/QualityCode_bX.nc')
     uv_s_ds = nc.Dataset(f'{dir}ObsDerived/UVFperAsec_bS.nc') 
@@ -534,27 +445,7 @@ def find_datapoints_sx(dir, save_to_csv=False):
     corrinfo_s = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bS.nc')
     corrinfo_x = nc.Dataset(f'{dir}Observables/CorrInfo-difx_bX.nc')
 
-    # Find source
-    source = []
-    for elem in np.ma.getdata(source_ds["Source"]).tolist():
-        source.extend([bytes_to_string(elem)]*2)
-
-    num_observations = int(len(source)/2)
-
-    # Find time
-    time = []
-    for elem in np.ma.getdata(timeutc_ds["YMDHM"]):
-        time.extend([time_to_string(elem)]*2)
-    second = []
-    for elem in np.ma.getdata(timeutc_ds["Second"]):
-        second.extend([elem]*2)
-
-    # Find stations
-    stat1 = []
-    stat2 = []
-    for elem in np.ma.getdata(baseline_ds["Baseline"]).tolist():
-        stat1.extend([bytes_to_string(elem[0]).replace(" ", "")]*2)
-        stat2.extend([bytes_to_string(elem[1]).replace(" ", "")]*2)
+    num_observations = int(len(start['Source'])/2)
 
     # Find quality code
     S_qualcode = list(bytes_to_string(np.ma.getdata(
@@ -601,18 +492,46 @@ def find_datapoints_sx(dir, save_to_csv=False):
     band = ["S", "X"] * num_observations
 
     # Collect everything into a dataframe
-    df = pd.DataFrame({"YMDHM": time,
-                       "Second": second,
-                       "Source": source,
-                       "Station1": stat1,
-                       "Station2": stat2,
-                       "band": band,
-                       "SNR": SNR,
-                       "bw": bw,
-                       "int_time": int_time,
-                       "Q_code": qualcode,
-                       "u": u,
-                       "v": v})
+    return get_df(start, band, bw, int_time, SNR, u, v, qualcode, save_to_csv=save_to_csv)
+
+def start_df(dir, num_bands):
+    # Import datasets
+    baseline_ds = nc.Dataset(f'{dir}Observables/Baseline.nc')
+    timeutc_ds = nc.Dataset(f'{dir}Observables/TimeUTC.nc')
+    source_ds = nc.Dataset(f'{dir}Observables/Source.nc')
+
+    # Find source
+    source = []
+    for elem in np.ma.getdata(source_ds["Source"]).tolist():
+        source.extend([bytes_to_string(elem)]*num_bands)
+
+    # Find time
+    time = []
+    for elem in np.ma.getdata(timeutc_ds["YMDHM"]):
+        time.extend([time_to_string(elem)]*num_bands)
+    second = []
+    for elem in np.ma.getdata(timeutc_ds["Second"]):
+        second.extend([elem]*num_bands)
+
+    # Find stations
+    stat1 = []
+    stat2 = []
+    for elem in np.ma.getdata(baseline_ds["Baseline"]).tolist():
+        stat1.extend([bytes_to_string(elem[0]).replace(" ", "")]*num_bands)
+        stat2.extend([bytes_to_string(elem[1]).replace(" ", "")]*num_bands)
+    
+    return {"YMDHM": time, "Second": second, "Source": source, "Station1": stat1, "Station2": stat2}
+
+def get_df(start, band, bw, int_time, SNR, u, v, qualcode, save_to_csv=False):
+    start["band"] = band
+    start["bw"] = bw
+    start["int_time"] = int_time
+    start["SNR"] = SNR
+    start["u"] = u
+    start["v"] = v
+    start["Q_code"] = qualcode
+    # Collect everything into a dataframe
+    df = pd.DataFrame(start)
     
     # Sort out rows with too low quality
     df = df.loc[(df.Q_code.astype(int) > 5)]
