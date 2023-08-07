@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from numpy import exp, cos, sin, pi, sqrt, degrees
+from numpy import exp, cos, sin, pi, sqrt, degrees, floor
 import numpy as np
 
 
@@ -14,11 +14,11 @@ class Gaussian:
 
     def __add__(self, gaussian):
         return Gaussian(gaussian.amp + self.amp, gaussian.x0 + self.x0, gaussian.y0 + self.y0, gaussian.a + self.a,
-                        gaussian.b + self.b, gaussian.theta + self.theta)
+                        gaussian.b + self.b, limit_angle(gaussian.theta + self.theta))
 
     def __mul__(self, number):
         return Gaussian(number * self.amp, number * self.x0, number * self.y0, number * self.a,
-                        number * self.b, number * self.theta)
+                        number * self.b, limit_angle(number * self.theta))
 
     def __iter__(self):
         return self
@@ -78,6 +78,9 @@ class Gaussian:
             (-pi ** 2 * (y_bar * cos(self.theta) - x_bar * sin(self.theta)) ** 2 / self.b - pi ** 2 * (
                     x_bar * cos(self.theta) + y_bar * sin(self.theta)) ** 2 / self.a))
 
+def limit_angle(theta):
+    theta = theta%(2*pi)
+    return theta
 
 @dataclass
 class GaussList:

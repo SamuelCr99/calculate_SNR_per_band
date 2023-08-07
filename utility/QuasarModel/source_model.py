@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import log, where, exp
-from utility.QuasarModel.gauss import Gaussian, GaussList
+from utility.QuasarModel.gauss import Gaussian, GaussList, limit_angle
 import scipy
 
 
@@ -179,7 +179,7 @@ class SourceModel:
                 d_gauss.x0 = 0.2 * gauss_in[i].x0 if d_gauss.x0 > 0 else -0.2 * gauss_in[i].x0
             if abs(d_gauss.y0 / max(y_l)) > 0.2:
                 d_gauss.y0 = 0.2 * gauss_in[i].y0 if d_gauss.y0 > 0 else -0.2 * gauss_in[i].y0
-            d_gauss.theta = adjust[5 + 6 * i]
+            d_gauss.theta = limit_angle(adjust[5 + 6 * i])
             delta_gauss.append(d_gauss)
         return delta_gauss
 

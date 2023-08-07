@@ -68,11 +68,12 @@ if __name__ == "__main__":
 
             data = DataWrapper(args.session_folder)
             config = StationsConfigWrapper()
-            plot_source(args.sources, data.get(sources=args.source, 
+            source_model = SourceModelWrapper(args.fits_file) if args.fits_file else None
+            plot_source(args.source, data.get(sources=args.source, 
                                                bands=args.bands, ignored_bands=args.ignored_bands, 
                                                stations=args.stations, ignored_stations=args.ignored_stations, 
                                                baselines=args.baselines, ignored_baselines=args.ignored_baselines), 
-                        config, highlighted_stations=args.highlighted_stations)
+                        config, source_model=source_model, highlighted_stations=args.highlighted_stations)
             if args.save_dir:
                 plt.figure(0).savefig(f"{args.save_dir}/flux_density_mes_{args.source}_{''.join(args.bands)}.png")
                 plt.figure(3).savefig(f"{args.save_dir}/distance_{args.source}_{''.join(args.bands)}.png")
