@@ -87,4 +87,4 @@ To restore all SEFD values to their original state, click the "Delete" button un
 the "Configuration" tab.
 
 ## Known issues
-* Program doesn't work
+* Scaling of flux density between predicted and measured is inconsistent. 
