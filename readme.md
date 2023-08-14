@@ -1,7 +1,7 @@
-# SEFD Estimation Tool
+# Source model evaluation tool
 
 ## Description
-GUI for finding optimal SEFD values based on VGOS DB sessions and source images. 
+Application for finding optimal SEFD values based on VGOS DB sessions and source images. 
 The program was developed at NVI Inc. by Filip Herbertsson and Samuel Collier 
 Ryder during a summer internship in 2023.
 
@@ -17,7 +17,7 @@ To install the program, you need to clone the GitHub repository and install the
 required libraries. This can be done by running the following commands in the terminal:
 
 ```bash
-$ git clone https://github.com/SamuelCr99/VLBI_baseline_movement_plotter.git
+$ git clone https://github.com/SamuelCr99/source_model_evaluation.git
 $ pip install -r requirements.txt
 ```
 
@@ -74,16 +74,13 @@ the "Fit SEFD" button.
 
 Changes made to the SEFD values for each station and band can be saved, so that they are consistent when using the program at different times.
 
-#### Save changes made to the stations
-To save the changes made to the stations click the "Save" button under the
+* To save the changes made to the stations click the "Save" button under the
 "Configuration" tab.
 
-#### Restore changes to latest saved file 
-To restore changes to latest save file click the "Restore to saved" button under
+* To restore changes to latest save file click the "Restore to saved" button under
 the "Configuration" tab.
 
-#### Restore changes to original file 
-To restore all SEFD values to their original state, click the "Delete" button under
+* To restore all SEFD values to their original state, click the "Delete" button under
 the "Configuration" tab.
 
 ## Known issues
