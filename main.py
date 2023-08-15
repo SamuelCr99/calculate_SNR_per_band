@@ -39,8 +39,8 @@ if __name__ == "__main__":
         plot_parser.add_argument('--ignored_baselines', type=str, help="Comma separated list of baselines to ignore", default=[])
         plot_parser.add_argument('--fits_file', type=str, help="Relative or absolute path to the fits file")
         plot_parser.add_argument('--model', type=str, help="Which model to use for prediction. Can be either 'img' or 'raw', or unspecified", default="img")
-        lsf_parser.add_argument('--scale_uv', type=float, help="The scale used to adjust the model in the u-v plane", default=1)
-        lsf_parser.add_argument('--scale_flux', type=float, help="The scale used to adjust the model in the flux density", default=1)
+        plot_parser.add_argument('--scale_uv', type=float, help="The scale used to adjust the model in the u-v plane", default=1)
+        plot_parser.add_argument('--scale_flux', type=float, help="The scale used to adjust the model in the flux density", default=1)
         plot_parser.add_argument('--save_dir', type=str, help="Relative or absolute path to save plots to")
 
         lsf_parser.add_argument('session_folder', type=str, help="Relative or absolute path to the session folder")
