@@ -90,6 +90,7 @@ def run_gui():
                             margins=[0, 0], resizable=True, finalize=True,
                             icon="images/favicon.ico", enable_close_attempted_event=True)
     main_window.TKroot.minsize(1320, 820)
+    main_window["scale"].bind("<Return>", "_enter")
 
     # Fixes so the left column doesn't expand
     repack(main_window["left_col"].Widget, {'fill':'y', 'expand':0, 'before':main_window["right_col"].Widget})
@@ -474,7 +475,7 @@ def run_gui():
             sg.Popup("No fits file selected.",
                      icon="images/favicon.ico")
 
-        elif event == "set_scale":
+        elif event == "set_scale" or event == "scale_enter":
             if source_model:
                 source_model.scale_uv = float(values["scale"])
                 main_window.write_event_value("plot", True)

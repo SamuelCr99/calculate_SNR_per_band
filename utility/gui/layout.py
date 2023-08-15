@@ -11,18 +11,21 @@ def create_layout():
     Returns:
     The finished layout
     """
-    headings = ["Sel.", "Stations", "Obs.", "SEFD", "★"]
+    station_headings = ["Sel.", "Stations", "Obs.", "SEFD", "★"]
     col_widths = [4,10,4,10,4]
-    table_col = sg.Table([], headings=headings, col_widths=col_widths, auto_size_columns=False, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_NONE,
+    stations_col = sg.Table([], headings=station_headings, col_widths=col_widths, auto_size_columns=False, key="stations_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_NONE,
                          expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
     source_headings = ["Source", "Obs."]
     sources_col = sg.Table([], headings=source_headings, key="sources_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
                          expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
-    debug_col = [[sg.Text("Flux density scale:", pad=[[0,20],[0,0]]), sg.Input(default_text="1", key="scale", expand_x=True), sg.Button("Set", key="set_scale")],
-                 [sg.Text("Source model:", pad=[[0,20],[0,0]]), sg.Combo(["QuasarModelImg","QuasarModelRaw"], default_value=["QuasarModelImg"], expand_x=True, key="model_type", enable_events=True)],
-                 [sg.Button("Fit SEFD", key="fit_SEFD"), sg.Button("Get Gauss.", key="gauss"), sg.Button("Set flux scale", key="flux_scale")]]
+    debug_buttons = sg.Column([[sg.Button("Fit SEFD", key="fit_SEFD"), sg.Button("Set flux scale", key="flux_scale"), sg.Push(), sg.Button("Get Gauss.", key="gauss")]], p=[[0,0],[20,0]], expand_x=True)
+
+    debug_layout = [[sg.Text("Flux density scale:", s=15), sg.Input(default_text="1", s=20, expand_x=True, key="scale"), sg.Button("Set", key="set_scale")],
+                    [sg.Text("Source model:", s=15), sg.Combo(["QuasarModelImg","QuasarModelRaw"], s=20, expand_x=True, default_value=["QuasarModelImg"], key="model_type", enable_events=True)],
+                    [debug_buttons]]
+    debug_col = sg.Column(debug_layout, p=20, expand_x=True)
 
     # Currently the only column
     left_col = [[sg.Frame("Source", [[sources_col]], expand_x=True, expand_y=True)],
@@ -32,9 +35,9 @@ def create_layout():
                                     sg.Radio("D", "band", key="D_band", enable_events=True),
                                     sg.Radio("S", "band", key="S_band", enable_events=True, visible=False),
                                     sg.Radio("X", "band", key="X_band", enable_events=True, visible=False)]], expand_x=True)],
-                [sg.Frame("Stations", [[table_col]],
+                [sg.Frame("Stations", [[stations_col]],
                           expand_x=True, expand_y=True)],
-                [sg.Frame("Debug", debug_col)],
+                [sg.Frame("Debug", [[debug_col]], expand_x=True)],
                 [sg.Text(text="", key="loading_text", text_color="white", font=("Andalde Mono", 16))]]
 
     figure1_tab = [[sg.Canvas(key="fig1", background_color="white", expand_x=True, expand_y=True)],
