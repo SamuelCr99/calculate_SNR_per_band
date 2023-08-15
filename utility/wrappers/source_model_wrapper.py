@@ -5,7 +5,7 @@ from math import radians, pi, e, sin, cos, sqrt
 
 class SourceModelWrapper:
 
-    def __init__(self, path, scale_uv=1, flux_scale=1, model="img"):
+    def __init__(self, path, scale_uv=1, scale_flux=1, model="img"):
 
         if model == "img":
             data = fits.open(path)[0]
@@ -18,7 +18,7 @@ class SourceModelWrapper:
             sm = SourceModelRaw()
         
         self.scale_uv = scale_uv
-        self.flux_scale = flux_scale
+        self.scale_flux = scale_flux
 
         self.gauss_list = sm.process(path)
 
@@ -37,10 +37,10 @@ class SourceModelWrapper:
 
             flux += A*pi/sqrt(a*b)*e**(-2*pi*1j*(x0*u+y0*v) -pi**2/a*(u*cos(t)+v*sin(t))**2 -pi**2/b*(v*cos(t)-u*sin(t))**2)
 
-        return abs(flux)/self.flux_scale
+        return abs(flux)/self.scale_flux
     
     def set_flux_scale(self, config, data):
-        self.flux_scale = 1
+        self.scale_flux = 1
 
         SNR_meas_list = []
         SNR_pred_list = []
@@ -69,4 +69,4 @@ class SourceModelWrapper:
             SNR_bit_pred = 0.617502*flux_pred*sqrt(1/(SEFD1*SEFD2))
             SNR_pred_list.append(SNR_bit_pred)
         
-        self.flux_scale = sum(list(map(lambda p,m: p/m, SNR_pred_list, SNR_meas_list)))/len(SNR_pred_list)
+        self.scale_flux = sum(list(map(lambda p,m: p/m, SNR_pred_list, SNR_meas_list)))/len(SNR_pred_list)

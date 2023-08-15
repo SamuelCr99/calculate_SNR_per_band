@@ -38,13 +38,17 @@ if __name__ == "__main__":
         plot_parser.add_argument('--baselines', type=str, help="Comma separated list of baselines to show", default=[])
         plot_parser.add_argument('--ignored_baselines', type=str, help="Comma separated list of baselines to ignore", default=[])
         plot_parser.add_argument('--fits_file', type=str, help="Relative or absolute path to the fits file")
-        plot_parser.add_argument('--model', type=str, help="Which model to use for prediction. Can be either 'img' or 'raw', or unspecified.", default="img")
+        plot_parser.add_argument('--model', type=str, help="Which model to use for prediction. Can be either 'img' or 'raw', or unspecified", default="img")
+        lsf_parser.add_argument('--scale_uv', type=float, help="The scale used to adjust the model in the u-v plane", default=1)
+        lsf_parser.add_argument('--scale_flux', type=float, help="The scale used to adjust the model in the flux density", default=1)
         plot_parser.add_argument('--save_dir', type=str, help="Relative or absolute path to save plots to")
 
         lsf_parser.add_argument('session_folder', type=str, help="Relative or absolute path to the session folder")
         lsf_parser.add_argument('--fits_file', type=str, help="Relative or absolute path to the fits file. Mandatory to have one of fits_file or fits_folder")
         lsf_parser.add_argument('--fits_folder', type=str, help="Relative or absolute path to the directory with fits files. Mandatory to have one of fits_file or fits_folder")
-        lsf_parser.add_argument('--model', type=str, help="Which model to use for prediction. Can be either 'img' or 'raw', or unspecified.", default="img")
+        lsf_parser.add_argument('--model', type=str, help="Which model to use for prediction. Can be either 'img' or 'raw', or unspecified", default="img")
+        lsf_parser.add_argument('--scale_uv', type=float, help="The scale used to adjust the model in the u-v plane", default=1)
+        lsf_parser.add_argument('--scale_flux', type=float, help="The scale used to adjust the model in the flux density", default=1)
         lsf_parser.add_argument('--sources', type=str, help="Source name or comma separated list of sources", default=[])
         lsf_parser.add_argument('--ignored_sources', type=str, help="Source name or comma separated list of sources to ignore", default=[])
         lsf_parser.add_argument('--bands', type=str, help="Band name or comma separated list of bands", default=[])
@@ -70,7 +74,7 @@ if __name__ == "__main__":
 
             data = DataWrapper(args.session_folder)
             config = StationsConfigWrapper()
-            source_model = SourceModelWrapper(args.fits_file, model=args.model) if args.fits_file else None
+            source_model = SourceModelWrapper(args.fits_file, model=args.model, scale_uv=args.scale_uv, scale_flux=args.scale_flux) if args.fits_file else None
             plot_source(args.source, data.get(sources=args.source, 
                                                bands=args.bands, ignored_bands=args.ignored_bands, 
                                                stations=args.stations, ignored_stations=args.ignored_stations, 
@@ -102,7 +106,7 @@ if __name__ == "__main__":
             config = StationsConfigWrapper()
 
             if args.fits_file:
-                source_model = SourceModelWrapper(args.fits_file, model=args.model)
+                source_model = SourceModelWrapper(args.fits_file, model=args.model, scale_uv=args.scale_uv, scale_flux=args.scale_flux)
 
             elif args.fits_folder:
                 source_model = model_source_map(data.get(sources=args.sources, bands=args.bands, ignored_stations=args.ignored_stations), args.fits_folder)
