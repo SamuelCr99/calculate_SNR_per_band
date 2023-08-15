@@ -90,7 +90,8 @@ def run_gui():
                             margins=[0, 0], resizable=True, finalize=True,
                             icon="images/favicon.ico", enable_close_attempted_event=True)
     main_window.TKroot.minsize(1320, 820)
-    main_window["scale"].bind("<Return>", "_enter")
+    main_window["scale_uv"].bind("<Return>", "_enter")
+    main_window["scale_flux"].bind("<Return>", "_enter")
 
     # Fixes so the left column doesn't expand
     repack(main_window["left_col"].Widget, {'fill':'y', 'expand':0, 'before':main_window["right_col"].Widget})
@@ -192,7 +193,8 @@ def run_gui():
 
             source_model_dir = new_dir
             main_window["loading_text"].update(value="")
-            main_window["scale"].update("1")
+            main_window["scale_uv"].update("1")
+            main_window["scale_flux"].update("1")
             main_window.refresh()
 
             # Re-plot with new fits file
@@ -467,18 +469,49 @@ def run_gui():
         ### Debug events ###
         ####################
 
-        if (event == "set_scale" or event == "fit_SEFD" or event == "gauss" or event == "flux_scale") and not source:
-            sg.Popup("No source selected.",
-                     icon="images/favicon.ico")
+        # Catch events when no model has been set
+        if (event == "set_scale_uv" or event == "set_scale_flux" or event == "set_scale_flux_auto" or event == "fit_SEFD" or event == "gauss"):
+            if not source:
+                sg.Popup("No source selected.", icon="images/favicon.ico")
+                continue
+            elif not source_model:
+                sg.Popup("No fits file selected.", icon="images/favicon.ico")
+                continue
 
-        elif (event == "set_scale" or event == "fit_SEFD" or event == "gauss" or event == "flux_scale") and not source_model:
-            sg.Popup("No fits file selected.",
-                     icon="images/favicon.ico")
+        if event == "set_scale_uv" or event == "scale_uv_enter":
+            source_model.scale_uv = float(values["scale_uv"])
+            main_window.write_event_value("plot", True)
 
-        elif event == "set_scale" or event == "scale_enter":
-            if source_model:
-                source_model.scale_uv = float(values["scale"])
-                main_window.write_event_value("plot", True)
+        elif event == "set_scale_flux" or event == "scale_flux_enter":
+            source_model.scale_flux = float(values["scale_flux"])
+            main_window.write_event_value("plot", True)
+        
+        elif event == "set_scale_flux_auto":
+            source_model.set_flux_scale(config, data.get(sources=source,ignored_stations=ignored_stations,bands=band))
+
+            # Update GUI
+            new_table = update_station_table(
+                config, source_dict[source]["stations"],
+                highlights, band)
+            main_window["stations_table"].update(new_table)
+            main_window["scale_flux"].update(value=source_model.scale_flux)
+            main_window.write_event_value("plot", True)
+            main_window.refresh()
+
+        elif event == "model_type":
+            source_model_type_new = "raw" if values["model_type"] == "QuasarModelRaw" else "img"
+
+            if source_model_type_new != source_model_type:
+                source_model_type = source_model_type_new
+
+                if source_model:
+                    try:
+                        source_model = SourceModelWrapper(source_model_dir, model=source_model_type)
+                        main_window["scale_uv"].update("1")
+                        main_window["scale_flux"].update("1")
+                        main_window.write_event_value("plot", True)
+                    except:
+                        pass
 
         elif event == "fit_SEFD":
             if source and source_model:
@@ -497,32 +530,6 @@ def run_gui():
                 sm = source_model.gauss_list[0]
                 sg.Popup(f"a = {sm.a}\nb = {sm.b}\nA = {sm.amp}\nt = {sm.theta}\nx0 = {sm.x0}\ny0 = {sm.y0}")
 
-        elif event == "flux_scale":
-            if source and source_model:
-                source_model.set_flux_scale(config, data.get(sources=source,ignored_stations=ignored_stations,bands=band))
-
-                # Update GUI
-                new_table = update_station_table(
-                    config, source_dict[source]["stations"],
-                    highlights, band)
-                main_window["stations_table"].update(new_table)
-                main_window.write_event_value("plot", True)
-                main_window.refresh()
-
-        elif event == "model_type":
-            source_model_type_new = "raw" if values["model_type"] == "QuasarModelRaw" else "img"
-
-            if source_model_type_new != source_model_type:
-                source_model_type = source_model_type_new
-
-                if source_model:
-                    try:
-                        source_model = SourceModelWrapper(source_model_dir, model=source_model_type, scale_uv=source_model.scale_uv)
-                        
-                        # Re-plot with new fits file
-                        main_window.write_event_value("plot", True)
-                    except:
-                        pass
 
         ##################
         ### Plot event ###

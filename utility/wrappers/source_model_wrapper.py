@@ -7,6 +7,8 @@ class SourceModelWrapper:
 
     def __init__(self, path, scale_uv=1, scale_flux=1, model="img"):
 
+        self.model = model
+
         if model == "img":
             data = fits.open(path)[0]
             self.delta_u = radians(data.header["CDELT1"])
@@ -23,8 +25,11 @@ class SourceModelWrapper:
         self.gauss_list = sm.process(path)
 
     def get_flux(self,u,v):
-        u = -self.delta_u*u/self.scale_uv
+        u = self.delta_u*u/self.scale_uv
         v = self.delta_v*v/self.scale_uv
+
+        # if self.model == "img":
+        #     u,v = (v,u)
 
         flux = 0
         for gaussian in self.gauss_list:

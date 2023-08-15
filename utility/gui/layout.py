@@ -20,10 +20,11 @@ def create_layout():
     sources_col = sg.Table([], headings=source_headings, key="sources_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
                          expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
-    debug_buttons = sg.Column([[sg.Button("Fit SEFD", key="fit_SEFD"), sg.Button("Set flux scale", key="flux_scale"), sg.Push(), sg.Button("Get Gauss.", key="gauss")]], p=[[0,0],[20,0]], expand_x=True)
+    debug_buttons = sg.Column([[sg.Push(), sg.Button("Fit SEFD", key="fit_SEFD"), sg.Button("Get Gauss.", key="gauss")]], p=[[0,0],[20,0]], expand_x=True)
 
-    debug_layout = [[sg.Text("Flux density scale:", s=15), sg.Input(default_text="1", s=20, expand_x=True, key="scale"), sg.Button("Set", key="set_scale")],
-                    [sg.Text("Source model:", s=15), sg.Combo(["QuasarModelImg","QuasarModelRaw"], s=20, expand_x=True, default_value=["QuasarModelImg"], key="model_type", enable_events=True)],
+    debug_layout = [[sg.Text("u-v scale:", s=15), sg.Input(default_text="1", s=15, key="scale_uv"), sg.Button("Set", key="set_scale_uv")],
+                    [sg.Text("Flux scale:", s=15), sg.Input(default_text="1", s=15, key="scale_flux"), sg.Button("Set", key="set_scale_flux"), sg.Button("Automatic", key="set_scale_flux_auto")],
+                    [sg.Text("Source model:", s=15), sg.Combo(["QuasarModelImg","QuasarModelRaw"], s=15, default_value=["QuasarModelImg"], key="model_type", enable_events=True)],
                     [debug_buttons]]
     debug_col = sg.Column(debug_layout, p=20, expand_x=True)
 

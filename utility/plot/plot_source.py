@@ -144,7 +144,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
         for i in range(num_points):
             row = []
             for j in range(num_points):
-                row.append(source_model.get_flux(coords_u_im[i],coords_v_im[j]))
+                row.append(source_model.get_flux(coords_v_im[num_points-j-1], coords_u_im[i]))
             flux_pred.append(row)
         
         plt.imshow(flux_pred, extent=extent, vmin=0, cmap=CMAP)
