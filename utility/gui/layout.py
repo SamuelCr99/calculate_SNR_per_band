@@ -20,7 +20,8 @@ def create_layout():
     sources_col = sg.Table([], headings=source_headings, key="sources_table", enable_click_events=True, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
                          expand_x=True, expand_y=True, p=20, alternating_row_color="grey25", justification="center")
 
-    debug_col = [[sg.Input(default_text="1", key="scale", expand_x=True), sg.Button("Set", key="set_scale")],
+    debug_col = [[sg.Text("Flux density scale:", pad=[[0,20],[0,0]]), sg.Input(default_text="1", key="scale", expand_x=True), sg.Button("Set", key="set_scale")],
+                 [sg.Text("Source model:", pad=[[0,20],[0,0]]), sg.Combo(["QuasarModelImg","QuasarModelRaw"], default_value=["QuasarModelImg"], expand_x=True, key="model_type", enable_events=True)],
                  [sg.Button("Fit SEFD", key="fit_SEFD"), sg.Button("Get Gauss.", key="gauss"), sg.Button("Set flux scale", key="flux_scale")]]
 
     # Currently the only column

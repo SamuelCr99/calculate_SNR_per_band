@@ -103,6 +103,8 @@ def run_gui():
     source_dict = {}
     source = ""
     source_model = None
+    source_model_type = "img"
+    source_model_dir = ""
     band = 0
     sort_stat_reverse = [True, False, True, True, True]
     sort_source_reverse = [False, True]
@@ -182,11 +184,12 @@ def run_gui():
             main_window.refresh()
 
             try:
-                source_model = SourceModelWrapper(new_dir)
+                source_model = SourceModelWrapper(new_dir, model=source_model_type)
             except:
                 sg.Popup("Something went wrong! Please select a valid fits file.",
                              icon="images/favicon.ico")
 
+            source_model_dir = new_dir
             main_window["loading_text"].update(value="")
             main_window["scale"].update("1")
             main_window.refresh()
@@ -463,12 +466,20 @@ def run_gui():
         ### Debug events ###
         ####################
 
-        if event == "set_scale":
+        if (event == "set_scale" or event == "fit_SEFD" or event == "gauss" or event == "flux_scale") and not source:
+            sg.Popup("No source selected.",
+                     icon="images/favicon.ico")
+
+        elif (event == "set_scale" or event == "fit_SEFD" or event == "gauss" or event == "flux_scale") and not source_model:
+            sg.Popup("No fits file selected.",
+                     icon="images/favicon.ico")
+
+        elif event == "set_scale":
             if source_model:
-                source_model.scale = float(values["scale"])
+                source_model.scale_uv = float(values["scale"])
                 main_window.write_event_value("plot", True)
 
-        if event == "fit_SEFD":
+        elif event == "fit_SEFD":
             if source and source_model:
                 least_square_fit(data.get(sources=source,ignored_stations=ignored_stations,bands=band), source_model, config)
 
@@ -480,12 +491,12 @@ def run_gui():
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
 
-        if event == "gauss":
+        elif event == "gauss":
             if source and source_model:
                 sm = source_model.gauss_list[0]
                 sg.Popup(f"a = {sm.a}\nb = {sm.b}\nA = {sm.amp}\nt = {sm.theta}\nx0 = {sm.x0}\ny0 = {sm.y0}")
 
-        if event == "flux_scale":
+        elif event == "flux_scale":
             if source and source_model:
                 source_model.set_flux_scale(config, data.get(sources=source,ignored_stations=ignored_stations,bands=band))
 
@@ -497,13 +508,20 @@ def run_gui():
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
 
-        if (event == "set_scale" or event == "fit_SEFD" or event == "gauss" or event == "flux_scale") and not source:
-            sg.Popup("No source selected.",
-                     icon="images/favicon.ico")
+        elif event == "model_type":
+            source_model_type_new = "raw" if values["model_type"] == "QuasarModelRaw" else "img"
 
-        if (event == "set_scale" or event == "fit_SEFD" or event == "gauss" or event == "flux_scale") and not source_model:
-            sg.Popup("No fits file selected.",
-                     icon="images/favicon.ico")
+            if source_model_type_new != source_model_type:
+                source_model_type = source_model_type_new
+
+                if source_model:
+                    try:
+                        source_model = SourceModelWrapper(source_model_dir, model=source_model_type, scale_uv=source_model.scale_uv)
+                        
+                        # Re-plot with new fits file
+                        main_window.write_event_value("plot", True)
+                    except:
+                        pass
 
         ##################
         ### Plot event ###

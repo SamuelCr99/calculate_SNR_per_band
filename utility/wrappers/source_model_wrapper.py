@@ -1,26 +1,30 @@
-from utility.QuasarModel.get_data import get_data
-from utility.QuasarModel.source_model import SourceModel as sm
+from utility.QuasarModelImg.source_model import SourceModel as SourceModelImg
+from utility.QuasarModelRaw.source_model import SourceModel as SourceModelRaw
 from astropy.io import fits
 from math import radians, pi, e, sin, cos, sqrt
 
 class SourceModelWrapper:
 
-    def __init__(self, path, scale=1, flux_scale=1):
-        data = fits.open(path)[0]
-        print(path)
-        # self.delta_u = radians(data.header["CDELT1"])
-        # self.delta_v = radians(data.header["CDELT2"])
-        self.delta_u = 1
-        self.delta_v = 1
-        self.scale = scale
+    def __init__(self, path, scale_uv=1, flux_scale=1, model="img"):
+
+        if model == "img":
+            data = fits.open(path)[0]
+            self.delta_u = radians(data.header["CDELT1"])
+            self.delta_v = radians(data.header["CDELT2"])
+            sm = SourceModelImg()
+        elif model == "raw":
+            self.delta_u = 1
+            self.delta_v = 1
+            sm = SourceModelRaw()
+        
+        self.scale_uv = scale_uv
         self.flux_scale = flux_scale
 
-        x,y,intensity = get_data(path)
-        self.gauss_list = sm().process(x,y,intensity)
+        self.gauss_list = sm.process(path)
 
     def get_flux(self,u,v):
-        u = -self.delta_u*u/self.scale
-        v = self.delta_v*v/self.scale
+        u = -self.delta_u*u/self.scale_uv
+        v = self.delta_v*v/self.scale_uv
 
         flux = 0
         for gaussian in self.gauss_list:
