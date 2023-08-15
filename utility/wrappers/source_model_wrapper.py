@@ -8,6 +8,7 @@ class SourceModelWrapper:
     def __init__(self, path, scale_uv=1, scale_flux=1, model="img"):
 
         self.model = model
+        self.name = path.split("/")[-1].split("\\")[-1].split(".")[0]
 
         if model == "img":
             data = fits.open(path)[0]

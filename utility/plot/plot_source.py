@@ -153,6 +153,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
          # Add text
         plt.xlabel("U [fringes/radian]")
         plt.ylabel("V [fringes/radian]")
+        plt.title(source_model.name)
 
     ##########################
     ### Flux density ratio ###
