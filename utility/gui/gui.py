@@ -212,9 +212,12 @@ def run_gui():
             if a == "Yes":
                 config.restore()
 
-                new_table = update_station_table(
-                    config, source_dict[source]["stations"],
-                    highlights, band)
+                if source:
+                    new_table = update_station_table(
+                        config, source_dict[source]["stations"],
+                        highlights, band)
+                else:
+                    new_table = []
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
@@ -227,9 +230,12 @@ def run_gui():
             if a == "Yes":
                 config.delete()
 
-                new_table = update_station_table(
-                    config, source_dict[source]["stations"],
-                    highlights, band)
+                if source:
+                    new_table = update_station_table(
+                        config, source_dict[source]["stations"],
+                        highlights, band)
+                else:
+                    new_table = []
                 main_window["stations_table"].update(new_table)
                 main_window.write_event_value("plot", True)
                 main_window.refresh()
