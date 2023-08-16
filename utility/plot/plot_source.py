@@ -118,7 +118,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     plt.figtext(
         0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
     plt.title(
-        f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands)}")
+        f"Flux density for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands)}")
 
     ############################
     ### Flux density (pred.) ###
@@ -153,7 +153,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
          # Add text
         plt.xlabel("U [fringes/radian]")
         plt.ylabel("V [fringes/radian]")
-        plt.title(source_model.name)
+        plt.title(f"Flux density using {source_model.name}")
 
     ##########################
     ### Flux density ratio ###
@@ -181,7 +181,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
         plt.figtext(
             0.95, 0.5, f'Number of points in plot: {len(coords_u)}', va="center", ha='center', rotation=90)
         plt.title(
-            f"UV coordinates for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands)}")
+            f"Flux density ratio for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands)}")
 
     ################
     ### Distance ###
@@ -214,7 +214,7 @@ def plot_source(source, data, config, source_model = None, highlighted_stations 
     plt.xlabel("sqrt(U^2+V^2) [fringes/radian]")
     plt.ylabel("Flux density")
     plt.title(
-        f"Flux density vs. sqrt(U^2+V^2) for band{'s'*(len(bands)>1)} {', '.join(bands)}")
+        f"Flux density vs. radial distance for source {source} for band{'s'*(len(bands)>1)} {', '.join(bands)}")
     
     # If multiple bands are plotted there need the be a legend to explain different
     # colors

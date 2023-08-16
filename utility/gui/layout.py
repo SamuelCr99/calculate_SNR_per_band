@@ -56,7 +56,7 @@ def create_layout():
     figure_tabgroup = [[sg.Tab("Flux density (meas.)", figure1_tab, background_color="white")],
                        [sg.Tab("Flux density (pred.)", figure2_tab, background_color="white")],
                        [sg.Tab("Flux density ratio", figure3_tab, background_color="white")],
-                       [sg.Tab("Distance", figure4_tab, background_color="white")]]
+                       [sg.Tab("Radial", figure4_tab, background_color="white")]]
     
     right_col = [[sg.TabGroup(figure_tabgroup, expand_x=True, expand_y=True)]]
 

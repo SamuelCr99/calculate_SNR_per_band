@@ -89,7 +89,7 @@ def run_gui():
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True,
                             icon="images/favicon.ico", enable_close_attempted_event=True)
-    main_window.TKroot.minsize(1320, 820)
+    main_window.TKroot.minsize(1320, 895)
     main_window["scale_uv"].bind("<Return>", "_enter")
     main_window["scale_flux"].bind("<Return>", "_enter")
 
