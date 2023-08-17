@@ -1,8 +1,6 @@
-import argparse
 import mplcursors
 import matplotlib.pyplot as plt
 from math import sqrt
-from utility.calc.to_uv import convert_uv
 from utility.calc.calculate_flux import calculate_flux
 
 CMAP = "jet"
