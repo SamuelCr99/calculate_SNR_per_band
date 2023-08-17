@@ -93,7 +93,7 @@ if __name__ == "__main__":
                     path = f"{dir}config.csv"
                 else:
                     path = ""
-                config = StationsConfigWrapper(args.session_dir, path)
+                config = StationsConfigWrapper(session_dir=args.session_dir, path=path)
                 config.delete()
 
         elif args.mode == "plot":
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             split_attribute("highlighted_stations")
 
             data = DataWrapper(args.data)
-            config = StationsConfigWrapper(args.config)
+            config = StationsConfigWrapper(path=args.config)
             
             source_model = SourceModelWrapper(args.fits_file, model=args.model, scale_uv=args.scale_uv, scale_flux=args.scale_flux) if args.fits_file else None
             plot_source(args.source, data.get(sources=args.source, 
