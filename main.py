@@ -45,24 +45,22 @@ if __name__ == "__main__":
         plot_parser.add_argument('--fits_file', type=str, help="relative or absolute path to the fits file")
         plot_parser.add_argument('--model', type=str, help="which model to use for prediction. Can be either 'img' or 'raw', or unspecified", default="img")
         plot_parser.add_argument('--scale_uv', type=float, help="the scale used to adjust the model in the u-v plane", default=1)
-        plot_parser.add_argument('--scale_flux', type=float, help="the scale used to adjust the model in the flux density", default=1)
+        plot_parser.add_argument('--scale_flux', type=str, help="the scale used to adjust the model in the flux density, or 'auto'", default=1)
         plot_parser.add_argument('--data', type=str, help="relative or absolute path to the data file to use. Only needed if other than default", default="")
         plot_parser.add_argument('--config', type=str, help="relative or absolute path to the config file to use. Only needed if other than default", default="")
         plot_parser.add_argument('--save_dir', type=str, help="relative or absolute path to save plots to", default="")
 
-        lsf_parser.add_argument('--fits_file', type=str, help="relative or absolute path to the fits file. Mandatory to have one of fits_file or fits_folder")
-        lsf_parser.add_argument('--fits_folder', type=str, help="relative or absolute path to the directory with fits files. Mandatory to have one of fits_file or fits_folder")
-        lsf_parser.add_argument('--model', type=str, help="which model to use for prediction. Can be either 'img' or 'raw', or unspecified", default="img")
-        lsf_parser.add_argument('--scale_uv', type=float, help="the scale used to adjust the model in the u-v plane", default=1)
-        lsf_parser.add_argument('--scale_flux', type=float, help="the scale used to adjust the model in the flux density", default=1)
-        lsf_parser.add_argument('--sources', type=str, help="source name or comma separated list of sources", default=[])
-        lsf_parser.add_argument('--ignored_sources', type=str, help="source name or comma separated list of sources to ignore", default=[])
+        lsf_parser.add_argument('source', type=str, help="source name or comma separated list of sources", default=[])
         lsf_parser.add_argument('--bands', type=str, help="band name or comma separated list of bands", default=[])
         lsf_parser.add_argument('--ignored_bands', type=str, help="band name or comma separated list of bands to ignore", default=[])
         lsf_parser.add_argument('--stations', type=str, help="comma separated list of stations to include", default=[])
         lsf_parser.add_argument('--ignored_stations', type=str, help="comma separated list of stations to ignore", default=[])
         lsf_parser.add_argument('--baselines', type=str, help="comma separated list of stations to include", default=[])
         lsf_parser.add_argument('--ignored_baselines', type=str, help="comma separated list of stations to ignore", default=[])
+        lsf_parser.add_argument('fits_file', type=str, help="relative or absolute path to the fits file")
+        lsf_parser.add_argument('--model', type=str, help="which model to use for prediction. Can be either 'img' or 'raw', or unspecified", default="img")
+        lsf_parser.add_argument('--scale_uv', type=float, help="the scale used to adjust the model in the u-v plane", default=1)
+        lsf_parser.add_argument('--scale_flux', type=str, help="the scale used to adjust the model in the flux density, or 'auto'", default=1)
         lsf_parser.add_argument('--data', type=str, help="relative or absolute path to the data file to use. Only needed if other than default", default="")
         lsf_parser.add_argument('--config', type=str, help="relative or absolute path to the config file to use. Only needed if other than default", default="")
 
@@ -101,14 +99,26 @@ if __name__ == "__main__":
             split_attribute("highlighted_stations")
 
             data = DataWrapper(args.data)
-            config = StationsConfigWrapper(path=args.config)
+            data = data.get(sources=args.source,
+                            bands=args.bands,
+                            ignored_bands=args.ignored_bands,
+                            stations=args.stations,
+                            ignored_stations=args.ignored_stations, 
+                            baselines=args.baselines,
+                            ignored_baselines=args.ignored_baselines)
             
-            source_model = SourceModelWrapper(args.fits_file, model=args.model, scale_uv=args.scale_uv, scale_flux=args.scale_flux) if args.fits_file else None
-            plot_source(args.source, data.get(sources=args.source, 
-                                               bands=args.bands, ignored_bands=args.ignored_bands, 
-                                               stations=args.stations, ignored_stations=args.ignored_stations, 
-                                               baselines=args.baselines, ignored_baselines=args.ignored_baselines), 
-                        config, source_model=source_model, highlighted_stations=args.highlighted_stations)
+            config = StationsConfigWrapper(path=args.config)
+
+            if args.fits_file:
+                scale_flux = float(args.scale_flux) if args.scale_flux and args.scale_flux != "auto" else 1
+                source_model = SourceModelWrapper(args.fits_file, model=args.model, scale_uv=args.scale_uv, scale_flux=scale_flux)
+                if args.scale_flux == "auto": source_model.set_flux_scale(config, data)
+            else:
+                source_model = None
+
+            plot_source(args.source, data, config, source_model=source_model,
+                        highlighted_stations=args.highlighted_stations)
+            
             if args.save_dir:
                 plt.figure(0).savefig(f"{args.save_dir}/flux_density_mes_{args.source}_{''.join(args.bands)}.png")
                 plt.figure(3).savefig(f"{args.save_dir}/distance_{args.source}_{''.join(args.bands)}.png")
@@ -119,28 +129,23 @@ if __name__ == "__main__":
                 plt.show()
 
         elif args.mode == "lsf":
-            if args.fits_file == None and args.fits_folder == None:
-                raise ValueError("Either fits_file or fits_folder must be specified")
-            
-            if args.fits_file != None and args.fits_folder != None:
-                raise ValueError("Both fits_file and fits_folder cannot be specified")
-
-            split_attribute("sources")
-            split_attribute("ignored_sources")
-
-            if type(args.ignored_stations) == str:
-                ignored_stations = args.ignored_stations.split(",")
 
             data = DataWrapper(args.data)
+            data = data.get(sources=args.source,
+                            bands=args.bands,
+                            ignored_bands=args.ignored_bands,
+                            stations=args.stations,
+                            ignored_stations=args.ignored_stations, 
+                            baselines=args.baselines,
+                            ignored_baselines=args.ignored_baselines)
+            
             config = StationsConfigWrapper(path=args.config)
 
-            if args.fits_file:
-                source_model = SourceModelWrapper(args.fits_file, model=args.model, scale_uv=args.scale_uv, scale_flux=args.scale_flux)
-
-            elif args.fits_folder:
-                source_model = model_source_map(data.get(sources=args.sources, bands=args.bands, ignored_stations=args.ignored_stations), args.fits_folder)
+            scale_flux = float(args.scale_flux) if args.scale_flux and args.scale_flux != "auto" else 1
+            source_model = SourceModelWrapper(args.fits_file, model=args.model, scale_uv=args.scale_uv, scale_flux=scale_flux)
+            if args.scale_flux == "auto": source_model.set_flux_scale(config, data)
             
-            least_square_fit(data.get(sources=args.sources, bands=args.bands, ignored_stations=args.ignored_stations), source_model, config)
+            least_square_fit(data, source_model, config)
             config.save()
 
         else:
