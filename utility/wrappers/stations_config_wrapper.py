@@ -1,32 +1,21 @@
 import pandas as pd
 import os
+import netCDF4 as nc
+import numpy as np
 
 CONFIG_PATH = "data/derived/config.csv"
 
 class StationsConfigWrapper:
 
-    def __init__(self, *arg):
-        if not arg or not arg[0]:
-            try:
-                self.df = pd.read_csv(CONFIG_PATH)
-                self.path = CONFIG_PATH
-            except:
-                create_config()
-                self.df = pd.read_csv(CONFIG_PATH)
-                self.path = CONFIG_PATH
-        else:
-            if type(arg[0]) == pd.DataFrame:
-                self.df = arg[0]
-                self.path = arg[1]
+    def __init__(self, session_dir="", path=""):
+        self.session_dir = session_dir
+        self.path = path if path else CONFIG_PATH
 
-            elif type(arg[0]) == str:
-                try:
-                    self.df = pd.read_csv(arg[0])
-                    self.path = arg[0]
-                except:
-                    create_config(arg[0])
-                    self.df = pd.read_csv(arg[0])
-                    self.path = arg[0]
+        try:
+            self.df = pd.read_csv(self.path)
+        except:
+            create_config(self.session_dir, self.path)
+            self.df = pd.read_csv(self.path)
             
         self.df_copy = self.df.copy(deep=True)
     
@@ -39,9 +28,10 @@ class StationsConfigWrapper:
         self.df = self.df_copy.copy(deep=True)
     
     def delete(self):
-        create_config(self.path)
-        self.df = pd.read_csv(self.path)
-        self.df_copy = self.df.copy(deep=True)
+        if self.session_dir:
+            create_config(self.session_dir, self.path)
+            self.df = pd.read_csv(self.path)
+            self.df_copy = self.df.copy(deep=True)
 
     def has_changed(self):
         return not self.df.equals(self.df_copy)
@@ -78,7 +68,7 @@ class StationsConfigWrapper:
     def get_deselected_stations(self):
         return self.df.loc[self.df["selected"] == 0]["name"].to_list()
 
-def create_config(*arg):
+def create_config(session_dir, path):
     """
     Finds stations and their SEFD
 
@@ -88,7 +78,10 @@ def create_config(*arg):
     Returns:
     No return values!
     """
-    path = arg[0] if arg and arg[0] else CONFIG_PATH
+    if session_dir[-1] != '/': session_dir += '/'
+    station_list_path = f"{session_dir}Apriori/Station.nc"
+    station_array = np.ma.getdata(nc.Dataset(station_list_path)["AprioriStationList"]).tolist()
+    station_list = list(map(lambda stat: bytes_to_string(stat), station_array))
 
     station_sefds = pd.read_csv(
         'data/standard/equip.cat', delim_whitespace=True)[['Antenna', 'X_SEFD', 'S_SEFD']]
@@ -108,11 +101,21 @@ def create_config(*arg):
         columns={'Name': 'name'})
 
     joined_df["selected"] = [1]*len(joined_df["name"])
+    
+    joined_df = joined_df.loc[joined_df.name.isin(station_list)]
 
     # Write to csv file
-    if not arg:
+    if path == CONFIG_PATH:
         data_folders = os.listdir('data/')
         if 'derived' not in data_folders:
             os.mkdir('data/derived')
 
     joined_df.to_csv(path, index=False)
+
+def bytes_to_string(bytes):
+    # Converts a list of byte characters to a string
+    string = ""
+    for byte in bytes:
+        char = byte.decode("utf-8")
+        if char != " ": string += char
+    return string

@@ -29,7 +29,7 @@ class DataWrapper:
         The newly created data object
         """
 
-        if arg and arg[0]:
+        if arg:
             # If provided a DataFrame, use that one
             if type(arg[0]) == pd.DataFrame:
                 self.df = arg[0]
@@ -43,30 +43,30 @@ class DataWrapper:
 
             # If provided a string, it can be a directory or a CSV file
             elif type(arg[0]) == str:
-                if arg[0].split(".")[-1] == "csv":
-                    self.df = pd.read_csv(arg[0], skiprows=1)
+                if arg[0]:
+                    if arg[0].split(".")[-1] == "csv":
+                        self.df = pd.read_csv(arg[0], skiprows=1)
 
-                    # Check if it is a ABCD session or an SX session
-                    self.is_abcd = "A" in self.df.band.to_list()
-                    self.is_sx = not self.is_abcd
+                        # Check if it is a ABCD session or an SX session
+                        self.is_abcd = "A" in self.df.band.to_list()
+                        self.is_sx = not self.is_abcd
 
-                else:
-                    # Check if it is a ABCD session or an SX session
-                    self.is_abcd = ("Observables" in os.listdir(f"{arg[0]}/")) and (
-                        "QualityCode_bS.nc" not in os.listdir(f"{arg[0]}/Observables/"))
-                    self.is_sx = not self.is_abcd
-                    
-                    if self.is_abcd:
-                        self.df = find_datapoints_abcd(arg[0])
                     else:
-                        self.df = find_datapoints_sx(arg[0])
+                        # Check if it is a ABCD session or an SX session
+                        self.is_abcd = ("Observables" in os.listdir(f"{arg[0]}/")) and (
+                            "QualityCode_bS.nc" not in os.listdir(f"{arg[0]}/Observables/"))
+                        self.is_sx = not self.is_abcd
+                        
+                        # Create a new file
+                        if self.is_abcd:
+                            self.df = find_datapoints_abcd(arg[0])
+                        else:
+                            self.df = find_datapoints_sx(arg[0])
+                else:
+                    self.__init__(DATA_PATH)
 
         else:
-            self.df = pd.read_csv(DATA_PATH, skiprows=1)
-
-            # Check if it is a ABCD session or an SX session
-            self.is_abcd = "A" in self.df.band.to_list()
-            self.is_sx = not self.is_abcd
+            self.df.__init__(DATA_PATH)
     
     def __len__(self):
         # Get the amount of rows (data points) in the data object

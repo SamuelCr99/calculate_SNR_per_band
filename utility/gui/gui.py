@@ -80,9 +80,6 @@ def run_gui():
     # Launch the GUI window
     sg.theme("DarkGrey5")
     sg.SetOptions(font=("Andalde Mono", 12))
-
-    # Retrieve config
-    config = StationsConfigWrapper()
     
     # Create the main GUI window
     layout = create_layout()
@@ -102,6 +99,7 @@ def run_gui():
     # Static variables for the event loop
     dir = ""
     data = None
+    config = None
     source_dict = {}
     source = ""
     source_model = None
@@ -135,10 +133,9 @@ def run_gui():
                 main_window.refresh()
 
                 # Load data (takes time)
-                data = DataWrapper(new_dir)
                 try:
-                    pass
-                    # data = DataWrapper(new_dir)
+                    data = DataWrapper(new_dir)
+                    config = StationsConfigWrapper(session_dir=new_dir)
                 except:
                     sg.Popup("Something went wrong! Please select a valid vgosDB directory.",
                              icon="images/favicon.ico")
@@ -201,11 +198,11 @@ def run_gui():
             main_window.write_event_value("plot", True)
 
         # Save the stations info config
-        if event == "Save":
+        if event == "Save" and config:
             config.save()
 
         # Restore to saved stations info config
-        if event == "Restore":
+        if event == "Restore" and config:
             a = sg.popup_yes_no(
                 "Restoring will remove all unsaved configurations. Do you wish to continue?",
                 icon="images/favicon.ico")
@@ -223,7 +220,7 @@ def run_gui():
                 main_window.refresh()
         
         # Delete configuration and re-generate config file
-        if event == "Delete":
+        if event == "Delete" and config:
             a = sg.popup_yes_no(
                 "Deleting will remove all configurations set. Do you wish to continue?",
                 icon="images/favicon.ico")
@@ -252,7 +249,7 @@ def run_gui():
 
         # Close the program and save config
         if event == sg.WIN_CLOSE_ATTEMPTED_EVENT or event == "Exit":
-            if config.has_changed():
+            if config and config.has_changed():
                 a,_ = sg.Window("Unsaved changes", [[sg.Text("You have unsaved changes. Do you wish to save?")],
                                                     [sg.Button("Yes",k="Yes"),sg.Button("No",k="No"),sg.Button("Cancel",k="Cancel")]], finalize=True, icon="images/favicon.ico", modal=True).read(close=True)
                 if a == "Yes":

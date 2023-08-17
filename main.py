@@ -46,8 +46,8 @@ if __name__ == "__main__":
         plot_parser.add_argument('--model', type=str, help="which model to use for prediction. Can be either 'img' or 'raw', or unspecified", default="img")
         plot_parser.add_argument('--scale_uv', type=float, help="the scale used to adjust the model in the u-v plane", default=1)
         plot_parser.add_argument('--scale_flux', type=float, help="the scale used to adjust the model in the flux density", default=1)
-        plot_parser.add_argument('--data', type=str, help="relative or absolute path to the data file to use", default="")
-        plot_parser.add_argument('--config', type=str, help="relative or absolute path to the config file to use", default="")
+        plot_parser.add_argument('--data', type=str, help="relative or absolute path to the data file to use. Only needed if other than default", default="")
+        plot_parser.add_argument('--config', type=str, help="relative or absolute path to the config file to use. Only needed if other than default", default="")
         plot_parser.add_argument('--save_dir', type=str, help="relative or absolute path to save plots to", default="")
 
         lsf_parser.add_argument('--fits_file', type=str, help="relative or absolute path to the fits file. Mandatory to have one of fits_file or fits_folder")
@@ -63,8 +63,8 @@ if __name__ == "__main__":
         lsf_parser.add_argument('--ignored_stations', type=str, help="comma separated list of stations to ignore", default=[])
         lsf_parser.add_argument('--baselines', type=str, help="comma separated list of stations to include", default=[])
         lsf_parser.add_argument('--ignored_baselines', type=str, help="comma separated list of stations to ignore", default=[])
-        lsf_parser.add_argument('--data', type=str, help="relative or absolute path to the data file to use", default="")
-        lsf_parser.add_argument('--config', type=str, help="relative or absolute path to the config file to use", default="")
+        lsf_parser.add_argument('--data', type=str, help="relative or absolute path to the data file to use. Only needed if other than default", default="")
+        lsf_parser.add_argument('--config', type=str, help="relative or absolute path to the config file to use. Only needed if other than default", default="")
 
         args = parser.parse_args()
 
@@ -93,7 +93,7 @@ if __name__ == "__main__":
                     path = f"{dir}config.csv"
                 else:
                     path = ""
-                config = StationsConfigWrapper(path)
+                config = StationsConfigWrapper(args.session_dir, path)
                 config.delete()
 
         elif args.mode == "plot":
