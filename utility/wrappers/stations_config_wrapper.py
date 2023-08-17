@@ -6,23 +6,32 @@ CONFIG_PATH = "data/derived/config.csv"
 class StationsConfigWrapper:
 
     def __init__(self, *arg):
-        if not arg:
+        if not arg or not arg[0]:
             try:
                 self.df = pd.read_csv(CONFIG_PATH)
+                self.path = CONFIG_PATH
             except:
                 create_config()
                 self.df = pd.read_csv(CONFIG_PATH)
+                self.path = CONFIG_PATH
         else:
             if type(arg[0]) == pd.DataFrame:
                 self.df = arg[0]
+                self.path = arg[1]
 
             elif type(arg[0]) == str:
-                self.df = pd.read_csv(arg[0])
+                try:
+                    self.df = pd.read_csv(arg[0])
+                    self.path = arg[0]
+                except:
+                    create_config(arg[0])
+                    self.df = pd.read_csv(arg[0])
+                    self.path = arg[0]
             
         self.df_copy = self.df.copy(deep=True)
     
     def save(self, path=""):
-        save_path = CONFIG_PATH if path == "" else path
+        save_path = self.path if path == "" else path
         self.df.to_csv(save_path, index=False)
         self.df_copy = self.df.copy(deep=True)
 
@@ -30,8 +39,8 @@ class StationsConfigWrapper:
         self.df = self.df_copy.copy(deep=True)
     
     def delete(self):
-        create_config()
-        self.df = pd.read_csv(CONFIG_PATH)
+        create_config(self.path)
+        self.df = pd.read_csv(self.path)
         self.df_copy = self.df.copy(deep=True)
 
     def has_changed(self):
@@ -69,7 +78,7 @@ class StationsConfigWrapper:
     def get_deselected_stations(self):
         return self.df.loc[self.df["selected"] == 0]["name"].to_list()
 
-def create_config():
+def create_config(*arg):
     """
     Finds stations and their SEFD
 
@@ -79,6 +88,8 @@ def create_config():
     Returns:
     No return values!
     """
+    path = arg[0] if arg and arg[0] else CONFIG_PATH
+
     station_sefds = pd.read_csv(
         'data/standard/equip.cat', delim_whitespace=True)[['Antenna', 'X_SEFD', 'S_SEFD']]
 
@@ -99,8 +110,9 @@ def create_config():
     joined_df["selected"] = [1]*len(joined_df["name"])
 
     # Write to csv file
-    data_folders = os.listdir('data/')
-    if 'derived' not in data_folders:
-        os.mkdir('data/derived')
+    if not arg:
+        data_folders = os.listdir('data/')
+        if 'derived' not in data_folders:
+            os.mkdir('data/derived')
 
-    joined_df.to_csv(CONFIG_PATH, index=False)
+    joined_df.to_csv(path, index=False)
