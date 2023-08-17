@@ -131,8 +131,8 @@ if __name__ == "__main__":
             if type(args.ignored_stations) == str:
                 ignored_stations = args.ignored_stations.split(",")
 
-            data = DataWrapper(args.session_folder)
-            config = StationsConfigWrapper()
+            data = DataWrapper(args.data)
+            config = StationsConfigWrapper(path=args.config)
 
             if args.fits_file:
                 source_model = SourceModelWrapper(args.fits_file, model=args.model, scale_uv=args.scale_uv, scale_flux=args.scale_flux)
@@ -141,7 +141,7 @@ if __name__ == "__main__":
                 source_model = model_source_map(data.get(sources=args.sources, bands=args.bands, ignored_stations=args.ignored_stations), args.fits_folder)
             
             least_square_fit(data.get(sources=args.sources, bands=args.bands, ignored_stations=args.ignored_stations), source_model, config)
-            config.save(args.save_dir)
+            config.save()
 
         else:
             raise ValueError("Unknown mode, please select plot or lsf")
