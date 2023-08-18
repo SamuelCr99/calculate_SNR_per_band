@@ -18,7 +18,7 @@ Ryder during a summer internship in 2023.
 
 The project is divided into two parts: band-data preparation and least-squares-fitting of SEFD values.
 
-The band-data preparation is preparation of data for each of the A, B, C and D bands, which the vgos session records on. Recorded data is either provided for each of the 32 channels that are separately, or for all of the channels combined. Thus, the data need to be recalculated if you want the quantities that are given for all channels combined to be given for each band separately.
+The band-data preparation is preparation of data for each of the A, B, C and D bands, which the VGOS session records on. Recorded data is either provided for each of the 32 channels that are separately, or for all of the channels combined. Thus, the data need to be recalculated if you want the quantities that are given for all channels combined to be given for each band separately.
 
 Least-squares-fitting of SEFD values uses a model of a source and combines that with the SNR values for each band, to try and find the correct SEFD values for the stations in the session.
 
@@ -40,7 +40,7 @@ Theoretically, you can get the predicted SNR from a flux density model of a sour
 
 $$SNR_{pred,band} = \eta\frac{flux\ density_{band}}{\sqrt{SEFD_i\cdot SEFD_j}}\sqrt{sample\ rate\cdot integration\ time},$$
 
-where the $sample\ rate$ and $integration\ time$ can be found in the vgosDB, and the constant $\eta=0.617502$ for vgos sessions. The SEFD values need to be known for both stations involved in the observation. When plotting the flux density for a session and a source, this equation is turned around to solve for flux density instead of SNR, and the measured SNR is used instead of the predicted.
+where the $sample\ rate$ and $integration\ time$ can be found in the vgosDB, and the constant $\eta=0.617502$ for VGOS sessions. The SEFD values need to be known for both stations involved in the observation. When plotting the flux density for a session and a source, this equation is turned around to solve for flux density instead of SNR, and the measured SNR is used instead of the predicted.
 
 ### Least-squares-fit calculations
 
@@ -154,7 +154,7 @@ the "Configuration" tab.
 
 The script mode uses three commands:
 
-* `prepare`: Prepares the band-data from a vgos session, as well as prepare a config-file containing the SEFD-values for all the stations present in the session.
+* `prepare`: Prepares the band-data from a VGOS session, as well as prepare a config-file containing the SEFD-values for all the stations present in the session.
 * `plot`: Uses the prepared data and config file to generate plots for specific sources. There are four kinds of plots that can be created, depending on what other flags are provided:
     * A plot of the flux density, calculated from the measured SNR and the SEFD values of the stations.
     * A plot of the flux density, as predicted by a model.
@@ -168,7 +168,7 @@ More information of which variables and flags are available for the different co
 $ python3 main.py <command> --help
 ```
 
-### Preparing a vgos session
+### Preparing a VGOS session
 
 In order to prepare the band-data from a session, the following command should be run
 
@@ -192,7 +192,7 @@ By default, the data is saved in the directory `data/derived`. If you want to sa
 
 ### Plotting
 
-One of the main uses of this utility is the ability to make plots of sources from data obtained in vgos (or S-X) sessions. After having prepared the session, this can be done by running the command
+One of the main uses of this utility is the ability to make plots of sources from data obtained in VGOS (or S-X) sessions. After having prepared the session, this can be done by running the command
 
 ```bash
 $ python3 main.py plot <source>
@@ -243,7 +243,7 @@ All flags mentioned in the __Plotting__ can be used to specify which data should
 
 ## Acknowledgements
 
-The data supplied in this project comes from Goddard Space Flight Center. The calculations to convert vgos session data from single band to multiple bands was made by John Gipson of NVI Inc., as well as the equations for the least-squares-fit.
+The data supplied in this project comes from Goddard Space Flight Center. The calculations to convert VGOS session data from single band to multiple bands was made by John Gipson of NVI Inc., as well as the equations for the least-squares-fit.
 
 ## Known issues and limitations
 * The scaling of the source model in the u-v coordinates as well as in the flux density is incosistent with the flux density obtained by the measured SNR.
