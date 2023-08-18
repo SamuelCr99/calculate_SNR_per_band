@@ -241,6 +241,9 @@ $ python3 main.py lsf <source> <fits_file>
 
 All flags mentioned in the __Plotting__ can be used to specify which data should be used, and if/how the model should be modified. The only exceptions are the `--save_dir` flag, as `lsf` always updates the config file provided, and the `--fits_file` flag, as this is a required argument instead.
 
+## Acknowledgements
+
+The data supplied in this project comes from Goddard Space Flight Center. The calculations to convert vgos session data from single band to multiple bands was made by John Gipson of NVI Inc., as well as the equations for the least-squares-fit.
 
 ## Known issues and limitations
 * The scaling of the source model in the u-v coordinates as well as in the flux density is incosistent with the flux density obtained by the measured SNR.
