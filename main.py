@@ -27,12 +27,16 @@ if __name__ == "__main__":
         subparsers.metavar = ""
 
         prepare_parser = subparsers.add_parser('prepare', help="prepare the session data for analysis")
+        list_parser = subparsers.add_parser('list', help="list quantities from a session")
         plot_parser = subparsers.add_parser('plot', help="plot flux density in u-v coordinates of a source")
         lsf_parser = subparsers.add_parser('lsf', help="find the SEFD values of the stations using least-squares-fit")
 
         prepare_parser.add_argument('type', type=str, help="type of information to process, either 'band-data', 'SEFD' or 'all'")
         prepare_parser.add_argument('session_dir', type=str, help="relative or absolute path to the session folder")
         prepare_parser.add_argument('--save_dir', type=str, help="relative or absolute path to save the prepared data to", default="")
+
+        list_parser.add_argument('type', type=str, help="type of information to display, either 'sources', 'bands' or 'stations'")
+        list_parser.add_argument('--data', type=str, help="relative or absolute path to the data file to use. Only needed if other than default", default="")
 
         plot_parser.add_argument('source', type=str, help="source name or comma separated list of sources")
         plot_parser.add_argument('--bands', type=str, help="band name or comma separated list of bands", default=[])
@@ -93,6 +97,20 @@ if __name__ == "__main__":
                     path = ""
                 config = StationsConfigWrapper(session_dir=args.session_dir, path=path)
                 config.delete()
+
+        elif args.mode == "list":
+            data = DataWrapper(args.data)
+            
+            print_data = []
+            if args.type == "sources":
+                print_data = data.get_sources()
+            elif args.type == "bands":
+                print_data = data.get_bands()
+            elif args.type == "stations":
+                print_data = data.get_stations()
+
+            for elem in print_data:
+                print(elem)
 
         elif args.mode == "plot":
 

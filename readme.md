@@ -152,9 +152,10 @@ the "Configuration" tab.
 
 ## How to use the script mode
 
-The script mode uses three commands:
+The script mode uses four commands:
 
 * `prepare`: Prepares the band-data from a VGOS session, as well as prepare a config-file containing the SEFD-values for all the stations present in the session.
+* `list`: Uses the prepared data and lists different quantities about the session.
 * `plot`: Uses the prepared data and config file to generate plots for specific sources. There are four kinds of plots that can be created, depending on what other flags are provided:
     * A plot of the flux density, calculated from the measured SNR and the SEFD values of the stations.
     * A plot of the flux density, as predicted by a model.
@@ -190,6 +191,18 @@ $ python3 main.py prepare all <session_dir>
 
 By default, the data is saved in the directory `data/derived`. If you want to save the data somewhere else for processing, you can use the `--save_dir` flag to specify the directory. The files are always named `datapoints.csv` and `config.csv`, and are CSV files.
 
+### Listing session information
+
+When plotting and doing a least-squares-fit you will need to select a source, and possibly select or exclude other information. You can therefore display different information using the list command
+
+```bash
+$ python3 main.py list <type>
+```
+
+where `type` is either `sources`, `bands` or `stations`.
+
+If you chose to prepare the data file in a different location than the default, you can specify the path to this file using the `--data` flag.
+
 ### Plotting
 
 One of the main uses of this utility is the ability to make plots of sources from data obtained in VGOS (or S-X) sessions. After having prepared the session, this can be done by running the command
@@ -198,7 +211,7 @@ One of the main uses of this utility is the ability to make plots of sources fro
 $ python3 main.py plot <source>
 ```
 
-where `source` is the B1950 name of the source. The available sources can be found by checking the list in the GUI, or by looking in the data file that was prepared.
+where `source` is the B1950 name of the source.
 
 Different flags can adjust which observations should be included. This is useful if you for example want to look at a single band, or if you want to exclude a specific station. The flags are
 * `--bands` to only look at specific bands
@@ -229,7 +242,7 @@ If you want to get a plot of the flux density from a source model, or you want t
 * `--scale_uv` specifies a scaling factor for the model in the u-v coordinates
 * `--scale_flux` specifies a scaling factor for the flux density of the model
 
-Fits file can be downloaded from https://astrogeo.org/vlbi_images/.
+FITS-files can be downloaded from https://astrogeo.org/vlbi_images/.
 
 ### Least-squares-fit of SEFD values
 

@@ -278,8 +278,22 @@ class DataWrapper:
         datapoints_csv = f"Generated from vgosDB: {session}\n" + self.df.to_csv(index=False)
         with open(path, "w") as file:
             file.write(datapoints_csv)
-    
 
+    def get_sources(self):
+        sources = list(set(self.df.Source.to_list()))
+        sources.sort()
+        return sources
+    
+    def get_bands(self):
+        bands = list(set(self.df.band.to_list()))
+        bands.sort()
+        return bands
+    
+    def get_stations(self):
+        stations = list(set(self.df.Station1.to_list() + self.df.Station2.to_list()))
+        stations.sort()
+        return stations
+    
 def bytes_to_string(bytes):
     # Converts a list of byte characters to a string
     string = ""
