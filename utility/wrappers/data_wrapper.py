@@ -276,6 +276,7 @@ class DataWrapper:
         else:
             path = DATA_PATH
 
+        self.df.reset_index(inplace=True, drop=True)
         datapoints_csv = f"Generated from vgosDB: {session}\n" + self.df.to_csv(index=False)
         with open(path, "w") as file:
             file.write(datapoints_csv)

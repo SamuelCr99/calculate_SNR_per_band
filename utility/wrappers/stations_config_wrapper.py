@@ -4,13 +4,14 @@ import netCDF4 as nc
 import numpy as np
 
 ROOT_PATH = "/".join(os.path.dirname(__file__).replace("\\","/").split("/")[0:-2]) + "/"
-CONFIG_PATH = ROOT_PATH + "data/derived/config.csv"
+CONFIG_PATH = ROOT_PATH + "data/derived/config_"
 
 class StationsConfigWrapper:
 
     def __init__(self, session_dir="", path=""):
         self.session_dir = session_dir
-        self.path = path if path else CONFIG_PATH
+        self.session_name = session_dir.replace("\\","/").split("/")[-1]
+        self.path = path if path else CONFIG_PATH + self.session_name + ".csv"
 
         try:
             self.df = pd.read_csv(self.path)
@@ -56,6 +57,7 @@ class StationsConfigWrapper:
         self.df.loc[self.df.name == station,"selected"] = 0
     
     def is_selected(self, station):
+        print(station)
         return self.df.loc[self.df.name == station,"selected"].iloc[0]
 
     def toggle(self, station):
