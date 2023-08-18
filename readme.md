@@ -155,9 +155,25 @@ If you chose to prepare the data and config files in a different location than t
 
 Plots can also be saved instead of shown. This happens if you specify a `--save_dir`.
 
+#### Plotting prediction model
+
+If you want to get a plot of the flux density from a source model, or you want to get a plot of the ratio between the predicted and measured flux density, you need to provide a FITS-file that the program can construct a model from. This is done by providing the `--fits_file` flag and then the path to the file. The model can be modified using different flags.
+* `--model` specifies which algorithm should be used to generate the model. The options are `img` or `raw`. The default is `img`, and this is currently the recommended one
+* `--scale_uv` specifies a scaling factor for the model in the u-v coordinates
+* `--scale_flux` specifies a scaling factor for the flux density of the model
+
 ### Least-squares-fit of SEFD values
 
+The data from a session as well as a model of a source can be used to fit the SEFD values of the stations involved in the session. This is done by running
 
+```bash
+$ python3 main.py lsf <source> <fits_file>
+```
+
+All flags mentioned in the __Plotting__ can be used to specify which data should be used, and if/how the model should be modified. The only exceptions are the `--save_dir` flag, as `lsf` always updates the config file provided, and the `--fits_file` flag, as this is a required argument instead.
 
 ## Known issues and limitations
-* Scaling of flux density between predicted and measured is inconsistent. 
+* The scaling of the source model in the u-v coordinates as well as in the flux density is incosistent with the flux density obtained by the measured SNR.
+* The source model predicts very different shapes of the same source between sessions, even when the time between sessions is short.
+* Least-squares-fitting can only be done on a single source in a given session. Ideally, this should be done using all sources (or a subset thereof) available in the session at the same time.
+* SEFD values are considered to be constant for a given session. However, SEFD values are known to vary with the elevation of the telescope.
