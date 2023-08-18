@@ -57,7 +57,6 @@ class StationsConfigWrapper:
         self.df.loc[self.df.name == station,"selected"] = 0
     
     def is_selected(self, station):
-        print(station)
         return self.df.loc[self.df.name == station,"selected"].iloc[0]
 
     def toggle(self, station):
