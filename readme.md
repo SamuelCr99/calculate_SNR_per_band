@@ -1,7 +1,12 @@
+<script
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+  type="text/javascript">
+</script>
+
 # Source model evaluation tool
 
 ## Description
-Application for finding optimal SEFD values based on VGOS DB sessions and source images. 
+Application for retrieving SNR, u-v corrdinates and flux density for the A, B, C and D bands from a VGOS session, and for finding optimal SEFD values based on VGOS sessions and source images. 
 The program was developed at NVI Inc. by Filip Herbertsson and Samuel Collier 
 Ryder during a summer internship in 2023.
 
@@ -10,6 +15,68 @@ Ryder during a summer internship in 2023.
 
 
 ## Approach
+
+The project is divided into two parts: band-data preparation and least-squares-fitting of SEFD values.
+
+The band-data preparation is preparation of data for each of the A, B, C and D bands, which the vgos session records on. Recorded data is either provided for each of the 32 channels that are separately, or for all of the channels combined. Thus, the data need to be recalculated if you want the quantities that are given for all channels combined to be given for each band separately.
+
+Least-squares-fitting of SEFD values uses a model of a source and combines that with the SNR values for each band, to try and find the correct SEFD values for the stations in the session.
+
+### Band-data calculations
+
+In order to get the SNR for each of the bands, $SNR_{meas,band}$, we use the SNR that is calculated for all of the bands combined, $SNR_{meas}$, as well as the complex amplitude $V_i$ for each of the channels. We use the equation
+
+$$SNR_{meas,band} = SNR_{meas,vgosDB}\frac{|\sum_i^N V_i|}{|\sum_i^M V_i|}\sqrt{\frac{M}{N}},$$
+
+where $M$ is the total number of channels and $N$ is the number of channels in the band that we are looking for. Important to note is that, although ideally we record on 32 channels with 8 channels per band, sometimes we don't have data for all of the channels.
+
+The u-v coordinates for each observation are converted using the relation
+
+$$u_{vgosDB}\cdot\lambda_{vgosDB} = u_{band}\cdot\lambda_{band},$$
+
+where $u_{vgosDB}$ and $u_{band}$ are the u-coordinates for all bands combined and for a single band respectively, $\lambda_{vgosDB}$ and $\lambda_{band}$ are the average wavelength of all bands combined and of a single band respectively. In order to calculate the v-coordinate, a similar equation is used. This relation was tested against using the coordinates of the observing stations in the terrestrial reference frame and their direction in the sky when looking at the source to calculate the u-v coordinates, and it appeared to agree closely.
+
+Theoretically, you can get the predicted SNR from a flux density model of a source by using the following equation
+
+$$SNR_{pred,band} = \eta\frac{flux\ density_{band}}{\sqrt{SEFD_i\cdot SEFD_j}}\sqrt{sample\ rate\cdot integration\ time},$$
+
+where the $sample\ rate$ and $integration\ time$ can be found in the vgosDB, and the constant $\eta=0.617502$ for vgos sessions. The SEFD values need to be known for both stations involved in the observation. When plotting the flux density for a session and a source, this equation is turned around to solve for flux density instead of SNR, and the measured SNR is used instead of the predicted.
+
+### Least-squares-fit calculations
+
+As a starting point, the SEFD values for a station is taken from the sked catalog, with the SEFD for the A-band being the SEFD for the X-band and the SEFDs for the B, C and D bands being the SEFD for the S-band.
+
+We start by defining the quantity $SNR_{bit}$ as
+
+$$SNR_{bit} = \frac{SNR}{\sqrt{sample\ rate\cdot integration\ time}} = \eta\frac{flux\ density}{\sqrt{SEFD_i\cdot SEFD_j}}$$
+
+From here on, we will refer to $SNR_{bit}$ as $SNR$. We want to minimize the quantity
+
+$$D_{n} = \ln{(SNR_{true})} - \ln{(SNR_{meas})},$$
+
+where $i$ and $j$ represent the two stations involved in the observation, $n$ is the observation, $SNR_{true}$ is the true SNR and $SNR_{meas}$ is the measured SNR. However we don't know what $SNR_{true}$ is. Instead, we have to use the predicted SNR $SNR_{pred}$ form our model, and rewrite the equation to
+
+$$D_{n} = \ln{\left(\frac{SNR_{pred}}{SNR_{meas}}\right)_{i,j}} - p_i - p_j,$$
+
+where $p_i$ and $p_j$ are correction factors that we can use to modify the SEFD values of the stations according to
+
+$$SEFD_{true,i} = SEFD_{sked,i}e^{2p_i}.$$
+
+This should be the true SEFD value of the station $i$. We want to minimize the quantity
+
+$$\sum_n D_{n}(p)^2,$$
+
+and we do so by solving the system of equations described by
+
+$$NP = B.$$
+
+Here, $P$ is the vector of the values $p_i$ for the stations. $N$ is a matrix where the elements are
+
+$$N_{i,j} = \begin{cases}\text{number of observations involving antenna}\ i\quad &\text{if}\ i=j\\ \text{number of observations involving antenna}\ i\ \text{and}\ j\quad &\text{if}\ i\neq j\end{cases}.$$
+
+and $B$ is a vector where the elements are
+
+$$B_k = \sum_n\log\left(\frac{SNR_{pred}}{SNR_{meas}}\right)_{i,j}\ \text{where}\ k=i\ \text{or}\ k=j$$
 
 ## How to install
 
