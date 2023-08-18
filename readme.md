@@ -229,6 +229,8 @@ If you want to get a plot of the flux density from a source model, or you want t
 * `--scale_uv` specifies a scaling factor for the model in the u-v coordinates
 * `--scale_flux` specifies a scaling factor for the flux density of the model
 
+Fits file can be downloaded from https://astrogeo.org/vlbi_images/.
+
 ### Least-squares-fit of SEFD values
 
 The data from a session as well as a model of a source can be used to fit the SEFD values of the stations involved in the session. This is done by running
@@ -238,6 +240,7 @@ $ python3 main.py lsf <source> <fits_file>
 ```
 
 All flags mentioned in the __Plotting__ can be used to specify which data should be used, and if/how the model should be modified. The only exceptions are the `--save_dir` flag, as `lsf` always updates the config file provided, and the `--fits_file` flag, as this is a required argument instead.
+
 
 ## Known issues and limitations
 * The scaling of the source model in the u-v coordinates as well as in the flux density is incosistent with the flux density obtained by the measured SNR.
