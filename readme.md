@@ -89,13 +89,11 @@ $ pip install -r requirements.txt
 ```
 
 ## How to use the GUI
-To run the program, run the main.py file: 
+To run the program, run the main.py file. If you are in the root directory of the repository, this is done by:
 
 ```bash
 $ python3 main.py
 ```
-
-Make sure this is done from the root directory of the repository, if not the program will not be able to find the required files.
 
 ### Load data
 
@@ -231,7 +229,7 @@ $ python3 main.py plot 1803+784 --bands A --ignored_stations KOKEE12M,ISHIOKA
 
 which should plot the source __1803+784__ in the __A__ band, ignoring data obtained by stations __KOKEE12M__ and __ISHIOKA__.  
 
-If you chose to prepare the data and config files in a different location than the default, you can specify the paths to these files using the `--data` and `--config` flags respectively. This would be the full paths, not only the directory.
+If you chose to prepare the data and config files in a different location than the default, you can specify the paths to these files using the `--data` and `--config` flags respectively. This would be the paths, not only the directory.
 
 Plots can also be saved instead of shown. This happens if you specify a `--save_dir`.
 

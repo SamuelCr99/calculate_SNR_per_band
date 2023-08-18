@@ -3,7 +3,8 @@ import os
 import netCDF4 as nc
 import numpy as np
 
-CONFIG_PATH = "data/derived/config.csv"
+ROOT_PATH = "/".join(os.path.dirname(__file__).replace("\\","/").split("/")[0:-2]) + "/"
+CONFIG_PATH = ROOT_PATH + "data/derived/config.csv"
 
 class StationsConfigWrapper:
 
@@ -78,13 +79,15 @@ def create_config(session_dir, path):
     Returns:
     No return values!
     """
+    standard_path = ROOT_PATH + "data/standard/"
+
     if session_dir[-1] != '/': session_dir += '/'
     station_list_path = f"{session_dir}Apriori/Station.nc"
     station_array = np.ma.getdata(nc.Dataset(station_list_path)["AprioriStationList"]).tolist()
     station_list = list(map(lambda stat: bytes_to_string(stat), station_array))
 
     station_sefds = pd.read_csv(
-        'data/standard/equip.cat', delim_whitespace=True)[['Antenna', 'X_SEFD', 'S_SEFD']]
+        f'{standard_path}equip.cat', delim_whitespace=True)[['Antenna', 'X_SEFD', 'S_SEFD']]
 
     station_sefds['A_SEFD'] = station_sefds['S_SEFD']
     station_sefds['B_SEFD'] = station_sefds['X_SEFD']
@@ -92,7 +95,7 @@ def create_config(session_dir, path):
     station_sefds['D_SEFD'] = station_sefds['X_SEFD']
 
     station_locations = pd.read_csv(
-        'data/standard/position.cat', delim_whitespace=True)[['Name', 'X', 'Y', 'Z', 'Lat', 'Lon']]
+        f'{standard_path}position.cat', delim_whitespace=True)[['Name', 'X', 'Y', 'Z', 'Lat', 'Lon']]
     joined_df = pd.merge(station_locations, station_sefds,
                          left_on='Name', right_on='Antenna')
     joined_df = joined_df.drop(columns=['Antenna','X','Y','Z','Lat','Lon'])
@@ -106,9 +109,9 @@ def create_config(session_dir, path):
 
     # Write to csv file
     if path == CONFIG_PATH:
-        data_folders = os.listdir('data/')
+        data_folders = os.listdir(f'{ROOT_PATH}data')
         if 'derived' not in data_folders:
-            os.mkdir('data/derived')
+            os.mkdir(f'{ROOT_PATH}data/derived')
 
     joined_df.to_csv(path, index=False)
 

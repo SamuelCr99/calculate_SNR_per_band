@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from utility.gui.gui import run_gui
 from utility.wrappers.data_wrapper import DataWrapper
 from utility.plot.plot_source import plot_source
-from utility.calc.least_square_fit import least_square_fit, model_source_map
+from utility.calc.least_square_fit import least_square_fit
 from utility.wrappers.stations_config_wrapper import StationsConfigWrapper
 from utility.wrappers.source_model_wrapper import SourceModelWrapper
 

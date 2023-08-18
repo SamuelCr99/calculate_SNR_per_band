@@ -13,6 +13,9 @@ from utility.wrappers.source_model_wrapper import SourceModelWrapper
 from utility.wrappers.data_wrapper import DataWrapper
 from utility.wrappers.stations_config_wrapper import StationsConfigWrapper
 
+ROOT_PATH = "/".join(os.path.dirname(__file__).replace("\\","/").split("/")[0:-2]) + "/"
+FAVICON_PATH = ROOT_PATH + "images/favicon.ico"
+
 def repack(widget, option):
     pack_info = widget.pack_info()
     pack_info.update(option)
@@ -70,13 +73,6 @@ def run_gui():
     Returns:
     No return values
     """
-
-    # Check that script is run from correct directory
-    folders = os.listdir()
-    if "data" not in folders:
-        raise Exception("Data folder not found, make sure script is being run from correct path")
-
-
     # Launch the GUI window
     sg.theme("DarkGrey5")
     sg.SetOptions(font=("Andalde Mono", 12))
@@ -85,7 +81,7 @@ def run_gui():
     layout = create_layout()
     main_window = sg.Window('Quasar Viewer', layout,
                             margins=[0, 0], resizable=True, finalize=True,
-                            icon="images/favicon.ico", enable_close_attempted_event=True)
+                            icon=FAVICON_PATH, enable_close_attempted_event=True)
     main_window.TKroot.minsize(1320, 895)
     main_window["scale_uv"].bind("<Return>", "_enter")
     main_window["scale_flux"].bind("<Return>", "_enter")
@@ -125,7 +121,7 @@ def run_gui():
         # Open the vgosDB
         if event == "Open session":
 
-            new_dir = askdirectory(initialdir="data/sessions")
+            new_dir = askdirectory(initialdir=ROOT_PATH + "data/sessions")
             if new_dir != dir and new_dir:
                 # Tell the user that we are loading data
                 main_window["loading_text"].update(value="Loading...")
@@ -138,7 +134,7 @@ def run_gui():
                     config = StationsConfigWrapper(session_dir=new_dir)
                 except:
                     sg.Popup("Something went wrong! Please select a valid vgosDB directory.",
-                             icon="images/favicon.ico")
+                             icon=FAVICON_PATH)
                     main_window["loading_text"].update(value="")
                     main_window.set_title(f"Quasar Viewer")
                     main_window.refresh()
@@ -176,7 +172,7 @@ def run_gui():
 
         # Open fits file
         if event == "Open fits":
-            new_dir = askopenfilename(initialdir="data/fits")
+            new_dir = askopenfilename(initialdir=ROOT_PATH + "data/fits")
 
             # Tell the user that we are loading data
             main_window["loading_text"].update(value="Loading...")
@@ -186,7 +182,7 @@ def run_gui():
                 source_model = SourceModelWrapper(new_dir, model=source_model_type)
             except:
                 sg.Popup("Something went wrong! Please select a valid fits file.",
-                             icon="images/favicon.ico")
+                             icon=FAVICON_PATH)
 
             source_model_dir = new_dir
             main_window["loading_text"].update(value="")
@@ -205,7 +201,7 @@ def run_gui():
         if event == "Restore" and config:
             a = sg.popup_yes_no(
                 "Restoring will remove all unsaved configurations. Do you wish to continue?",
-                icon="images/favicon.ico")
+                icon=FAVICON_PATH)
             if a == "Yes":
                 config.restore()
 
@@ -223,7 +219,7 @@ def run_gui():
         if event == "Delete" and config:
             a = sg.popup_yes_no(
                 "Deleting will remove all configurations set. Do you wish to continue?",
-                icon="images/favicon.ico")
+                icon=FAVICON_PATH)
             if a == "Yes":
                 config.delete()
 
@@ -239,19 +235,19 @@ def run_gui():
 
         # Display about info
         if event == "About...":
-            with open("LICENSE.txt", "r") as f:
+            with open(ROOT_PATH + "LICENSE.txt", "r") as f:
                 license = f.read()
                 license = license.replace("\n\n", "\t")
                 license = license.replace("\n", " ")
                 license = license.replace("\t", "\n\n")
             sg.Popup("""GUI for finding optimal SEFD values based on VGOS DB sessions and source images. The program was developed at NVI Inc. by Filip Herbertsson and Samuel Collier Ryder during a summer internship in 2023.""" + "\n\n" + license,
-                     icon="images/favicon.ico")
+                     icon=FAVICON_PATH)
 
         # Close the program and save config
         if event == sg.WIN_CLOSE_ATTEMPTED_EVENT or event == "Exit":
             if config and config.has_changed():
                 a,_ = sg.Window("Unsaved changes", [[sg.Text("You have unsaved changes. Do you wish to save?")],
-                                                    [sg.Button("Yes",k="Yes"),sg.Button("No",k="No"),sg.Button("Cancel",k="Cancel")]], finalize=True, icon="images/favicon.ico", modal=True).read(close=True)
+                                                    [sg.Button("Yes",k="Yes"),sg.Button("No",k="No"),sg.Button("Cancel",k="Cancel")]], finalize=True, icon=FAVICON_PATH, modal=True).read(close=True)
                 if a == "Yes":
                     config.save()
                 if a == "Cancel":
@@ -404,7 +400,7 @@ def run_gui():
                                                        band_letter)],
                                                    [sg.Text("SEFD: ", s=(8, 1)), sg.Input(
                                                        default_text=orig_SEFD, key="new_SEFD_input"), sg.Button("Set", key="new_SEFD_set")],
-                                                   [sg.Text("Invalid input!", key="invalid_input", visible=False, text_color="red")]], finalize=True, icon="images/favicon.ico", modal=True)
+                                                   [sg.Text("Invalid input!", key="invalid_input", visible=False, text_color="red")]], finalize=True, icon=FAVICON_PATH, modal=True)
                 edit_popup["new_SEFD_input"].bind("<Return>", "_enter")
                 edit_popup["invalid_input"].hide_row()
                 edit_popup["new_SEFD_input"].set_focus()
@@ -457,7 +453,7 @@ def run_gui():
                     # Check maximum two highlights
                     if len(highlights) > 1:
                         sg.Popup("You can only select two highlights!",
-                                icon="images/favicon.ico")
+                                icon=FAVICON_PATH)
                         continue
                     highlights.append(selected_station)
 
@@ -475,10 +471,10 @@ def run_gui():
         # Catch events when no model has been set
         if (event == "set_scale_uv" or event == "set_scale_flux" or event == "set_scale_flux_auto" or event == "fit_SEFD" or event == "gauss"):
             if not source:
-                sg.Popup("No source selected.", icon="images/favicon.ico")
+                sg.Popup("No source selected.", icon=FAVICON_PATH)
                 continue
             elif not source_model:
-                sg.Popup("No fits file selected.", icon="images/favicon.ico")
+                sg.Popup("No fits file selected.", icon=FAVICON_PATH)
                 continue
 
         if event == "set_scale_uv" or event == "scale_uv_enter":

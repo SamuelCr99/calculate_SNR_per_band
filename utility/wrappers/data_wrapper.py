@@ -11,7 +11,8 @@ BAND_A_B_LIM = 4500
 BAND_B_C_LIM = 6000
 BAND_C_D_LIM = 8000
 BAND_LETTERS = ["A","B","C","D","S","X"]
-DATA_PATH = "data/derived/datapoints.csv"
+ROOT_PATH = "/".join(os.path.dirname(__file__).replace("\\","/").split("/")[0:-2]) + "/"
+DATA_PATH = ROOT_PATH + "data/derived/datapoints.csv"
 
 class DataWrapper:
 
